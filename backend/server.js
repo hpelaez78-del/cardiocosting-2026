@@ -41,7 +41,9 @@ const isAllowedOrigin = (origin) => {
     const url = new URL(origin);
     const hostname = url.hostname;
     const host = url.host;
+
     const isLocalDevHost = ['localhost', '127.0.0.1', '0.0.0.0', '[::1]'].includes(hostname);
+    const isVercelHost = hostname.endsWith('.vercel.app'); // Permite el dominio principal y las vistas previas de Vercel
     const isPrivateNetworkHost =
       hostname.startsWith('10.') ||
       hostname.startsWith('192.168.') ||
@@ -62,7 +64,7 @@ const isAllowedOrigin = (origin) => {
       hostname.startsWith('172.30.') ||
       hostname.startsWith('172.31.');
 
-    return isLocalDevHost || isPrivateNetworkHost || host.startsWith('localhost:') || host.startsWith('127.0.0.1:');
+    return isLocalDevHost || isVercelHost || isPrivateNetworkHost || host.startsWith('localhost:') || host.startsWith('127.0.0.1:');
   } catch {
     return false;
   }

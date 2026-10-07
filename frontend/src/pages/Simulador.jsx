@@ -30,19 +30,25 @@ export default function Simulador() {
       }
     };
 
+    cargarConvenios();
+  }, []);
+
+  useEffect(() => {
     const cargarInsumos = async () => {
+      if (!selectedSede) {
+        setInsumosDetalle([]);
+        return;
+      }
       try {
-        const res = await api.get('/insumos');
-        const items = Array.isArray(res?.data) ? res.data : [];
-        setInsumosDetalle(items);
+        const res = await api.get('/insumos', { params: { sedeId: selectedSede } });
+        setInsumosDetalle(Array.isArray(res?.data) ? res.data : []);
       } catch (err) {
         console.error('No se pudieron cargar los insumos:', err);
       }
     };
 
-    cargarConvenios();
     cargarInsumos();
-  }, []);
+  }, [selectedSede]);
 
   const fetchData = async () => {
     try {
@@ -79,14 +85,17 @@ export default function Simulador() {
     evaluacion.map((item) => {
       const tarifaSimulada = Number(item.tarifaConvenio || 0) * (1 + incremento / 100);
       const margen = tarifaSimulada - Number(item.costoTotal || 0);
-      const volumenAfectado = Number(item.vol_mes || 0) * (1 + volumen / 100);
-      const balance = margen * volumenAfectado;
+      const volumenAfectado = item.vol_mes === null || item.vol_mes === undefined
+        ? null
+        : Number(item.vol_mes) * (1 + volumen / 100);
+      const balance = volumenAfectado === null ? null : margen * volumenAfectado;
       return { ...item, tarifaSimulada, margen, volumenAfectado, balance };
     }),
     [evaluacion, incremento, volumen]
   );
 
-  const totalBalance = filas.reduce((sum, item) => sum + Number(item.balance || 0), 0);
+  const tieneVolumenSede = evaluacion.length > 0 && evaluacion.every((item) => item.vol_mes !== null && item.vol_mes !== undefined);
+  const totalBalance = tieneVolumenSede ? filas.reduce((sum, item) => sum + Number(item.balance || 0), 0) : null;
 
   const toggleExamen = (id) => {
     setExpandedExamenes((prev) => ({
@@ -106,11 +115,13 @@ export default function Simulador() {
         </div>
         <div className="rounded-xl border border-lime-700 bg-lime-950/30 px-4 py-3 text-right text-lime-200">
           <div className="text-xs uppercase tracking-[0.2em] text-lime-300">Balance proyectado</div>
-          <div className="text-2xl font-bold">{new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(totalBalance || 0)}</div>
+          <div className="text-2xl font-bold">{totalBalance === null ? 'N/D' : new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(totalBalance)}</div>
         </div>
       </div>
 
       {error && <div className="mb-4 rounded border border-rose-900 bg-rose-950/40 p-3 text-sm text-rose-200">{error}</div>}
+      {!error && evaluacion.length > 0 && !tieneVolumenSede && <div role="status" className="mb-4 rounded border border-amber-700 bg-amber-950/40 p-3 text-sm text-amber-200">Falta cargar el volumen por examen para esta sede. Se muestran costos y márgenes unitarios; el balance total no está disponible.</div>}
+      {!error && evaluacion.some((item) => item.volumen_estimado) && <div role="status" className="mb-4 rounded border border-amber-700 bg-amber-950/40 p-3 text-sm text-amber-200">El volumen por examen se prorrateó desde la mezcla global. Confirme la distribución antes de usar el balance como resultado real.</div>}
 
       <div className="mb-6 grid gap-4 rounded-2xl border border-slate-700 bg-slate-800 p-4 md:grid-cols-4">
         <div>
@@ -140,7 +151,7 @@ export default function Simulador() {
         </div>
         <div>
           <label className="mb-2 block text-sm text-slate-300">Volumen %</label>
-          <input type="number" value={volumen} onChange={(e) => setVolumen(Number(e.target.value) || 0)} className="w-full rounded border border-slate-600 bg-slate-900 p-2 text-white" />
+          <input type="number" value={volumen} onChange={(e) => setVolumen(Number(e.target.value) || 0)} disabled={!tieneVolumenSede} className="w-full rounded border border-slate-600 bg-slate-900 p-2 text-white disabled:opacity-50" />
         </div>
       </div>
 
@@ -184,7 +195,7 @@ export default function Simulador() {
                     <td className={`p-3 font-semibold ${Number(item.margen || 0) >= 0 ? 'text-lime-400' : 'text-rose-400'}`}>
                       {new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(Number(item.margen || 0))}
                     </td>
-                    <td className="p-3 font-semibold text-white">{new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(Number(item.balance || 0))}</td>
+                    <td className="p-3 font-semibold text-white">{item.balance === null ? 'N/D' : new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(Number(item.balance || 0))}</td>
                   </tr>
 
                   {detalleInsumos.length > 0 && expandedExamenes[item.examenId] && (

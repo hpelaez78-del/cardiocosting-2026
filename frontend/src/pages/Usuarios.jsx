@@ -11,6 +11,7 @@ const MODULOS_PERMISO = [
   'dashboard',
   'sedes',
   'personal',
+  'equipos',
   'convenios',
   'insumos',
   'simulador',

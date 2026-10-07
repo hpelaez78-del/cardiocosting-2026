@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Boxes, Package2, Pencil, Plus, Trash2, TrendingUp } from 'lucide-react';
 import api from '../api/axiosConfig';
+import { useSedeContext } from '../context/SedeContext';
 
 const formatCOP = (value) =>
   new Intl.NumberFormat('es-CO', {
@@ -17,6 +18,7 @@ const emptyForm = {
 };
 
 export default function Insumos() {
+  const { selectedSede, sedes } = useSedeContext();
   const [insumos, setInsumos] = useState([]);
   const [examenes, setExamenes] = useState([]);
   const [form, setForm] = useState(emptyForm);
@@ -40,7 +42,11 @@ export default function Insumos() {
 
   const cargarInsumos = async () => {
     try {
-      const res = await api.get('/insumos');
+      if (!selectedSede) {
+        setInsumos([]);
+        return;
+      }
+      const res = await api.get('/insumos', { params: { sedeId: selectedSede } });
       const items = Array.isArray(res?.data) ? res.data : [];
       setInsumos(items);
     } catch (err) {
@@ -60,7 +66,7 @@ export default function Insumos() {
     };
 
     load();
-  }, []);
+  }, [selectedSede]);
 
   const resumen = useMemo(() => {
     const total = insumos.reduce((sum, item) => sum + Number(item.cantidad || 0) * Number(item.valor_unitario || 0), 0);
@@ -100,6 +106,7 @@ export default function Insumos() {
 
     try {
       const payload = {
+        sede_id: selectedSede,
         examen_id: form.examen_id,
         nombre_insumo: form.nombre_insumo,
         cantidad: Number(form.cantidad) || 1,
@@ -134,7 +141,7 @@ export default function Insumos() {
   const handleDelete = async (id) => {
     setError('');
     try {
-      await api.delete(`/insumos/${id}`);
+      await api.delete(`/insumos/${id}`, { params: { sedeId: selectedSede } });
       await cargarInsumos();
       if (editingId === id) resetForm();
     } catch (err) {
@@ -148,6 +155,7 @@ export default function Insumos() {
 
   return (
     <div className="space-y-6">
+      <p className="text-sm text-slate-500">Sede: <span className="font-semibold text-slate-800">{sedes.find((sede) => String(sede.id) === String(selectedSede))?.nombre || 'Sin sede seleccionada'}</span></p>
       <div className="grid gap-4 md:grid-cols-3">
         <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
           <div className="flex items-center justify-between">

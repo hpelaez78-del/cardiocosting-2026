@@ -8,8 +8,10 @@ import Sedes from './pages/Sedes';
 import Personal from './pages/Personal';
 import Convenios from './pages/Convenios';
 import Insumos from './pages/Insumos';
+import Equipos from './pages/Equipos';
 import Simulador from './pages/Simulador';
 import Usuarios from './pages/Usuarios';
+import ConfiguracionCosteo from './pages/ConfiguracionCosteo';
 
 const hasModulePermission = (modulo, accion = 'view') => {
   try {
@@ -96,6 +98,14 @@ export default function App() {
             }
           />
           <Route
+            path="/equipos"
+            element={
+              <ProtectedRoute requiredPermission="equipos">
+                {withShell(Equipos)}
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/convenios"
             element={
               <ProtectedRoute requiredPermission="convenios">
@@ -124,6 +134,14 @@ export default function App() {
             element={
               <ProtectedRoute requiredPermission="usuarios">
                 {withShell(Usuarios)}
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/configuracion-costeo"
+            element={
+              <ProtectedRoute requiredPermission="configuracion">
+                {withShell(ConfiguracionCosteo)}
               </ProtectedRoute>
             }
           />

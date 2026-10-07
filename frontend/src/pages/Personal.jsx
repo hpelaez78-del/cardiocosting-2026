@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import api from '../api/axiosConfig';
+import { useSedeContext } from '../context/SedeContext';
 
 export default function Personal() {
+  const { selectedSede, sedes } = useSedeContext();
   const [personal, setPersonal] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -9,8 +11,10 @@ export default function Personal() {
   const [newRol, setNewRol] = useState({
     id: '',
     cargo: '',
+    grupo_costeo: 'asistencial',
+    cantidad: 1,
     sueldo_base: 0,
-    prov_pct: 0,
+    prov_pct: 48.5,
     horas_mes: 160,
   });
   const [creating, setCreating] = useState(false);
@@ -18,7 +22,11 @@ export default function Personal() {
   const fetchPersonal = async () => {
     setLoading(true);
     try {
-      const res = await api.get('/personal');
+      if (!selectedSede) {
+        setPersonal([]);
+        return;
+      }
+      const res = await api.get('/personal', { params: { sedeId: selectedSede } });
       setPersonal(Array.isArray(res?.data) ? res.data : []);
       setError('');
     } catch (err) {
@@ -30,7 +38,7 @@ export default function Personal() {
 
   useEffect(() => {
     fetchPersonal();
-  }, []);
+  }, [selectedSede]);
 
   const handleCreate = async (e) => {
     e.preventDefault();
@@ -38,13 +46,16 @@ export default function Personal() {
     setError('');
     try {
       await api.post('/personal', {
-        id: newRol.id,
+        sede_id: selectedSede,
+        cargo_key: newRol.id,
         cargo: newRol.cargo,
+        grupo_costeo: newRol.grupo_costeo,
+        cantidad: Number(newRol.cantidad),
         sueldo_base: Number(newRol.sueldo_base) || 0,
         prov_pct: Number(newRol.prov_pct) || 0,
         horas_mes: Number(newRol.horas_mes) || 1,
       });
-      setNewRol({ id: '', cargo: '', sueldo_base: 0, prov_pct: 0, horas_mes: 160 });
+      setNewRol({ id: '', cargo: '', grupo_costeo: 'asistencial', cantidad: 1, sueldo_base: 0, prov_pct: 48.5, horas_mes: 160 });
       await fetchPersonal();
     } catch (err) {
       setError(err?.response?.data?.error || 'No se pudo crear el rol.');
@@ -58,6 +69,7 @@ export default function Personal() {
     setError('');
     try {
       await api.put(`/personal/${rol.id}`, {
+        cantidad: Number(rol.cantidad),
         sueldo_base: Number(rol.sueldo_base) || 0,
         prov_pct: Number(rol.prov_pct) || 0,
         horas_mes: Number(rol.horas_mes) || 1,
@@ -81,16 +93,24 @@ export default function Personal() {
       <div className="mb-6">
         <p className="text-sm uppercase tracking-[0.2em] text-sky-400">Nomina</p>
         <h1 className="text-3xl font-bold text-slate-900">Personal y Costos por Rol</h1>
+        <p className="mt-1 text-sm text-slate-500">{sedes.find((sede) => String(sede.id) === String(selectedSede))?.nombre || 'Sin sede seleccionada'}</p>
       </div>
 
       {error && <div className="mb-4 rounded border border-rose-900 bg-rose-950/40 p-3 text-sm text-rose-200">{error}</div>}
 
-      <form onSubmit={handleCreate} className="mb-6 grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 md:grid-cols-6">
+      <form onSubmit={handleCreate} className="mb-6 grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 md:grid-cols-4 xl:grid-cols-8">
         <input value={newRol.id} onChange={(e) => setNewRol({ ...newRol, id: e.target.value })} placeholder="ID" className="rounded border border-slate-200 bg-slate-50 p-2 text-slate-800" required />
-        <input value={newRol.cargo} onChange={(e) => setNewRol({ ...newRol, cargo: e.target.value })} placeholder="Cargo / rol" className="rounded border border-slate-200 bg-slate-50 p-2 text-slate-800 md:col-span-2" required />
+        <input value={newRol.cargo} onChange={(e) => setNewRol({ ...newRol, cargo: e.target.value })} placeholder="Cargo / rol" className="rounded border border-slate-200 bg-slate-50 p-2 text-slate-800 xl:col-span-2" required />
+        <select value={newRol.grupo_costeo} onChange={(e) => setNewRol({ ...newRol, grupo_costeo: e.target.value })} className="rounded border border-slate-200 bg-slate-50 p-2 text-slate-800">
+          <option value="medico">Médico directo</option>
+          <option value="asistencial">Asistencial directo</option>
+          <option value="administrativo">Administrativo</option>
+        </select>
+        <input type="number" min="1" value={newRol.cantidad} onChange={(e) => setNewRol({ ...newRol, cantidad: e.target.value })} placeholder="Cantidad" className="rounded border border-slate-200 bg-slate-50 p-2 text-slate-800" required />
         <input type="number" value={newRol.sueldo_base} onChange={(e) => setNewRol({ ...newRol, sueldo_base: e.target.value })} placeholder="Sueldo base" className="rounded border border-slate-200 bg-slate-50 p-2 text-slate-800" />
         <input type="number" value={newRol.prov_pct} onChange={(e) => setNewRol({ ...newRol, prov_pct: e.target.value })} placeholder="% provisiones" className="rounded border border-slate-200 bg-slate-50 p-2 text-slate-800" />
-        <button type="submit" disabled={creating} className="rounded bg-sky-600 px-3 py-2 font-medium text-white disabled:opacity-60">
+        <input type="number" min="1" value={newRol.horas_mes} onChange={(e) => setNewRol({ ...newRol, horas_mes: e.target.value })} placeholder="Horas/mes" className="rounded border border-slate-200 bg-slate-50 p-2 text-slate-800" required />
+        <button type="submit" disabled={creating || !selectedSede} className="rounded bg-sky-600 px-3 py-2 font-medium text-white disabled:opacity-60">
           {creating ? 'Creando...' : 'Adicionar rol'}
         </button>
       </form>
@@ -100,7 +120,10 @@ export default function Personal() {
           <thead className="bg-slate-900 text-slate-300">
             <tr>
               <th className="p-3">Rol</th>
+              <th className="p-3">Grupo</th>
+              <th className="p-3">Cantidad</th>
               <th className="p-3">Sueldo base</th>
+              <th className="p-3">Costo total/persona</th>
               <th className="p-3">% provisiones</th>
               <th className="p-3">Horas/mes</th>
               <th className="p-3">Acción</th>
@@ -110,7 +133,10 @@ export default function Personal() {
             {personal.map((rol) => (
               <tr key={rol.id} className="border-t border-slate-700">
                 <td className="p-3 font-semibold text-white">{rol.cargo || rol.nombre}</td>
+                <td className="p-3 text-slate-200">{rol.grupo_costeo}</td>
+                <td className="p-3"><input type="number" min="1" value={rol.cantidad} onChange={(e) => updateField(rol.id, 'cantidad', e.target.value)} className="w-20 rounded border border-slate-600 bg-slate-900 p-2 text-white" /></td>
                 <td className="p-3"><input value={rol.sueldo_base ?? 0} onChange={(e) => updateField(rol.id, 'sueldo_base', e.target.value)} className="w-36 rounded border border-slate-600 bg-slate-900 p-2 text-white" /></td>
+                <td className="p-3 text-slate-200">${Number(rol.costo_total_persona || 0).toLocaleString('es-CO')}</td>
                 <td className="p-3"><input value={rol.prov_pct ?? 0} onChange={(e) => updateField(rol.id, 'prov_pct', e.target.value)} className="w-24 rounded border border-slate-600 bg-slate-900 p-2 text-white" /></td>
                 <td className="p-3"><input value={rol.horas_mes ?? 1} onChange={(e) => updateField(rol.id, 'horas_mes', e.target.value)} className="w-24 rounded border border-slate-600 bg-slate-900 p-2 text-white" /></td>
                 <td className="p-3">

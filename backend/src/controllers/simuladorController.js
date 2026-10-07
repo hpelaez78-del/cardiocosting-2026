@@ -1,28 +1,20 @@
 const pool = require('../config/db');
 const { calcularCostoMinuto, calcularCostoExamen } = require('../services/costEngine');
+const formulaConfigService = require('../services/formulaConfigService');
 
 const resolveConvenioId = async (convenioId) => {
   const id = convenioId !== undefined && convenioId !== null && convenioId !== '' ? Number(convenioId) : null;
-  if (id) {
-    return id;
-  }
+  if (id) return id;
 
   const generalConvenio = await pool.query(`
-    SELECT id
-    FROM convenios
-    WHERE LOWER(TRIM(nombre_eps)) = 'general'
-    LIMIT 1;
+    SELECT id FROM convenios WHERE LOWER(TRIM(nombre_eps)) = 'general' LIMIT 1;
   `);
-
   return generalConvenio.rows[0]?.id ?? null;
 };
 
 const getTarifaConvenioMap = async (convenioId) => {
   const selectedConvenioId = await resolveConvenioId(convenioId);
-
-  if (!selectedConvenioId) {
-    return {};
-  }
+  if (!selectedConvenioId) return {};
 
   const tarifaRes = await pool.query(`
     SELECT examen_id, tarifa_acordada
@@ -39,105 +31,153 @@ const getTarifaConvenioMap = async (convenioId) => {
 const simularEscenario = async (req, res) => {
   const { sedeId, ajustesSede, ajustesRoles, ajustesExamenes, convenioId } = req.body || {};
 
+  if (!sedeId) {
+    return res.status(400).json({ error: 'Debe especificar el id de la sede para la simulación' });
+  }
+
   try {
+    const activeConfig = await formulaConfigService.readActiveFormulaConfig();
+    const costingConfig = activeConfig.config;
+
+    // 1. Obtener datos base de la Sede
     const sedeRes = await pool.query(`
       SELECT
         id,
         nombre,
-        arriendo_mensual AS arriendo,
-        servicios_publicos AS servicios,
-        nomina_admin AS admin,
-        mantenimiento_otros AS mtto,
-        volumen_mensual_esperado AS volumen
+        COALESCE(arriendo_mensual, 0) AS arriendo,
+        COALESCE(servicios_publicos, 0) AS servicios,
+        COALESCE((
+          SELECT SUM(p.cantidad * p.sueldo_base * (1 + p.porcentaje_provisiones / 100))
+          FROM personal_sede p
+          WHERE p.sede_id = sedes.id AND p.grupo_costeo = 'administrativo'
+        ), 0) AS admin,
+        COALESCE(mantenimiento_otros, 0) AS mtto,
+        COALESCE(volumen_mensual_esperado, 0) AS volumen
       FROM sedes
-      WHERE id = $1;
-    `, [sedeId]);
+      WHERE id::text = $1 OR LOWER(nombre) LIKE LOWER('%' || $1 || '%')
+      LIMIT 1;
+    `, [String(sedeId)]);
 
     if (sedeRes.rows.length === 0) {
       return res.status(404).json({ error: 'Sede no encontrada' });
     }
 
     const sedeBase = sedeRes.rows[0];
+    const totalFijoBase = Number(sedeBase.arriendo) + Number(sedeBase.servicios) + Number(sedeBase.admin) + Number(sedeBase.mtto);
+
+    // Aplicar ajustes de simulación sobre la Sede
     const sedeSimulada = {
       ...sedeBase,
       ...(ajustesSede || {})
     };
 
+    // 3. Obtener Roles y aplicar simulaciones
     const rolesRes = await pool.query(`
-      SELECT
-        id,
-        cargo AS nombre,
-        sueldo_base,
-        porcentaje_provisiones AS prov_pct,
-        horas_mes
-      FROM personal_cargos;
-    `);
+      SELECT grupo_costeo, cantidad, sueldo_base, porcentaje_provisiones, horas_mes
+      FROM personal_sede
+      WHERE sede_id = $1 AND grupo_costeo IN ('medico', 'asistencial')
+    `, [sedeBase.id]);
 
+    const rolesMap = {};
+    for (const group of ['medico', 'asistencial']) {
+      const groupRows = rolesRes.rows.filter((row) => row.grupo_costeo === group);
+      const adjustment = (ajustesRoles && ajustesRoles[group]) || {};
+      const monthlyCost = groupRows.reduce((total, row) => {
+        const rate = calcularCostoMinuto(row.sueldo_base, row.porcentaje_provisiones, row.horas_mes, costingConfig.labor);
+        return total + (rate === null ? 0 : Number(row.cantidad) * rate * Number(row.horas_mes) * costingConfig.labor.minutesPerHour);
+      }, 0);
+      const productiveMinutes = groupRows.reduce((total, row) => total + Number(row.cantidad) * Number(row.horas_mes) * costingConfig.labor.minutesPerHour, 0);
+      rolesMap[group] = adjustment.costo_minuto !== undefined
+        ? Number(adjustment.costo_minuto)
+        : productiveMinutes > 0 ? monthlyCost / productiveMinutes : null;
+    }
+
+    // 4. Obtener Exámenes y aplicar simulaciones
     const examenesRes = await pool.query(`
       SELECT
         e.id,
         e.nombre,
-        e.minutos_medico AS min_medico,
-        e.minutos_asistencial AS min_asis,
+        COALESCE(e.minutos_medico, 0) AS min_medico,
+        COALESCE(e.minutos_asistencial, 0) AS min_asis,
+        COALESCE(e.minutos_medico, 0) + COALESCE(e.minutos_asistencial, 0) AS duracion_minutos,
+        e.capacidad_sala_minutos,
         COALESCE(i.costo_insumos_detalle, e.costo_insumos_directos, 0) AS insumos,
-        e.costo_depreciacion_equipos AS cips,
-        e.tarifa_soat_referencia AS tarifa_convenio,
-        e.volumen_mes_proyectado AS vol_mes
+        COALESCE(e.costo_depreciacion_equipos, 0) AS cips,
+        er.valor_compra AS equipo_valor_compra,
+        er.vida_util_meses AS equipo_vida_util_meses,
+        er.costo_mantenimiento_anual AS equipo_mantenimiento_anual,
+        er.minutos_disponibles_mes AS equipo_minutos_disponibles_mes,
+        er.tiempo_uso_minutos AS equipo_tiempo_uso_minutos,
+        e.tarifa_soat_referencia,
+        v.volumen_mes AS vol_mes,
+        COALESCE(v.estimado, FALSE) AS volumen_estimado,
+        e.volumen_mes_proyectado AS volumen_red
       FROM examenes e
       LEFT JOIN (
         SELECT examen_id, SUM(cantidad * valor_unitario) AS costo_insumos_detalle
         FROM insumos_detalle
+        WHERE sede_id = $2
         GROUP BY examen_id
       ) i ON i.examen_id = e.id
+      LEFT JOIN volumen_sede_examen v
+        ON v.examen_id = e.id AND v.sede_id = $1
+      LEFT JOIN equipos_costo_referencia er ON er.examen_id = e.id
       ORDER BY e.id ASC;
-    `);
-
-    const rolesMap = {};
-    rolesRes.rows.forEach((rol) => {
-      const claveRol = String(rol.id || rol.nombre || '').toLowerCase();
-      const ajuste = (ajustesRoles && ajustesRoles[claveRol]) || {};
-
-      const sueldo = ajuste.sueldo_base !== undefined ? ajuste.sueldo_base : rol.sueldo_base;
-      const prov = ajuste.prov_pct !== undefined ? ajuste.prov_pct : rol.prov_pct;
-      const horas = ajuste.horas_mes !== undefined ? ajuste.horas_mes : rol.horas_mes;
-
-      rolesMap[claveRol] = calcularCostoMinuto(Number(sueldo), Number(prov), Number(horas));
-      if (rol.id === 'medico') rolesMap.medico = rolesMap[claveRol];
-      if (rol.id === 'asistencial') rolesMap.asistencial = rolesMap[claveRol];
-    });
+    `, [sedeBase.id, sedeBase.id]);
 
     const tarifaConvenioMap = await getTarifaConvenioMap(convenioId);
 
     const resultadosSimulados = examenesRes.rows.map((examen) => {
       const ajusteExamen = (ajustesExamenes && ajustesExamenes[examen.id]) || {};
-      const tarifaConvenio = Number(
-        tarifaConvenioMap[String(examen.id)] ?? examen.tarifa_convenio ?? examen.tarifa_soat_referencia ?? 0
-      ) || 0;
+      const tarifaConvenio = Object.hasOwn(tarifaConvenioMap, String(examen.id))
+        ? tarifaConvenioMap[String(examen.id)]
+        : null;
+
       const examenSimulado = {
         ...examen,
         tarifa_convenio: tarifaConvenio,
         ...ajusteExamen
       };
-      const calculo = calcularCostoExamen(examenSimulado, rolesMap, sedeSimulada);
+
+      const calculo = calcularCostoExamen(examenSimulado, rolesMap, sedeSimulada, costingConfig);
+      const volumenSede = examenSimulado.vol_mes === null || examenSimulado.vol_mes === undefined
+        ? null
+        : Number(examenSimulado.vol_mes);
 
       return {
         examenId: examen.id,
         nombre: examen.nombre || `Examen #${examen.id}`,
-        tarifaConvenio,
-        calculoSimulado: calculo
+        min_medico: Number(examenSimulado.min_medico),
+        min_asis: Number(examenSimulado.min_asis),
+        duracion_minutos: Number(calculo.duracionMinutos),
+        insumos: Number(calculo.costoInsumos),
+        cips: Number(calculo.costoCips),
+        vol_mes: volumenSede,
+        volumen: volumenSede,
+        volumen_estimado: Boolean(examen.volumen_estimado),
+        tarifaConvenio: tarifaConvenio ?? Number(examen.tarifa_soat_referencia || 0),
+        ...calculo
       };
     });
+    const calculosIncompletos = resultadosSimulados.filter((examen) => examen.datosFaltantes.length > 0);
+    if (calculosIncompletos.length > 0) {
+      return res.status(409).json({
+        error: `Simulación incompleta para ${calculosIncompletos.length} exámenes: faltan tarifas de personal o duración.`
+      });
+    }
 
     res.json({
       mensaje: 'Proyección simulada con éxito',
-      sedeId,
-      resultados: resultadosSimulados
+      sedeId: sedeBase.id,
+      nombreSede: sedeBase.nombre,
+      formulaVersionId: activeConfig.id,
+      formulaVersionName: activeConfig.nombre,
+      costoFijoBolsa: totalFijoBase,
+      evaluacion: resultadosSimulados
     });
   } catch (error) {
     res.status(500).json({ error: 'Error al simular el escenario: ' + error.message });
   }
 };
 
-module.exports = {
-  simularEscenario
-};
+module.exports = { simularEscenario };

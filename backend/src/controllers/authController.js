@@ -2,83 +2,70 @@ const pool = require('../config/db');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-const login = async (req, res) => {
-  const { email, password } = req.body;
+const JWT_SECRET = process.env.JWT_SECRET || 'secret_key_cardiocosting';
 
-  const jwtSecret = process.env.JWT_SECRET;
-  if (!jwtSecret) {
-    return res.status(500).json({ error: 'Configuración del servidor incompleta' });
+const login = async (req, res) => {
+  const identifier = req.body.email || req.body.usuario || req.body.username;
+  const password = req.body.password || req.body.contrasena;
+
+  if (!identifier || !password) {
+    return res.status(400).json({ error: 'Debe proporcionar usuario y contraseña' });
   }
 
   try {
-    console.log('--- INTENTO DE LOGIN ---');
-    console.log('Email recibido:', email);
-
-    const result = await pool.query(`
-      SELECT u.*, r.nombre AS rol, r.permisos
-      FROM usuarios u
-      LEFT JOIN roles r ON r.id = u.role_id
-      WHERE u.email = $1;
-    `, [email]);
-
-    if (result.rows.length === 0) {
-      return res.status(401).json({ error: 'Credenciales inválidas (usuario no encontrado)' });
-    }
-
-    const usuario = result.rows[0];
-
-    // Detectar dinámicamente la columna de la contraseña en la BD
-    const dbPassword = usuario.password || usuario.contrasena || usuario.clave || usuario.password_hash;
-
-    if (!dbPassword) {
-      return res.status(500).json({ error: 'El usuario no tiene una contraseña configurada en la BD' });
-    }
-
-    // Comparar hash bcrypt o texto plano
-    let passwordValida = false;
-    if (dbPassword.startsWith('$2a$') || dbPassword.startsWith('$2b$')) {
-      passwordValida = await bcrypt.compare(password, dbPassword);
-    } else {
-      passwordValida = (password === dbPassword);
-    }
-
-    if (!passwordValida) {
-      return res.status(401).json({ error: 'Credenciales inválidas (contraseña incorrecta)' });
-    }
-
-    const permisos = Array.isArray(usuario.permisos)
-      ? usuario.permisos
-      : (usuario.permisos ? JSON.parse(JSON.stringify(usuario.permisos)) : []);
-
-    const token = jwt.sign(
-      {
-        id: usuario.id,
-        email: usuario.email,
-        rol: usuario.rol,
-        permisos
-      },
-      jwtSecret,
-      { expiresIn: '8h' }
+    const userRes = await pool.query(
+      `SELECT id, nombre, email, password_hash, role_id, activo, sede_id 
+       FROM usuarios 
+       WHERE LOWER(email) = LOWER($1);`,
+      [String(identifier).trim()]
     );
 
+    const user = userRes.rows[0];
+
+    if (!user) {
+      return res.status(401).json({ error: 'Credenciales inválidas' });
+    }
+
+    if (!user.activo) {
+      return res.status(401).json({ error: 'Usuario inactivo. Contacte al administrador.' });
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password_hash);
+
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: 'Credenciales inválidas' });
+    }
+
+    const roleRes = await pool.query('SELECT nombre, permisos FROM roles WHERE id = $1;', [user.role_id]);
+    const roleName = roleRes.rows[0]?.nombre || 'USUARIO';
+
+    const userData = {
+      id: user.id,
+      nombre: user.nombre,
+      email: user.email,
+      role_id: user.role_id,
+      role: roleName,
+      permisos: roleRes.rows[0]?.permisos || {},
+      sede_id: user.sede_id
+    };
+
+    const token = jwt.sign(userData, JWT_SECRET, { expiresIn: '8h' });
+
     res.json({
-      message: 'Inicio de sesión exitoso',
       token,
-      usuario: {
-        id: usuario.id,
-        nombre: usuario.nombre,
-        email: usuario.email,
-        rol: usuario.rol,
-        permisos
+      user: userData,
+      // Compatibilidad con lecturas de frontend que buscan data.session
+      session: {
+        access_token: token,
+        token_type: 'bearer',
+        user: userData
       }
     });
   } catch (error) {
-    console.error('Error en controller de login:', error);
-    return res.status(500).json({
-      error: 'Error interno del servidor',
-      detail: error.message
-    });
+    res.status(500).json({ error: 'Error interno en el servidor durante la autenticación: ' + error.message });
   }
 };
 
-module.exports = { login };
+module.exports = {
+  login
+};

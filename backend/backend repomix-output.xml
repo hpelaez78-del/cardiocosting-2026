@@ -1,0 +1,2221 @@
+This file is a merged representation of a subset of the codebase, containing files not matching ignore patterns, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of a subset of the repository's contents that is considered the most important context.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching these patterns are excluded: node_modules/**, .git/**, .venv/**, *.log
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+src/
+  config/
+    db.js
+  controllers/
+    authController.js
+    conveniosController.js
+    costosController.js
+    evaluadorController.js
+    insumosController.js
+    personalController.js
+    sedesController.js
+    simuladorController.js
+    usuariosController.js
+  middlewares/
+    authMiddleware.js
+  routes/
+    apiRoutes.js
+    authRoutes.js
+    conveniosRoutes.js
+    evaluadorRoutes.js
+    simuladorRoutes.js
+  services/
+    costEngine.js
+    financialService.js
+tests/
+  usuariosModule.test.js
+.env.example
+package.json
+server.js
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="src/config/db.js">
+const { Pool } = require('pg');
+require('dotenv').config();
+
+const required = ['DB_HOST', 'DB_USER', 'DB_PASSWORD', 'DB_NAME'];
+const missing = required.filter(v => !process.env[v]);
+if (missing.length > 0) {
+    console.error(`[FATAL] Variables de entorno no configuradas: ${missing.join(', ')}`);
+    process.exit(1);
+}
+
+const pool = new Pool({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    port: parseInt(process.env.DB_PORT) || 5432,
+    max: 20,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 5000,
+});
+
+pool.on('error', (err) => {
+    console.error('[DB] Error inesperado en cliente del pool:', err.message);
+});
+
+const ensureDefaultRoles = async () => {
+    try {
+        await pool.query(`
+            ALTER TABLE roles
+            ADD COLUMN IF NOT EXISTS permisos JSONB DEFAULT '{}'::jsonb;
+        `);
+
+        const existing = await pool.query(`
+            SELECT id, nombre, permisos
+            FROM roles
+            WHERE LOWER(TRIM(nombre)) IN ('administrador', 'finanzas', 'coordinador_sede')
+            ORDER BY id ASC;
+        `);
+
+        const permisosPorDefecto = {
+            view: true,
+            create: true,
+            edit: true,
+            delete: true
+        };
+
+        const rolesPorDefecto = [
+            {
+                nombre: 'ADMINISTRADOR',
+                descripcion: 'Acceso total y parametrización del sistema',
+                permisos: {
+                    dashboard: permisosPorDefecto,
+                    sedes: permisosPorDefecto,
+                    personal: permisosPorDefecto,
+                    convenios: permisosPorDefecto,
+                    insumos: permisosPorDefecto,
+                    simulador: permisosPorDefecto,
+                    usuarios: permisosPorDefecto
+                }
+            },
+            {
+                nombre: 'FINANZAS',
+                descripcion: 'Gestión de tarifas, convenios y simulación',
+                permisos: {
+                    dashboard: { view: true, create: false, edit: false, delete: false },
+                    convenios: permisosPorDefecto,
+                    insumos: permisosPorDefecto,
+                    simulador: permisosPorDefecto,
+                    usuarios: { view: true, create: false, edit: false, delete: false }
+                }
+            },
+            {
+                nombre: 'COORDINADOR_SEDE',
+                descripcion: 'Consulta y operación por sede',
+                permisos: {
+                    dashboard: { view: true, create: false, edit: false, delete: false },
+                    sedes: { view: true, create: false, edit: true, delete: false },
+                    personal: { view: true, create: true, edit: true, delete: false },
+                    insumos: { view: true, create: true, edit: true, delete: false }
+                }
+            }
+        ];
+
+        if (existing.rows.length === rolesPorDefecto.length) {
+            console.log('[DB] Roles base ya existen en la base de datos.');
+            return existing.rows;
+        }
+
+        for (const rol of rolesPorDefecto) {
+            await pool.query(`
+                INSERT INTO roles (nombre, descripcion, permisos)
+                VALUES ($1, $2, $3)
+                ON CONFLICT (nombre) DO UPDATE SET descripcion = EXCLUDED.descripcion, permisos = EXCLUDED.permisos;
+            `, [rol.nombre, rol.descripcion, JSON.stringify(rol.permisos)]);
+        }
+
+        console.log('[DB] Roles base creados automáticamente.');
+        const result = await pool.query(`
+            SELECT id, nombre, descripcion, permisos
+            FROM roles
+            WHERE LOWER(TRIM(nombre)) IN ('administrador', 'finanzas', 'coordinador_sede')
+            ORDER BY id ASC;
+        `);
+
+        return result.rows;
+    } catch (error) {
+        console.error('[DB] Error al asegurar los roles base:', error.message);
+        throw error;
+    }
+};
+
+const ensureDefaultConvenio = async () => {
+    try {
+        const existing = await pool.query(`
+            SELECT id, nombre_eps
+            FROM convenios
+            WHERE LOWER(TRIM(nombre_eps)) = 'general'
+            LIMIT 1;
+        `);
+
+        if (existing.rows.length > 0) {
+            console.log('[DB] Convenio General ya existe en la base de datos.');
+            return existing.rows[0];
+        }
+
+        const created = await pool.query(`
+            INSERT INTO convenios (nombre_eps, fecha_ultimo_reajuste)
+            VALUES ('General', NOW())
+            RETURNING *;
+        `);
+
+        const convenioId = created.rows[0].id;
+
+        await pool.query(`
+            INSERT INTO tarifas_convenios (convenio_id, examen_id, tarifa_acordada)
+            SELECT $1, e.id, 0
+            FROM examenes e
+            WHERE NOT EXISTS (
+                SELECT 1
+                FROM tarifas_convenios tc
+                WHERE tc.convenio_id = $1 AND tc.examen_id = e.id
+            );
+        `, [convenioId]);
+
+        console.log('[DB] Convenio General creado automáticamente con tarifas iniciales.');
+        return created.rows[0];
+    } catch (error) {
+        console.error('[DB] Error al asegurar el convenio General:', error.message);
+        throw error;
+    }
+};
+
+pool.connect()
+    .then(client => {
+        console.log('⚡ [DB] Conexión a PostgreSQL (cardiocosting_db) establecida correctamente.');
+        client.release();
+    })
+    .catch(err => {
+        console.error('❌ [DB] Error al conectar con la base de datos:', err.message);
+    });
+
+module.exports = pool;
+module.exports.ensureDefaultRoles = ensureDefaultRoles;
+module.exports.ensureDefaultConvenio = ensureDefaultConvenio;
+</file>
+
+<file path="src/controllers/authController.js">
+const pool = require('../config/db');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
+const login = async (req, res) => {
+  const { email, password } = req.body;
+
+  const jwtSecret = process.env.JWT_SECRET;
+  if (!jwtSecret) {
+    return res.status(500).json({ error: 'Configuración del servidor incompleta' });
+  }
+
+  try {
+    console.log('--- INTENTO DE LOGIN ---');
+    console.log('Email recibido:', email);
+
+    const result = await pool.query(`
+      SELECT u.*, r.nombre AS rol, r.permisos
+      FROM usuarios u
+      LEFT JOIN roles r ON r.id = u.role_id
+      WHERE u.email = $1;
+    `, [email]);
+
+    if (result.rows.length === 0) {
+      return res.status(401).json({ error: 'Credenciales inválidas (usuario no encontrado)' });
+    }
+
+    const usuario = result.rows[0];
+
+    // Detectar dinámicamente la columna de la contraseña en la BD
+    const dbPassword = usuario.password || usuario.contrasena || usuario.clave || usuario.password_hash;
+
+    if (!dbPassword) {
+      return res.status(500).json({ error: 'El usuario no tiene una contraseña configurada en la BD' });
+    }
+
+    // Comparar hash bcrypt o texto plano
+    let passwordValida = false;
+    if (dbPassword.startsWith('$2a$') || dbPassword.startsWith('$2b$')) {
+      passwordValida = await bcrypt.compare(password, dbPassword);
+    } else {
+      passwordValida = (password === dbPassword);
+    }
+
+    if (!passwordValida) {
+      return res.status(401).json({ error: 'Credenciales inválidas (contraseña incorrecta)' });
+    }
+
+    const permisos = Array.isArray(usuario.permisos)
+      ? usuario.permisos
+      : (usuario.permisos ? JSON.parse(JSON.stringify(usuario.permisos)) : []);
+
+    const token = jwt.sign(
+      {
+        id: usuario.id,
+        email: usuario.email,
+        rol: usuario.rol,
+        permisos
+      },
+      jwtSecret,
+      { expiresIn: '8h' }
+    );
+
+    res.json({
+      message: 'Inicio de sesión exitoso',
+      token,
+      usuario: {
+        id: usuario.id,
+        nombre: usuario.nombre,
+        email: usuario.email,
+        rol: usuario.rol,
+        permisos
+      }
+    });
+  } catch (error) {
+    console.error('Error en controller de login:', error);
+    return res.status(500).json({
+      error: 'Error interno del servidor',
+      detail: error.message
+    });
+  }
+};
+
+module.exports = { login };
+</file>
+
+<file path="src/controllers/conveniosController.js">
+const db = require('../config/db');
+
+const crearConvenio = async (req, res) => {
+  const { nombre_eps, fecha_ultimo_reajuste } = req.body;
+
+  if (!nombre_eps) {
+    return res.status(400).json({ error: 'Falta el nombre del convenio' });
+  }
+
+  try {
+    await db.query(
+      `SELECT setval(pg_get_serial_sequence('convenios', 'id'), COALESCE((SELECT MAX(id) FROM convenios), 0), true);`
+    );
+
+    const convenio = await db.query(
+      `INSERT INTO convenios (nombre_eps, fecha_ultimo_reajuste)
+       VALUES ($1, $2)
+       RETURNING *;`,
+      [String(nombre_eps).trim(), fecha_ultimo_reajuste || null]
+    );
+
+    const examenes = await db.query(`SELECT id FROM examenes ORDER BY nombre ASC;`);
+
+    for (const examen of examenes.rows) {
+      await db.query(
+        `INSERT INTO tarifas_convenios (convenio_id, examen_id, tarifa_acordada)
+         VALUES ($1, $2, 0);`,
+        [convenio.rows[0].id, examen.id]
+      );
+    }
+
+    res.status(201).json({ message: 'Convenio creado correctamente', data: convenio.rows[0] });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al crear el convenio: ' + error.message });
+  }
+};
+
+const obtenerConvenios = async (req, res) => {
+  try {
+    const result = await db.query('SELECT * FROM convenios ORDER BY id ASC');
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const obtenerTarifasPorConvenio = async (req, res) => {
+  try {
+    const { convenioId } = req.params;
+    const result = await db.query(
+      `SELECT tc.id, tc.examen_id, e.codigo_cups, e.nombre as examen, tc.tarifa_acordada
+       FROM tarifas_convenios tc
+       JOIN examenes e ON tc.examen_id = e.id
+       WHERE tc.convenio_id = $1
+       ORDER BY e.nombre ASC`,
+      [convenioId]
+    );
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const actualizarTarifa = async (req, res) => {
+  try {
+    const { convenio_id, examen_id, nueva_tarifa } = req.body;
+
+    const existente = await db.query(
+      `SELECT id FROM tarifas_convenios WHERE convenio_id = $1 AND examen_id = $2;`,
+      [convenio_id, examen_id]
+    );
+
+    let result;
+    if (existente.rows.length > 0) {
+      result = await db.query(
+        `UPDATE tarifas_convenios
+         SET tarifa_acordada = $2
+         WHERE id = $1
+         RETURNING *;`,
+        [existente.rows[0].id, nueva_tarifa]
+      );
+    } else {
+      result = await db.query(
+        `INSERT INTO tarifas_convenios (convenio_id, examen_id, tarifa_acordada)
+         VALUES ($1, $2, $3)
+         RETURNING *;`,
+        [convenio_id, examen_id, nueva_tarifa]
+      );
+    }
+
+    res.json({ message: 'Tarifa actualizada correctamente', tarifa: result.rows[0] });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports = {
+  crearConvenio,
+  obtenerConvenios,
+  obtenerTarifasPorConvenio,
+  actualizarTarifa
+};
+</file>
+
+<file path="src/controllers/costosController.js">
+const pool = require('../config/db');
+const financialService = require('../services/financialService');
+
+const getCostosCompat = async (req, res) => {
+  try {
+    const [sedesRes, rolesRes, examenesRes] = await Promise.all([
+      pool.query(`
+        SELECT
+          id,
+          nombre,
+          arriendo_mensual AS arriendo,
+          servicios_publicos AS servicios,
+          nomina_admin AS admin,
+          mantenimiento_otros AS mtto,
+          volumen_mensual_esperado AS volumen
+        FROM sedes 
+        ORDER BY id ASC;
+      `),
+      pool.query(`
+        SELECT
+          id,
+          cargo AS nombre,
+          cargo,
+          sueldo_base,
+          porcentaje_provisiones AS prov_pct,
+          horas_mes
+        FROM personal_cargos
+        ORDER BY id ASC;
+      `),
+      pool.query(`
+        SELECT
+          e.id,
+          e.nombre,
+          e.minutos_medico AS min_medico,
+          e.minutos_asistencial AS min_asis,
+          COALESCE(i.costo_insumos_detalle, e.costo_insumos_directos, 0) AS insumos,
+          e.costo_depreciacion_equipos AS cips,
+          e.tarifa_soat_referencia AS tarifa_convenio,
+          e.volumen_mes_proyectado AS vol_mes
+        FROM examenes e
+        LEFT JOIN (
+          SELECT examen_id, SUM(cantidad * valor_unitario) AS costo_insumos_detalle
+          FROM insumos_detalle
+          GROUP BY examen_id
+        ) i ON i.examen_id = e.id
+        ORDER BY e.id ASC;
+      `)
+    ]);
+
+    const convenioId = req.query?.convenioId || req.query?.convenio || null;
+    let tarifaMap = {};
+
+    const selectedConvenioId = convenioId
+      ? Number(convenioId)
+      : await pool.query(`
+          SELECT id
+          FROM convenios
+          WHERE LOWER(TRIM(nombre_eps)) = 'general'
+          LIMIT 1;
+        `).then((res) => res.rows[0]?.id ?? null);
+
+    if (selectedConvenioId) {
+      const tarifasRes = await pool.query(`
+        SELECT examen_id, tarifa_acordada
+        FROM tarifas_convenios
+        WHERE convenio_id = $1;
+      `, [selectedConvenioId]);
+
+      tarifaMap = tarifasRes.rows.reduce((acc, row) => {
+        acc[String(row.examen_id)] = Number(row.tarifa_acordada || 0);
+        return acc;
+      }, {});
+    }
+
+    const examenes = examenesRes.rows.map((examen) => ({
+      ...examen,
+      tarifa_convenio: Number(tarifaMap[String(examen.id)] ?? examen.tarifa_convenio ?? examen.tarifa_soat_referencia ?? 0) || 0
+    }));
+
+    return res.json({
+      sedes: sedesRes.rows,
+      roles: rolesRes.rows,
+      examenes
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error: 'Error al consultar costos: ' + error.message
+    });
+  }
+};
+
+const updateCostoCompat = async (req, res) => {
+  const { endpoint, id } = req.params;
+  const payload = req.body || {};
+  const targetId = id || payload.id;
+
+  try {
+    if (!endpoint) {
+      return res.status(400).json({ error: 'Endpoint no especificado' });
+    }
+
+    if (endpoint === 'sedes') {
+      const { arriendo, servicios, admin, mtto, volumen } = payload;
+
+      if (!targetId) {
+        return res.status(400).json({ error: 'Falta el id de la sede' });
+      }
+
+      const result = await pool.query(
+        `UPDATE sedes
+         SET arriendo_mensual = $1,
+             servicios_publicos = $2,
+             nomina_admin = $3,
+             mantenimiento_otros = $4,
+             volumen_mensual_esperado = $5
+         WHERE id = $6
+         RETURNING id, nombre, arriendo_mensual AS arriendo, servicios_publicos AS servicios, nomina_admin AS admin, mantenimiento_otros AS mtto, volumen_mensual_esperado AS volumen;`,
+        [
+          Number(arriendo) || 0,
+          Number(servicios) || 0,
+          Number(admin) || 0,
+          Number(mtto) || 0,
+          Number(volumen) || 1,
+          targetId
+        ]
+      );
+
+      if (result.rowCount === 0) {
+        return res.status(404).json({ error: 'Sede no encontrada' });
+      }
+
+      return res.json({ message: 'Sede actualizada exitosamente', data: result.rows[0] });
+    }
+
+    if (endpoint === 'personal') {
+      const { sueldo_base, prov_pct, horas_mes } = payload;
+
+      if (!targetId) {
+        return res.status(400).json({ error: 'Falta el id del rol' });
+      }
+
+      const result = await pool.query(
+        `UPDATE personal_cargos
+         SET sueldo_base = $1,
+             porcentaje_provisiones = $2,
+             horas_mes = $3
+         WHERE id = $4
+         RETURNING id, cargo AS nombre, cargo, sueldo_base, porcentaje_provisiones AS prov_pct, horas_mes;`,
+        [
+          Number(sueldo_base) || 0,
+          Number(prov_pct) || 0,
+          Number(horas_mes) || 1,
+          targetId
+        ]
+      );
+
+      if (result.rowCount === 0) {
+        return res.status(404).json({ error: 'Rol no encontrado' });
+      }
+
+      return res.json({ message: 'Rol actualizado exitosamente', data: result.rows[0] });
+    }
+
+    return res.status(404).json({ error: 'Endpoint legado no soportado' });
+  } catch (error) {
+    return res.status(500).json({
+      error: 'Error al actualizar costos: ' + error.message
+    });
+  }
+};
+
+// Controladores para Equipos Biomédicos (Sprint 1)
+const getEquipos = async (req, res) => {
+  try {
+    const { sedeId } = req.params;
+    const equipos = await financialService.getEquiposBySede(sedeId);
+    return res.json(equipos);
+  } catch (error) {
+    return res.status(500).json({ error: 'Error al consultar equipos: ' + error.message });
+  }
+};
+
+const createEquipo = async (req, res) => {
+  try {
+    const { equipoData, examenId, tiempoUsoMinutos } = req.body;
+    if (!equipoData || !equipoData.nombre || !equipoData.valor_compra) {
+      return res.status(400).json({ error: 'Nombre y valor de compra son obligatorios' });
+    }
+    const nuevoEquipo = await financialService.createEquipoConAsignacion(equipoData, examenId, tiempoUsoMinutos);
+    return res.status(201).json(nuevoEquipo);
+  } catch (error) {
+    return res.status(500).json({ error: 'Error al crear el equipo: ' + error.message });
+  }
+};
+
+const deleteEquipo = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await financialService.deleteEquipo(id);
+    return res.json({ message: 'Equipo eliminado exitosamente' });
+  } catch (error) {
+    return res.status(500).json({ error: 'Error al eliminar el equipo: ' + error.message });
+  }
+};
+
+module.exports = {
+  getCostosCompat,
+  updateCostoCompat,
+  getEquipos,
+  createEquipo,
+  deleteEquipo
+};
+</file>
+
+<file path="src/controllers/evaluadorController.js">
+const pool = require('../config/db');
+const { calcularCostoMinuto, calcularCostoExamen } = require('../services/costEngine');
+
+const resolveConvenioId = async (convenioId) => {
+  const id = convenioId !== undefined && convenioId !== null && convenioId !== '' ? Number(convenioId) : null;
+  if (id) return id;
+
+  const generalConvenio = await pool.query(`
+    SELECT id FROM convenios WHERE LOWER(TRIM(nombre_eps)) = 'general' LIMIT 1;
+  `);
+  return generalConvenio.rows[0]?.id ?? null;
+};
+
+const getTarifaConvenioMap = async (convenioId) => {
+  const selectedConvenioId = await resolveConvenioId(convenioId);
+  if (!selectedConvenioId) return {};
+
+  const tarifaRes = await pool.query(`
+    SELECT examen_id, tarifa_acordada FROM tarifas_convenios WHERE convenio_id = $1;
+  `, [selectedConvenioId]);
+
+  return tarifaRes.rows.reduce((acc, row) => {
+    acc[String(row.examen_id)] = Number(row.tarifa_acordada || 0);
+    return acc;
+  }, {});
+};
+
+const evaluarSede = async (req, res) => {
+  const { sedeId } = req.params;
+  const convenioId = req.query.convenioId || req.query.convenio || null;
+
+  try {
+    // 1. Buscar sede por ID o coincidencia de nombre
+    const sedeRes = await pool.query(`
+      SELECT
+        id,
+        nombre,
+        COALESCE(arriendo_mensual, 0) AS arriendo,
+        COALESCE(servicios_publicos, 0) AS servicios,
+        COALESCE(nomina_admin, 0) AS admin,
+        COALESCE(mantenimiento_otros, 0) AS mtto,
+        COALESCE(volumen_mensual_esperado, 1) AS volumen
+      FROM sedes
+      WHERE id::text = $1 
+         OR LOWER(nombre) LIKE LOWER('%' || $1 || '%')
+      LIMIT 1;
+    `, [String(sedeId)]);
+
+    if (sedeRes.rows.length === 0) {
+      return res.status(404).json({ error: 'Sede no encontrada' });
+    }
+
+    const sede = sedeRes.rows[0];
+
+    // Total Fijo General de la Sede por componentes
+    const totalFijoSede =
+      Number(sede.arriendo) +
+      Number(sede.servicios) +
+      Number(sede.admin) +
+      Number(sede.mtto);
+
+    // 2. Consultar Sub-bolsas asociadas filtrando sólo áreas directas
+    const areasRes = await pool.query(`
+      SELECT COALESCE(SUM(costo_asignado_directo), 0) AS sub_bolsa
+      FROM sede_areas
+      WHERE sede_id::text = $1 AND es_directo = true;
+    `, [String(sede.id)]);
+
+    const subBolsaSum = Number(areasRes.rows[0]?.sub_bolsa || 0);
+    const costoFijoBolsa = subBolsaSum > 0 ? subBolsaSum : totalFijoSede;
+
+    // Objeto de sede efectivo con la sub-bolsa para costEngine
+    const sedeEfectiva = {
+      ...sede,
+      costoFijoBolsa,
+      subBolsaActiva: subBolsaSum > 0
+    };
+
+    // 3. Obtener Roles y Exámenes
+    const rolesRes = await pool.query(`
+      SELECT id, cargo AS nombre, sueldo_base, porcentaje_provisiones AS prov_pct, horas_mes FROM personal_cargos;
+    `);
+
+    const examenesRes = await pool.query(`
+      SELECT
+        e.id,
+        e.nombre,
+        COALESCE(e.minutos_medico, 0) AS min_medico,
+        COALESCE(e.minutos_asistencial, 0) AS min_asis,
+        COALESCE(e.duracion_minutos, (COALESCE(e.minutos_medico, 0) + COALESCE(e.minutos_asistencial, 0)), 30) AS duracion_minutos,
+        COALESCE(i.costo_insumos_detalle, e.costo_insumos_directos, 0) AS insumos,
+        e.costo_depreciacion_equipos AS cips,
+        e.tarifa_soat_referencia AS tarifa_convenio,
+        COALESCE(e.volumen_mes_proyectado, 30) AS vol_mes
+      FROM examenes e
+      LEFT JOIN (
+        SELECT examen_id, SUM(cantidad * valor_unitario) AS costo_insumos_detalle
+        FROM insumos_detalle
+        GROUP BY examen_id
+      ) i ON i.examen_id = e.id
+      ORDER BY e.id ASC;
+    `);
+
+    const rolesMap = {};
+    rolesRes.rows.forEach((rol) => {
+      const claveRol = String(rol.id || rol.nombre || '').toLowerCase();
+      rolesMap[claveRol] = calcularCostoMinuto(
+        Number(rol.sueldo_base) || 0,
+        Number(rol.prov_pct) || 0,
+        Number(rol.horas_mes) || 1
+      );
+      if (rol.id === 'medico') rolesMap.medico = rolesMap[claveRol];
+      if (rol.id === 'asistencial') rolesMap.asistencial = rolesMap[claveRol];
+    });
+
+    const tarifaConvenioMap = await getTarifaConvenioMap(convenioId);
+
+    const evaluacion = examenesRes.rows.map((examen) => {
+      const tarifaConvenio = Number(
+        tarifaConvenioMap[String(examen.id)] ?? examen.tarifa_convenio ?? 0
+      ) || 0;
+
+      // Inyectar sedeEfectiva con el costoFijoBolsa calculado
+      const calculo = calcularCostoExamen({ ...examen, tarifa_convenio: tarifaConvenio }, rolesMap, sedeEfectiva);
+
+      return {
+        ...calculo,
+        examenId: examen.id,
+        nombre: examen.nombre || `Examen #${examen.id}`,
+        volumen: Number(examen.vol_mes) || Number(calculo.volumen) || 30,
+        tiempoMinutos: Number(examen.duracion_minutos) || Number(calculo.tiempoMinutos) || 30,
+        tarifaConvenio
+      };
+    });
+
+    res.json({
+      sedeId: sede.id,
+      nombreSede: sede.nombre,
+      costoFijoBolsa,
+      evaluacion
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al evaluar la sede: ' + error.message });
+  }
+};
+
+module.exports = { evaluarSede };
+</file>
+
+<file path="src/controllers/insumosController.js">
+const db = require('../config/db');
+
+const getExamenes = async (req, res) => {
+  try {
+    const result = await db.query(`
+      SELECT id, codigo_cups, nombre
+      FROM examenes
+      ORDER BY nombre ASC;
+    `);
+
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al consultar exámenes: ' + error.message });
+  }
+};
+
+const getInsumos = async (req, res) => {
+  try {
+    const { examenId } = req.params || {};
+    const conditions = examenId ? 'WHERE examen_id = $1' : '';
+    const params = examenId ? [examenId] : [];
+
+    const result = await db.query(`
+      SELECT
+        id,
+        examen_id,
+        nombre_insumo,
+        cantidad,
+        valor_unitario,
+        (cantidad * valor_unitario) AS subtotal
+      FROM insumos_detalle
+      ${conditions}
+      ORDER BY examen_id, nombre_insumo ASC;
+    `, params);
+
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al consultar insumos: ' + error.message });
+  }
+};
+
+const createInsumo = async (req, res) => {
+  const { examen_id, nombre_insumo, cantidad, valor_unitario } = req.body || {};
+
+  if (!examen_id || !nombre_insumo) {
+    return res.status(400).json({ error: 'Faltan examen_id o nombre_insumo' });
+  }
+
+  try {
+    const result = await db.query(`
+      INSERT INTO insumos_detalle (examen_id, nombre_insumo, cantidad, valor_unitario)
+      VALUES ($1, $2, $3, $4)
+      RETURNING *;
+    `, [
+      String(examen_id).trim(),
+      String(nombre_insumo).trim(),
+      Number(cantidad) || 1,
+      Number(valor_unitario) || 0
+    ]);
+
+    res.status(201).json({ message: 'Insumo creado correctamente', data: result.rows[0] });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al crear el insumo: ' + error.message });
+  }
+};
+
+const updateInsumo = async (req, res) => {
+  const { id } = req.params;
+  const { examen_id, nombre_insumo, cantidad, valor_unitario } = req.body || {};
+
+  try {
+    const result = await db.query(`
+      UPDATE insumos_detalle
+      SET examen_id = $1,
+          nombre_insumo = $2,
+          cantidad = $3,
+          valor_unitario = $4
+      WHERE id = $5
+      RETURNING *;
+    `, [
+      String(examen_id).trim(),
+      String(nombre_insumo).trim(),
+      Number(cantidad) || 1,
+      Number(valor_unitario) || 0,
+      id
+    ]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Insumo no encontrado' });
+    }
+
+    res.json({ message: 'Insumo actualizado correctamente', data: result.rows[0] });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al actualizar el insumo: ' + error.message });
+  }
+};
+
+const deleteInsumo = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await db.query(`
+      DELETE FROM insumos_detalle
+      WHERE id = $1
+      RETURNING *;
+    `, [id]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Insumo no encontrado' });
+    }
+
+    res.json({ message: 'Insumo eliminado correctamente' });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al eliminar el insumo: ' + error.message });
+  }
+};
+
+module.exports = {
+  getExamenes,
+  getInsumos,
+  createInsumo,
+  updateInsumo,
+  deleteInsumo
+};
+</file>
+
+<file path="src/controllers/personalController.js">
+const pool = require('../config/db');
+
+const createPersonal = async (req, res) => {
+  const { id, cargo, sueldo_base, prov_pct, horas_mes } = req.body;
+
+  if (!id || !cargo) {
+    return res.status(400).json({ error: 'Falta el id o nombre del rol' });
+  }
+
+  try {
+    const result = await pool.query(
+      `INSERT INTO personal_cargos (id, cargo, sueldo_base, porcentaje_provisiones, horas_mes)
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING
+         id,
+         cargo AS nombre,
+         cargo,
+         sueldo_base,
+         porcentaje_provisiones AS prov_pct,
+         horas_mes;`,
+      [
+        String(id).trim(),
+        String(cargo).trim(),
+        Number(sueldo_base) || 0,
+        Number(prov_pct) || 0,
+        Number(horas_mes) || 1,
+      ]
+    );
+
+    res.status(201).json({ message: 'Rol creado correctamente', data: result.rows[0] });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al crear el rol: ' + error.message });
+  }
+};
+
+const getPersonal = async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT
+        id,
+        cargo AS nombre,
+        cargo,
+        sueldo_base,
+        porcentaje_provisiones AS prov_pct,
+        horas_mes
+      FROM personal_cargos
+      ORDER BY id ASC;
+    `);
+
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al consultar personal: ' + error.message });
+  }
+};
+
+const updatePersonal = async (req, res) => {
+  const { id } = req.params;
+  const { sueldo_base, prov_pct, horas_mes } = req.body;
+
+  try {
+    const result = await pool.query(
+      `UPDATE personal_cargos
+       SET sueldo_base = $1,
+           porcentaje_provisiones = $2,
+           horas_mes = $3
+       WHERE id = $4
+       RETURNING
+         id,
+         cargo AS nombre,
+         cargo,
+         sueldo_base,
+         porcentaje_provisiones AS prov_pct,
+         horas_mes;`,
+      [
+        Number(sueldo_base) || 0,
+        Number(prov_pct) || 0,
+        Number(horas_mes) || 1,
+        id
+      ]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Rol no encontrado' });
+    }
+
+    res.json({ message: 'Rol actualizado exitosamente', data: result.rows[0] });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al actualizar el rol: ' + error.message });
+  }
+};
+
+module.exports = {
+  createPersonal,
+  getPersonal,
+  updatePersonal
+};
+</file>
+
+<file path="src/controllers/sedesController.js">
+const pool = require('../config/db');
+
+const createSede = async (req, res) => {
+  const { id, nombre, arriendo, servicios, admin, mtto, volumen } = req.body;
+
+  if (!id || !nombre) {
+    return res.status(400).json({ error: 'Falta el id o nombre de la sede' });
+  }
+
+  try {
+    const result = await pool.query(
+      `INSERT INTO sedes (id, nombre, arriendo_mensual, servicios_publicos, nomina_admin, mantenimiento_otros, volumen_mensual_esperado)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       RETURNING
+         id,
+         nombre,
+         arriendo_mensual AS arriendo,
+         servicios_publicos AS servicios,
+         nomina_admin AS admin,
+         mantenimiento_otros AS mtto,
+         volumen_mensual_esperado AS volumen;`,
+      [
+        String(id).trim(),
+        String(nombre).trim(),
+        Number(arriendo) || 0,
+        Number(servicios) || 0,
+        Number(admin) || 0,
+        Number(mtto) || 0,
+        Number(volumen) || 1,
+      ]
+    );
+
+    res.status(201).json({ message: 'Sede creada correctamente', data: result.rows[0] });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al crear la sede: ' + error.message });
+  }
+};
+
+const getSedes = async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT
+        id,
+        nombre,
+        arriendo_mensual AS arriendo,
+        servicios_publicos AS servicios,
+        nomina_admin AS admin,
+        mantenimiento_otros AS mtto,
+        volumen_mensual_esperado AS volumen
+      FROM sedes
+      ORDER BY id ASC;
+    `);
+
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al consultar sedes: ' + error.message });
+  }
+};
+
+const updateSede = async (req, res) => {
+  const { id } = req.params;
+  const { arriendo, servicios, admin, mtto, volumen } = req.body;
+
+  try {
+    const result = await pool.query(
+      `UPDATE sedes
+       SET arriendo_mensual = $1,
+           servicios_publicos = $2,
+           nomina_admin = $3,
+           mantenimiento_otros = $4,
+           volumen_mensual_esperado = $5
+       WHERE id::text = $6
+       RETURNING
+         id,
+         nombre,
+         arriendo_mensual AS arriendo,
+         servicios_publicos AS servicios,
+         nomina_admin AS admin,
+         mantenimiento_otros AS mtto,
+         volumen_mensual_esperado AS volumen;`,
+      [
+        Number(arriendo) || 0,
+        Number(servicios) || 0,
+        Number(admin) || 0,
+        Number(mtto) || 0,
+        Number(volumen) || 1,
+        String(id)
+      ]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Sede no encontrada' });
+    }
+
+    res.json({ message: 'Sede actualizada exitosamente', data: result.rows[0] });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al actualizar sede: ' + error.message });
+  }
+};
+
+// --- SUB-BOLSAS Y PRORRATEO POR m² ---
+
+const getAreasSede = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      `SELECT 
+         id, 
+         sede_id, 
+         nombre_area AS nombre, 
+         COALESCE(m2, superficie_m2, 0) AS m2, 
+         es_directo AS "esDirecto", 
+         costo_asignado_directo AS "costoAsignadoDirecto"
+       FROM sede_areas 
+       WHERE sede_id::text = $1 
+       ORDER BY id ASC;`,
+      [String(id)]
+    );
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al consultar las áreas de la sede: ' + error.message });
+  }
+};
+
+const saveAreasSede = async (req, res) => {
+  const { id } = req.params;
+  const { areas } = req.body;
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    // Eliminar únicamente las áreas asociadas a la sede actual
+    await client.query('DELETE FROM sede_areas WHERE sede_id::text = $1;', [String(id)]);
+
+    if (Array.isArray(areas) && areas.length > 0) {
+      for (const a of areas) {
+        const nombreArea = String(a.nombre || a.nombre_area || 'Área').trim();
+        const m2 = Number(a.m2 ?? a.superficie_m2) || 0;
+        const esDirecto = a.esDirecto !== undefined ? Boolean(a.esDirecto) : (a.es_directo !== undefined ? Boolean(a.es_directo) : true);
+        const costoDirecto = Number(a.costoAsignadoDirecto ?? a.costo_asignado_directo) || 0;
+
+        await client.query(
+          `INSERT INTO sede_areas (sede_id, nombre_area, m2, es_directo, costo_asignado_directo)
+           VALUES ($1, $2, $3, $4, $5);`,
+          [
+            String(id),
+            nombreArea,
+            m2,
+            esDirecto,
+            costoDirecto
+          ]
+        );
+      }
+    }
+
+    await client.query('COMMIT');
+    res.json({ message: 'Áreas y sub-bolsas actualizadas correctamente' });
+  } catch (error) {
+    await client.query('ROLLBACK');
+    res.status(500).json({ error: 'Error al actualizar áreas de la sede: ' + error.message });
+  } finally {
+    client.release();
+  }
+};
+
+module.exports = {
+  createSede,
+  getSedes,
+  updateSede,
+  getAreasSede,
+  saveAreasSede
+};
+</file>
+
+<file path="src/controllers/simuladorController.js">
+const pool = require('../config/db');
+const { calcularCostoMinuto, calcularCostoExamen } = require('../services/costEngine');
+
+const resolveConvenioId = async (convenioId) => {
+  const id = convenioId !== undefined && convenioId !== null && convenioId !== '' ? Number(convenioId) : null;
+  if (id) {
+    return id;
+  }
+
+  const generalConvenio = await pool.query(`
+    SELECT id
+    FROM convenios
+    WHERE LOWER(TRIM(nombre_eps)) = 'general'
+    LIMIT 1;
+  `);
+
+  return generalConvenio.rows[0]?.id ?? null;
+};
+
+const getTarifaConvenioMap = async (convenioId) => {
+  const selectedConvenioId = await resolveConvenioId(convenioId);
+
+  if (!selectedConvenioId) {
+    return {};
+  }
+
+  const tarifaRes = await pool.query(`
+    SELECT examen_id, tarifa_acordada
+    FROM tarifas_convenios
+    WHERE convenio_id = $1;
+  `, [selectedConvenioId]);
+
+  return tarifaRes.rows.reduce((acc, row) => {
+    acc[String(row.examen_id)] = Number(row.tarifa_acordada || 0);
+    return acc;
+  }, {});
+};
+
+const simularEscenario = async (req, res) => {
+  const { sedeId, ajustesSede, ajustesRoles, ajustesExamenes, convenioId } = req.body || {};
+
+  try {
+    const sedeRes = await pool.query(`
+      SELECT
+        id,
+        nombre,
+        arriendo_mensual AS arriendo,
+        servicios_publicos AS servicios,
+        nomina_admin AS admin,
+        mantenimiento_otros AS mtto,
+        volumen_mensual_esperado AS volumen
+      FROM sedes
+      WHERE id::text = $1 OR LOWER(nombre) LIKE LOWER('%' || $1 || '%');
+    `, [String(sedeId)]);
+
+    if (sedeRes.rows.length === 0) {
+      return res.status(404).json({ error: 'Sede no encontrada' });
+    }
+
+    const sedeBase = sedeRes.rows[0];
+
+    // Consultar Sub-bolsas por áreas directas
+    const areasRes = await pool.query(`
+      SELECT COALESCE(SUM(costo_asignado_directo), 0) AS sub_bolsa
+      FROM sede_areas
+      WHERE sede_id::text = $1 AND es_directo = true;
+    `, [String(sedeBase.id)]);
+
+    const subBolsaSum = Number(areasRes.rows[0]?.sub_bolsa || 0);
+    const totalFijoBase = Number(sedeBase.arriendo) + Number(sedeBase.servicios) + Number(sedeBase.admin) + Number(sedeBase.mtto);
+    const costoFijoBolsa = subBolsaSum > 0 ? subBolsaSum : totalFijoBase;
+
+    const sedeSimulada = {
+      ...sedeBase,
+      costoFijoBolsa,
+      ...(ajustesSede || {})
+    };
+
+    const rolesRes = await pool.query(`
+      SELECT
+        id,
+        cargo AS nombre,
+        sueldo_base,
+        porcentaje_provisiones AS prov_pct,
+        horas_mes
+      FROM personal_cargos;
+    `);
+
+    const examenesRes = await pool.query(`
+      SELECT
+        e.id,
+        e.nombre,
+        e.minutos_medico AS min_medico,
+        e.minutos_asistencial AS min_asis,
+        COALESCE(i.costo_insumos_detalle, e.costo_insumos_directos, 0) AS insumos,
+        e.costo_depreciacion_equipos AS cips,
+        e.tarifa_soat_referencia AS tarifa_convenio,
+        e.volumen_mes_proyectado AS vol_mes
+      FROM examenes e
+      LEFT JOIN (
+        SELECT examen_id, SUM(cantidad * valor_unitario) AS costo_insumos_detalle
+        FROM insumos_detalle
+        GROUP BY examen_id
+      ) i ON i.examen_id = e.id
+      ORDER BY e.id ASC;
+    `);
+
+    const rolesMap = {};
+    rolesRes.rows.forEach((rol) => {
+      const claveRol = String(rol.id || rol.nombre || '').toLowerCase();
+      const ajuste = (ajustesRoles && ajustesRoles[claveRol]) || {};
+
+      const sueldo = ajuste.sueldo_base !== undefined ? ajuste.sueldo_base : rol.sueldo_base;
+      const prov = ajuste.prov_pct !== undefined ? ajuste.prov_pct : rol.prov_pct;
+      const horas = ajuste.horas_mes !== undefined ? ajuste.horas_mes : rol.horas_mes;
+
+      rolesMap[claveRol] = calcularCostoMinuto(Number(sueldo), Number(prov), Number(horas));
+      if (rol.id === 'medico') rolesMap.medico = rolesMap[claveRol];
+      if (rol.id === 'asistencial') rolesMap.asistencial = rolesMap[claveRol];
+    });
+
+    const tarifaConvenioMap = await getTarifaConvenioMap(convenioId);
+
+    const resultadosSimulados = examenesRes.rows.map((examen) => {
+      const ajusteExamen = (ajustesExamenes && ajustesExamenes[examen.id]) || {};
+      const tarifaConvenio = Number(
+        tarifaConvenioMap[String(examen.id)] ?? examen.tarifa_convenio ?? examen.tarifa_soat_referencia ?? 0
+      ) || 0;
+      const examenSimulado = {
+        ...examen,
+        tarifa_convenio: tarifaConvenio,
+        ...ajusteExamen
+      };
+      const calculo = calcularCostoExamen(examenSimulado, rolesMap, sedeSimulada);
+
+      return {
+        examenId: examen.id,
+        nombre: examen.nombre || `Examen #${examen.id}`,
+        tarifaConvenio,
+        calculoSimulado: calculo
+      };
+    });
+
+    res.json({
+      mensaje: 'Proyección simulada con éxito',
+      sedeId,
+      resultados: resultadosSimulados
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al simular el escenario: ' + error.message });
+  }
+};
+
+module.exports = {
+  simularEscenario
+};
+</file>
+
+<file path="src/controllers/usuariosController.js">
+const pool = require('../config/db');
+const bcrypt = require('bcryptjs');
+
+const normalizeRoleName = (value) => String(value || '').trim();
+
+const normalizePermisos = (value) => {
+  if (Array.isArray(value)) {
+    return value.filter(Boolean).map((item) => String(item).trim()).filter(Boolean);
+  }
+
+  if (value && typeof value === 'object') {
+    return Object.entries(value)
+      .filter(([, enabled]) => Boolean(enabled))
+      .map(([key]) => String(key).trim())
+      .filter(Boolean);
+  }
+
+  return [];
+};
+
+const parseBoolean = (value) => {
+  if (typeof value === 'boolean') return value;
+  if (typeof value === 'string') return ['1', 'true', 'yes', 'y'].includes(value.toLowerCase());
+  return Boolean(value);
+};
+
+const resolveRoleIdValue = async (value) => {
+  if (value === undefined || value === null || value === '') {
+    return null;
+  }
+
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value;
+  }
+
+  const numericValue = Number(value);
+  if (!Number.isNaN(numericValue) && String(value).trim() !== '') {
+    return numericValue;
+  }
+
+  const nombreRol = normalizeRoleName(value).toUpperCase();
+  if (!nombreRol) {
+    return null;
+  }
+
+  const result = await pool.query(
+    `SELECT id FROM roles WHERE UPPER(TRIM(nombre)) = $1 LIMIT 1;`,
+    [nombreRol]
+  );
+
+  return result.rows[0]?.id ?? null;
+};
+
+const getRoles = async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT id, nombre, descripcion, permisos
+      FROM roles
+      ORDER BY id ASC;
+    `);
+
+    res.json(result.rows.map((rol) => ({
+      ...rol,
+      permisos: Array.isArray(rol.permisos) ? rol.permisos : (rol.permisos ? JSON.parse(JSON.stringify(rol.permisos)) : [])
+    })));
+  } catch (error) {
+    res.status(500).json({ error: 'Error al consultar roles: ' + error.message });
+  }
+};
+
+const createRole = async (req, res) => {
+  const { nombre, descripcion, permisos } = req.body || {};
+  const nombreNormalizado = normalizeRoleName(nombre);
+
+  if (!nombreNormalizado) {
+    return res.status(400).json({ error: 'El nombre del rol es obligatorio.' });
+  }
+
+  try {
+    const permisosNormalizados = typeof permisos === 'object' && permisos !== null ? permisos : {};
+    const result = await pool.query(
+      `INSERT INTO roles (nombre, descripcion, permisos)
+       VALUES ($1, $2, $3)
+       RETURNING id, nombre, descripcion, permisos;`,
+      [nombreNormalizado.toUpperCase(), descripcion ? String(descripcion).trim() : null, JSON.stringify(permisosNormalizados)]
+    );
+
+    res.status(201).json({ message: 'Rol creado correctamente', data: result.rows[0] });
+  } catch (error) {
+    if (error?.code === '23505') {
+      return res.status(409).json({ error: 'Ya existe un rol con ese nombre.' });
+    }
+
+    res.status(500).json({ error: 'Error al crear el rol: ' + error.message });
+  }
+};
+
+const getUsuarios = async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT
+        u.id,
+        u.nombre,
+        u.email,
+        u.activo,
+        u.role_id,
+        r.nombre AS rol_nombre,
+        u.sede_id,
+        s.nombre AS sede_nombre
+      FROM usuarios u
+      LEFT JOIN roles r ON r.id = u.role_id
+      LEFT JOIN sedes s ON s.id = u.sede_id
+      ORDER BY u.id ASC;
+    `);
+
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al consultar usuarios: ' + error.message });
+  }
+};
+
+const createUsuario = async (req, res) => {
+  const {
+    nombre,
+    email,
+    password,
+    role_id,
+    roleId,
+    perfil_id,
+    perfilId,
+    permiso_id,
+    permisoId,
+    perfil,
+    permiso,
+    sede_id,
+    sedeId,
+    activo,
+  } = req.body || {};
+
+  if (!nombre || !email || !password) {
+    return res.status(400).json({ error: 'Nombre, email y contraseña son obligatorios.' });
+  }
+
+  try {
+    const passwordHash = await bcrypt.hash(String(password), 10);
+    const roleIdValue = await resolveRoleIdValue(role_id ?? roleId ?? perfil_id ?? perfilId ?? permiso_id ?? permisoId ?? perfil ?? permiso ?? null);
+    const sedeIdValue = sede_id ?? sedeId ?? null;
+    const activoValue = parseBoolean(activo ?? true);
+
+    const result = await pool.query(
+      `INSERT INTO usuarios (nombre, email, password_hash, role_id, sede_id, activo)
+       VALUES ($1, $2, $3, $4, $5, $6)
+       RETURNING id, nombre, email, role_id, sede_id, activo;`,
+      [String(nombre).trim(), String(email).trim(), passwordHash, roleIdValue !== null ? Number(roleIdValue) : null, sedeIdValue ? String(sedeIdValue).trim() : null, activoValue]
+    );
+
+    res.status(201).json({ message: 'Usuario creado correctamente', data: result.rows[0] });
+  } catch (error) {
+    if (error?.code === '23505') {
+      return res.status(409).json({ error: 'Ya existe un usuario con ese email.' });
+    }
+
+    res.status(500).json({ error: 'Error al crear el usuario: ' + error.message });
+  }
+};
+
+const updateUsuario = async (req, res) => {
+  const { id } = req.params;
+  const {
+    nombre,
+    email,
+    password,
+    role_id,
+    roleId,
+    perfil_id,
+    perfilId,
+    permiso_id,
+    permisoId,
+    perfil,
+    permiso,
+    sede_id,
+    sedeId,
+    activo,
+  } = req.body || {};
+
+  try {
+    const campos = [];
+    const valores = [];
+    let index = 1;
+
+    if (nombre !== undefined) {
+      campos.push(`nombre = $${index++}`);
+      valores.push(String(nombre).trim());
+    }
+
+    if (email !== undefined) {
+      campos.push(`email = $${index++}`);
+      valores.push(String(email).trim());
+    }
+
+    if (password) {
+      campos.push(`password_hash = $${index++}`);
+      valores.push(await bcrypt.hash(String(password), 10));
+    }
+
+    const resolvedRoleId = await resolveRoleIdValue(role_id ?? roleId ?? perfil_id ?? perfilId ?? permiso_id ?? permisoId ?? perfil ?? permiso);
+    if (role_id !== undefined || roleId !== undefined || perfil_id !== undefined || perfilId !== undefined || permiso_id !== undefined || permisoId !== undefined || perfil !== undefined || permiso !== undefined) {
+      campos.push(`role_id = $${index++}`);
+      valores.push(resolvedRoleId === null ? null : Number(resolvedRoleId));
+    }
+
+    const resolvedSedeId = sede_id ?? sedeId;
+    if (resolvedSedeId !== undefined) {
+      campos.push(`sede_id = $${index++}`);
+      valores.push(resolvedSedeId === null || resolvedSedeId === '' ? null : String(resolvedSedeId).trim());
+    }
+
+    if (activo !== undefined) {
+      campos.push(`activo = $${index++}`);
+      valores.push(parseBoolean(activo));
+    }
+
+    if (campos.length === 0) {
+      return res.status(400).json({ error: 'No se enviaron cambios para actualizar.' });
+    }
+
+    valores.push(id);
+    const result = await pool.query(
+      `UPDATE usuarios
+       SET ${campos.join(', ')}
+       WHERE id = $${index}
+       RETURNING id, nombre, email, role_id, sede_id, activo;`,
+      valores
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Usuario no encontrado.' });
+    }
+
+    res.json({ message: 'Usuario actualizado correctamente', data: result.rows[0] });
+  } catch (error) {
+    if (error?.code === '23505') {
+      return res.status(409).json({ error: 'Ya existe un usuario con ese email.' });
+    }
+
+    res.status(500).json({ error: 'Error al actualizar el usuario: ' + error.message });
+  }
+};
+
+const getPerfil = async (req, res) => {
+  const usuarioId = req.usuario?.id || req.params?.id;
+
+  if (!usuarioId) {
+    return res.status(401).json({ error: 'No autorizado.' });
+  }
+
+  try {
+    const result = await pool.query(`
+      SELECT
+        u.id,
+        u.nombre,
+        u.email,
+        u.activo,
+        u.role_id,
+        r.nombre AS rol_nombre,
+        u.sede_id,
+        s.nombre AS sede_nombre
+      FROM usuarios u
+      LEFT JOIN roles r ON r.id = u.role_id
+      LEFT JOIN sedes s ON s.id = u.sede_id
+      WHERE u.id = $1;
+    `, [usuarioId]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Perfil no encontrado.' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al consultar perfil: ' + error.message });
+  }
+};
+
+const updatePerfil = async (req, res) => {
+  const usuarioId = req.usuario?.id;
+
+  if (!usuarioId) {
+    return res.status(401).json({ error: 'No autorizado.' });
+  }
+
+  const { nombre, email, password, activo } = req.body || {};
+  const payload = { nombre, email, password, activo };
+  return updateUsuario({ params: { id: String(usuarioId) }, body: payload }, res);
+};
+
+module.exports = {
+  getRoles,
+  createRole,
+  getUsuarios,
+  createUsuario,
+  updateUsuario,
+  getPerfil,
+  updatePerfil,
+};
+</file>
+
+<file path="src/middlewares/authMiddleware.js">
+const jwt = require('jsonwebtoken');
+
+const verificarToken = (req, res, next) => {
+  const jwtSecret = process.env.JWT_SECRET;
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!jwtSecret) {
+    return res.status(500).json({ error: 'Configuración del servidor incompleta' });
+  }
+
+  if (!token) {
+    return res.status(401).json({ error: 'Acceso denegado: Token no proporcionado' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, jwtSecret);
+    req.usuario = decoded;
+    next();
+  } catch (error) {
+    return res.status(403).json({ error: 'Token inválido o expirado' });
+  }
+};
+
+const verificarRol = (rolesPermitidos) => {
+  return (req, res, next) => {
+    if (!req.usuario || !rolesPermitidos.includes(req.usuario.rol)) {
+      return res.status(403).json({ error: 'No tienes permisos para realizar esta operación' });
+    }
+    next();
+  };
+};
+
+module.exports = { verificarToken, verificarRol };
+</file>
+
+<file path="src/routes/apiRoutes.js">
+const express = require('express');
+const router = express.Router();
+
+const { verificarToken } = require('../middlewares/authMiddleware');
+
+const { 
+  createSede, 
+  getSedes, 
+  updateSede, 
+  getAreasSede, 
+  saveAreasSede 
+} = require('../controllers/sedesController');
+const { createPersonal, getPersonal, updatePersonal } = require('../controllers/personalController');
+const { evaluarSede } = require('../controllers/evaluadorController');
+const { simularEscenario } = require('../controllers/simuladorController');
+const { 
+  getCostosCompat, 
+  updateCostoCompat, 
+  getEquipos, 
+  createEquipo, 
+  deleteEquipo 
+} = require('../controllers/costosController');
+const { getExamenes, getInsumos, createInsumo, updateInsumo, deleteInsumo } = require('../controllers/insumosController');
+const {
+  getRoles,
+  createRole,
+  getUsuarios,
+  createUsuario,
+  updateUsuario,
+  getPerfil,
+  updatePerfil,
+} = require('../controllers/usuariosController');
+
+// Middleware JWT
+router.use(verificarToken);
+
+// Compatibilidad legacy /api/costos y /api/v1/costos
+router.get('/costos', getCostosCompat);
+router.put('/costos/:endpoint', updateCostoCompat);
+router.put('/costos/:endpoint/:id', updateCostoCompat);
+
+// Rutas de Equipos Biomédicos (Sprint 1)
+router.get('/equipos/:sedeId', getEquipos);
+router.post('/equipos', createEquipo);
+router.delete('/equipos/:id', deleteEquipo);
+
+// Rutas Sedes (Sprint 2 - Sub-bolsas por área y m²)
+router.get('/sedes', getSedes);
+router.post('/sedes', createSede);
+router.put('/sedes/:id', updateSede);
+router.get('/sedes/:id/areas', getAreasSede);
+router.post('/sedes/:id/areas', saveAreasSede);
+
+// Rutas Personal
+router.get('/personal', getPersonal);
+router.post('/personal', createPersonal);
+router.put('/personal/:id', updatePersonal);
+
+// Rutas Evaluador y Simulador
+router.get('/evaluador/sede/:sedeId', evaluarSede);
+router.post('/simulador/escenario', simularEscenario);
+
+// Rutas de Usuarios, Roles y Perfiles
+router.get('/roles', getRoles);
+router.post('/roles', createRole);
+router.get('/perfiles', getRoles);
+router.post('/perfiles', createRole);
+
+// IMPORTANTE: Definir las rutas específicas de perfil antes de las rutas con :id
+router.get('/usuarios/perfil', getPerfil);
+router.put('/usuarios/perfil', updatePerfil);
+
+router.get('/usuarios', getUsuarios);
+router.post('/usuarios', createUsuario);
+router.put('/usuarios/:id', updateUsuario);
+
+// Rutas de Insumos
+router.get('/examenes', getExamenes);
+router.get('/insumos', getInsumos);
+router.get('/insumos/:examenId', getInsumos);
+router.post('/insumos', createInsumo);
+router.put('/insumos/:id', updateInsumo);
+router.delete('/insumos/:id', deleteInsumo);
+
+module.exports = router;
+</file>
+
+<file path="src/routes/authRoutes.js">
+const express = require('express');
+const router = express.Router();
+const authController = require('../controllers/authController');
+
+// Responde a POST /api/v1/auth/login
+router.post('/login', authController.login);
+
+module.exports = router;
+</file>
+
+<file path="src/routes/conveniosRoutes.js">
+const express = require('express');
+const router = express.Router();
+const { crearConvenio, obtenerConvenios, obtenerTarifasPorConvenio, actualizarTarifa } = require('../controllers/conveniosController');
+const { verificarToken, verificarRol } = require('../middlewares/authMiddleware');
+
+router.get('/', verificarToken, obtenerConvenios);
+router.post('/', verificarToken, verificarRol(['ADMINISTRADOR']), crearConvenio);
+router.post('/', verificarToken, verificarRol(['ADMINISTRADOR']), crearConvenio);
+router.get('/:convenioId/tarifas', verificarToken, obtenerTarifasPorConvenio);
+router.put('/tarifa', verificarToken, verificarRol(['ADMINISTRADOR']), actualizarTarifa);
+
+module.exports = router;
+</file>
+
+<file path="src/routes/evaluadorRoutes.js">
+const express = require('express');
+const router = express.Router();
+const { obtenerEvaluacionSede, obtenerConsolidadoMultisitio } = require('../controllers/evaluadorController');
+const { verificarToken } = require('../middlewares/authMiddleware');
+
+router.get('/sede/:sedeId', verificarToken, obtenerEvaluacionSede);
+router.get('/consolidado', verificarToken, obtenerConsolidadoMultisitio);
+
+module.exports = router;
+</file>
+
+<file path="src/routes/simuladorRoutes.js">
+const express = require('express');
+const router = express.Router();
+const { 
+  ejecutarSimulacion, 
+  guardarSimulacion, 
+  obtenerHistorialSimulaciones, 
+  obtenerDetalleSimulacion 
+} = require('../controllers/simuladorController');
+const { verificarToken } = require('../middlewares/authMiddleware');
+
+router.post('/simular', verificarToken, ejecutarSimulacion);
+router.post('/guardar', verificarToken, guardarSimulacion);
+router.get('/historial/:sedeId', verificarToken, obtenerHistorialSimulaciones);
+router.get('/historial/detalle/:id', verificarToken, obtenerDetalleSimulacion);
+
+module.exports = router;
+</file>
+
+<file path="src/services/costEngine.js">
+/**
+ * Motor de cálculos financieros para Cardiocosting
+ */
+
+const calcularCostoMinuto = (sueldoBase, provPct, horasMes) => {
+  const sueldo = Number(sueldoBase) || 0;
+  const prov = Number(provPct) || 0;
+  const horas = Number(horasMes) || 1;
+
+  if (horas <= 0) return 0;
+  const sueldoTotal = sueldo * (1 + prov / 100);
+  const costoHora = sueldoTotal / horas;
+  return costoHora / 60;
+};
+
+const calcularCostoExamen = (examen, rolesMap, sede) => {
+  const minMedico = Number(examen.min_medico ?? examen.minutos_medico ?? 0) || 0;
+  const minAsistencial = Number(examen.min_asis ?? examen.minutos_asistencial ?? 0) || 0;
+  const costoMedico = minMedico * (Number(rolesMap.medico) || 0);
+  const costoAsistencial = minAsistencial * (Number(rolesMap.asistencial) || 0);
+  const costoPersonalTotal = costoMedico + costoAsistencial;
+
+  // Gastos fijos generales calculados por componentes
+  const totalComponentes =
+    Number(sede.arriendo ?? sede.arriendo_mensual ?? 0) +
+    Number(sede.servicios ?? sede.servicios_publicos ?? 0) +
+    Number(sede.admin ?? sede.nomina_admin ?? 0) +
+    Number(sede.mtto ?? sede.mantenimiento_otros ?? 0);
+
+  // Prioridad: costoFijoBolsa asignado por sub-bolsas directas de la sede
+  const bolsaAsignada = Number(sede.costoFijoBolsa ?? sede.costo_fijo_bolsa ?? 0);
+  const gastosFijosSede = bolsaAsignada > 0 ? bolsaAsignada : totalComponentes;
+
+  const volumen = Number(sede.volumen ?? sede.volumen_mensual_esperado ?? 1) || 1;
+  const costoFijoPorUnidad = volumen > 0 ? gastosFijosSede / volumen : 0;
+
+  const costoDirectoTotal =
+    costoPersonalTotal +
+    Number(examen.insumos ?? examen.costo_insumos_directos ?? 0) +
+    Number(examen.cips ?? examen.costo_depreciacion_equipos ?? 0) +
+    costoFijoPorUnidad;
+
+  const tarifa = Number(examen.tarifa_convenio ?? examen.tarifa_soat_referencia ?? 0) || 0;
+  const utilidad = tarifa - costoDirectoTotal;
+  const margenPct = tarifa > 0 ? (utilidad / tarifa) * 100 : 0;
+
+  return {
+    costoPersonal: costoPersonalTotal,
+    costoInsumos: Number(examen.insumos ?? examen.costo_insumos_directos ?? 0),
+    costoFijoProrrateado: costoFijoPorUnidad,
+    costoTotal: costoDirectoTotal,
+    utilidad,
+    margenPct
+  };
+};
+
+module.exports = {
+  calcularCostoMinuto,
+  calcularCostoExamen
+};
+</file>
+
+<file path="src/services/financialService.js">
+const pool = require('../config/db');
+
+class FinancialService {
+  /**
+   * Consulta los equipos biomédicos asociados a una sede y sus exámenes vinculados
+   */
+  async getEquiposBySede(sedeId) {
+    const query = `
+      SELECT 
+        e.id, 
+        e.sede_id, 
+        e.nombre, 
+        e.valor_compra, 
+        e.vida_util_meses, 
+        e.costo_mantenimiento_anual, 
+        e.minutos_disponibles_mes,
+        se.id AS servicio_equipo_id, 
+        se.examen_id, 
+        se.tiempo_uso_minutos,
+        ex.nombre AS nombre_examen, 
+        ex.codigo_cups
+      FROM equipos e
+      LEFT JOIN servicio_equipo se ON e.id = se.equipo_id
+      LEFT JOIN examenes ex ON se.examen_id = ex.id
+      WHERE e.sede_id = $1
+      ORDER BY e.id DESC;
+    `;
+    const { rows } = await pool.query(query, [sedeId]);
+
+    // Agrupar los exámenes asignados por equipo
+    const equiposMap = {};
+
+    rows.forEach(row => {
+      if (!equiposMap[row.id]) {
+        equiposMap[row.id] = {
+          id: row.id,
+          sede_id: row.sede_id,
+          nombre: row.nombre,
+          valor_compra: Number(row.valor_compra || 0),
+          vida_util_meses: Number(row.vida_util_meses || 60),
+          costo_mantenimiento_anual: Number(row.costo_mantenimiento_anual || 0),
+          minutos_disponibles_mes: Number(row.minutos_disponibles_mes || 9600),
+          servicio_equipo: []
+        };
+      }
+
+      if (row.servicio_equipo_id) {
+        equiposMap[row.id].servicio_equipo.push({
+          id: row.servicio_equipo_id,
+          examen_id: row.examen_id,
+          tiempo_uso_minutos: Number(row.tiempo_uso_minutos || 0),
+          examenes: {
+            nombre: row.nombre_examen,
+            codigo_cups: row.codigo_cups
+          }
+        });
+      }
+    });
+
+    return Object.values(equiposMap);
+  }
+
+  /**
+   * Transacción para guardar el equipo y crear su relación en servicio_equipo
+   */
+  async createEquipoConAsignacion(equipoData, examenId, tiempoUsoMinutos) {
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+
+      const { 
+        sede_id, 
+        nombre, 
+        valor_compra, 
+        vida_util_meses, 
+        costo_mantenimiento_anual, 
+        minutos_disponibles_mes 
+      } = equipoData;
+
+      const eqQuery = `
+        INSERT INTO equipos (sede_id, nombre, valor_compra, vida_util_meses, costo_mantenimiento_anual, minutos_disponibles_mes)
+        VALUES ($1, $2, $3, $4, $5, $6)
+        RETURNING *;
+      `;
+      const eqRes = await client.query(eqQuery, [
+        sede_id, 
+        nombre, 
+        Number(valor_compra), 
+        Number(vida_util_meses || 60), 
+        Number(costo_mantenimiento_anual || 0), 
+        Number(minutos_disponibles_mes || 9600)
+      ]);
+      const nuevoEquipo = eqRes.rows[0];
+
+      if (examenId) {
+        const relQuery = `
+          INSERT INTO servicio_equipo (equipo_id, examen_id, tiempo_uso_minutos)
+          VALUES ($1, $2, $3);
+        `;
+        await client.query(relQuery, [nuevoEquipo.id, examenId, Number(tiempoUsoMinutos)]);
+      }
+
+      await client.query('COMMIT');
+      return nuevoEquipo;
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  /**
+   * Elimina un equipo por ID (por CASCADE borra las relaciones en servicio_equipo)
+   */
+  async deleteEquipo(equipoId) {
+    const query = 'DELETE FROM equipos WHERE id = $1;';
+    const result = await pool.query(query, [equipoId]);
+    return result.rowCount > 0;
+  }
+}
+
+module.exports = new FinancialService();
+</file>
+
+<file path="tests/usuariosModule.test.js">
+const test = require('node:test');
+const assert = require('node:assert/strict');
+
+const usuariosController = require('../src/controllers/usuariosController');
+
+test('usuariosController expone gestión de usuarios, roles y perfil', () => {
+  assert.ok(usuariosController.getRoles);
+  assert.ok(usuariosController.createRole);
+  assert.ok(usuariosController.getUsuarios);
+  assert.ok(usuariosController.createUsuario);
+  assert.ok(usuariosController.updateUsuario);
+  assert.ok(usuariosController.getPerfil);
+  assert.ok(usuariosController.updatePerfil);
+});
+
+test('usuariosController normaliza permisos con acciones por módulo', () => {
+  const permisos = usuariosController.normalizePermisos({
+    dashboard: { ver: true, crear: true, editar: false, eliminar: false },
+    sedes: { ver: true, crear: false, editar: false, eliminar: false },
+  });
+
+  assert.deepEqual(permisos.dashboard, { ver: true, crear: true, editar: false, eliminar: false });
+  assert.deepEqual(permisos.sedes, { ver: true, crear: false, editar: false, eliminar: false });
+});
+</file>
+
+<file path=".env.example">
+PORT=5000
+DB_HOST=localhost
+DB_USER=postgres
+DB_PASSWORD=your_db_password
+DB_NAME=cardiocosting_db
+DB_PORT=5432
+JWT_SECRET=replace_with_a_strong_random_secret
+FRONTEND_URL=http://localhost:5173
+</file>
+
+<file path="package.json">
+{
+  "name": "cardiocosting-backend",
+  "version": "1.0.0",
+  "description": "Backend para CardioCosting 2026",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.0",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "pg": "^8.23.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
+</file>
+
+<file path="server.js">
+const express = require('express');
+const cors = require('cors');
+require('dotenv').config();
+
+const db = require('./src/config/db');
+const authRoutes = require('./src/routes/authRoutes');
+const apiRoutes = require('./src/routes/apiRoutes');
+const conveniosRoutes = require('./src/routes/conveniosRoutes');
+
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+if (!process.env.JWT_SECRET) {
+  console.error('[FATAL] JWT_SECRET no está definido. Configúralo en tu archivo .env.');
+  process.exit(1);
+}
+
+const defaultAllowedOrigins = [
+  'http://localhost:5175',
+  'http://127.0.0.1:5175',
+  'http://0.0.0.0:5175',
+  'http://[::1]:5175',
+  'http://10.20.4.26:5175',
+  'http://10.20.4.26:5175'
+];
+
+const allowedOrigins = [...new Set([
+  ...defaultAllowedOrigins,
+  ...(process.env.FRONTEND_URL || '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean)
+])];
+
+const isAllowedOrigin = (origin) => {
+  if (!origin) return true;
+
+  if (allowedOrigins.includes(origin)) return true;
+
+  try {
+    const url = new URL(origin);
+    const hostname = url.hostname;
+    const host = url.host;
+
+    const isLocalDevHost = ['localhost', '127.0.0.1', '0.0.0.0', '[::1]'].includes(hostname);
+    const isVercelHost = hostname.endsWith('.vercel.app'); // Permite el dominio principal y las vistas previas de Vercel
+    const isPrivateNetworkHost =
+      hostname.startsWith('10.') ||
+      hostname.startsWith('192.168.') ||
+      hostname.startsWith('172.16.') ||
+      hostname.startsWith('172.17.') ||
+      hostname.startsWith('172.18.') ||
+      hostname.startsWith('172.19.') ||
+      hostname.startsWith('172.20.') ||
+      hostname.startsWith('172.21.') ||
+      hostname.startsWith('172.22.') ||
+      hostname.startsWith('172.23.') ||
+      hostname.startsWith('172.24.') ||
+      hostname.startsWith('172.25.') ||
+      hostname.startsWith('172.26.') ||
+      hostname.startsWith('172.27.') ||
+      hostname.startsWith('172.28.') ||
+      hostname.startsWith('172.29.') ||
+      hostname.startsWith('172.30.') ||
+      hostname.startsWith('172.31.');
+
+    return isLocalDevHost || isVercelHost || isPrivateNetworkHost || host.startsWith('localhost:') || host.startsWith('127.0.0.1:');
+  } catch {
+    return false;
+  }
+};
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (isAllowedOrigin(origin)) {
+      callback(null, true);
+      return;
+    }
+
+    callback(new Error('Origen no permitido por CORS'));
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
+
+app.use(express.json());
+
+// Montaje de rutas
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/convenios', conveniosRoutes);
+app.use('/api/v1', apiRoutes);
+app.use('/api', apiRoutes);
+
+app.use((req, res) => {
+  res.status(404).json({ error: 'Ruta no encontrada' });
+});
+
+app.use((err, req, res, next) => {
+  console.error('[ERROR]', err);
+  res.status(500).json({ error: 'Error interno del servidor' });
+});
+
+app.listen(PORT, async () => {
+  try {
+    await db.ensureDefaultRoles();
+    await db.ensureDefaultConvenio();
+    console.log(`Servidor Backend ejecutándose en http://localhost:${PORT}`);
+  } catch (error) {
+    console.error('[BOOT] No se pudo asegurar la configuración base del sistema:', error.message);
+    console.log(`Servidor Backend ejecutándose en http://localhost:${PORT}`);
+  }
+});
+</file>
+
+</files>

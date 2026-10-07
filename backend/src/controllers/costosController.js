@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const financialService = require('../services/financialService');
 
 const getCostosCompat = async (req, res) => {
   try {
@@ -168,7 +169,47 @@ const updateCostoCompat = async (req, res) => {
   }
 };
 
+// Controladores para Equipos Biomédicos (Sprint 1)
+const getEquipos = async (req, res) => {
+  try {
+    const sedeId = req.params.sedeId || req.params.sede;
+    if (!sedeId) return res.status(400).json({ error: 'Falta el id de la sede' });
+    const equipos = await financialService.getEquiposBySede(sedeId);
+    return res.json(equipos);
+  } catch (error) {
+    return res.status(500).json({ error: 'Error al consultar equipos: ' + error.message });
+  }
+};
+
+const createEquipo = async (req, res) => {
+  try {
+    const { equipoData, examenId, tiempoUsoMinutos } = req.body;
+    if (!equipoData?.sede_id || !equipoData.nombre || Number(equipoData.valor_compra) <= 0
+      || Number(equipoData.vida_util_meses) <= 0 || Number(equipoData.minutos_disponibles_mes) <= 0
+      || !examenId || Number(tiempoUsoMinutos) <= 0) {
+      return res.status(400).json({ error: 'Sede, equipo, valor, vida útil, capacidad, examen y tiempo de uso son obligatorios' });
+    }
+    const nuevoEquipo = await financialService.createEquipoConAsignacion(equipoData, examenId, tiempoUsoMinutos);
+    return res.status(201).json(nuevoEquipo);
+  } catch (error) {
+    return res.status(500).json({ error: 'Error al crear el equipo: ' + error.message });
+  }
+};
+
+const deleteEquipo = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await financialService.deleteEquipo(id);
+    return res.json({ message: 'Equipo eliminado exitosamente' });
+  } catch (error) {
+    return res.status(500).json({ error: 'Error al eliminar el equipo: ' + error.message });
+  }
+};
+
 module.exports = {
   getCostosCompat,
-  updateCostoCompat
+  updateCostoCompat,
+  getEquipos,
+  createEquipo,
+  deleteEquipo
 };

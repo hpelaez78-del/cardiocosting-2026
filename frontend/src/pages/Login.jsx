@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Activity, ShieldCheck, Stethoscope } from 'lucide-react';
 import api from '../api/axiosConfig';
+import { useSedeContext } from '../context/SedeContext';
 
 export default function Login() {
-  const [email, setEmail] = useState('gerencia@cardiologiasigloxxi.com');
-  const [password, setPassword] = useState('Admin123');
+  const { recargarContexto } = useSedeContext();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -19,10 +21,12 @@ export default function Login() {
       const res = await api.post('/auth/login', { email, password });
 
       localStorage.setItem('token', res.data.token);
-      if (res.data.usuario) {
-        localStorage.setItem('usuario', JSON.stringify(res.data.usuario));
+      const usuario = res.data.usuario || res.data.user;
+      if (usuario) {
+        localStorage.setItem('usuario', JSON.stringify(usuario));
       }
 
+      await recargarContexto();
       navigate('/');
     } catch (err) {
       if (err.response && err.response.data && err.response.data.error) {
@@ -98,7 +102,7 @@ export default function Login() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full rounded-2xl border border-slate-700 bg-slate-950/80 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/20"
-                  placeholder="gerencia@cardiologiasigloxxi.com"
+                  placeholder="nombre@dominio.com"
                 />
               </div>
 
@@ -123,9 +127,6 @@ export default function Login() {
               </button>
             </form>
 
-            <div className="mt-6 rounded-2xl border border-slate-700 bg-slate-950/40 p-3 text-xs text-slate-400">
-              Credencial válida verificada: <span className="font-semibold text-cyan-300">gerencia@cardiologiasigloxxi.com</span> / <span className="font-semibold text-cyan-300">Admin123</span>
-            </div>
           </div>
         </div>
       </div>

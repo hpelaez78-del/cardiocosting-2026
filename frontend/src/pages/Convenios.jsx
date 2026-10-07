@@ -77,8 +77,7 @@ export default function Convenios() {
     setSaving(true);
     setError('');
     try {
-      await api.put('/convenios/tarifa', {
-        convenio_id: Number(selectedConvenioId),
+      await api.put(`/convenios/${selectedConvenioId}/tarifas`, {
         examen_id: tarifa.examen_id,
         nueva_tarifa: Number(tarifa.tarifa_acordada) || 0,
       });

@@ -7,6 +7,14 @@ const authRoutes = require('./src/routes/authRoutes');
 const apiRoutes = require('./src/routes/apiRoutes');
 const conveniosRoutes = require('./src/routes/conveniosRoutes');
 
+// Carga condicional de personalRoutes si existe como archivo separado
+let personalRoutes;
+try {
+  personalRoutes = require('./src/routes/personalRoutes');
+} catch (e) {
+  personalRoutes = null;
+}
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -20,7 +28,6 @@ const defaultAllowedOrigins = [
   'http://127.0.0.1:5175',
   'http://0.0.0.0:5175',
   'http://[::1]:5175',
-  'http://10.20.4.26:5175',
   'http://10.20.4.26:5175'
 ];
 
@@ -34,7 +41,6 @@ const allowedOrigins = [...new Set([
 
 const isAllowedOrigin = (origin) => {
   if (!origin) return true;
-
   if (allowedOrigins.includes(origin)) return true;
 
   try {
@@ -43,7 +49,7 @@ const isAllowedOrigin = (origin) => {
     const host = url.host;
 
     const isLocalDevHost = ['localhost', '127.0.0.1', '0.0.0.0', '[::1]'].includes(hostname);
-    const isVercelHost = hostname.endsWith('.vercel.app'); // Permite el dominio principal y las vistas previas de Vercel
+    const isVercelHost = hostname.endsWith('.vercel.app');
     const isPrivateNetworkHost =
       hostname.startsWith('10.') ||
       hostname.startsWith('192.168.') ||
@@ -76,7 +82,6 @@ app.use(cors({
       callback(null, true);
       return;
     }
-
     callback(new Error('Origen no permitido por CORS'));
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
@@ -86,28 +91,56 @@ app.use(cors({
 
 app.use(express.json());
 
+// Log de peticiones entrantes para identificar rutas faltantes en consola
+app.use((req, res, next) => {
+  console.log(`[HTTP] ${req.method} ${req.originalUrl}`);
+  next();
+});
+
 // Montaje de rutas
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/convenios', conveniosRoutes);
+
+if (personalRoutes) {
+  app.use('/api/v1/personal', personalRoutes);
+}
+
 app.use('/api/v1', apiRoutes);
 app.use('/api', apiRoutes);
 
+// Manejador de rutas no encontradas (404)
 app.use((req, res) => {
-  res.status(404).json({ error: 'Ruta no encontrada' });
+  console.warn(`[404 NOT FOUND] ${req.method} ${req.originalUrl}`);
+  res.status(404).json({ error: `Ruta no encontrada: ${req.method} ${req.originalUrl}` });
 });
 
+// Manejador global de errores (500) - Muestra el detalle del error para depuración
 app.use((err, req, res, next) => {
-  console.error('[ERROR]', err);
-  res.status(500).json({ error: 'Error interno del servidor' });
+  console.error('[ERROR 500]', err);
+  res.status(500).json({ 
+    error: 'Error interno del servidor',
+    detalle: err.message || err 
+  });
 });
 
-app.listen(PORT, async () => {
+const startServer = async () => {
   try {
-    await db.ensureDefaultRoles();
-    await db.ensureDefaultConvenio();
-    console.log(`Servidor Backend ejecutándose en http://localhost:${PORT}`);
+    await db.ensurePermissionsSchema();
+    await db.ensureEquipmentPermissions();
+    await db.ensureSedeAreas();
+    await db.ensureEquiposSchema();
+    await db.ensureCostingDataSchema();
+    await db.ensureInsumosSedeSchema();
+    await db.ensureFormulaConfigSchema();
   } catch (error) {
     console.error('[BOOT] No se pudo asegurar la configuración base del sistema:', error.message);
-    console.log(`Servidor Backend ejecutándose en http://localhost:${PORT}`);
+    process.exitCode = 1;
+    return;
   }
-});
+
+  app.listen(PORT, () => {
+    console.log(`Servidor Backend ejecutándose en http://localhost:${PORT}`);
+  });
+};
+
+startServer();

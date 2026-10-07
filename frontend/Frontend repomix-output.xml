@@ -1,0 +1,3723 @@
+This file is a merged representation of a subset of the codebase, containing files not matching ignore patterns, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of a subset of the repository's contents that is considered the most important context.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching these patterns are excluded: node_modules/**, .git/**, .venv/**, dist/**, *.log
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+public/
+  favicon.svg
+  icons.svg
+src/
+  api/
+    axiosConfig.js
+  assets/
+    hero.png
+    react.svg
+    vite.svg
+  components/
+    layout/
+      AppShell.jsx
+    Sidebar.jsx
+  context/
+    SedeContext.jsx
+  pages/
+    Convenios.jsx
+    Dashboard.jsx
+    Equipos.jsx
+    EvaluadorSede.jsx
+    Insumos.jsx
+    Login.jsx
+    Personal.jsx
+    Sedes.jsx
+    Simulador.jsx
+    Usuarios.jsx
+  App.css
+  App.jsx
+  index.css
+  main.jsx
+.env.example
+.gitignore
+.oxlintrc.json
+index.html
+package.json
+postcss.config.js
+README.md
+tailwind.config.js
+vite.config.js
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="public/favicon.svg">
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="46" fill="none" viewBox="0 0 48 46"><path fill="#863bff" d="M25.946 44.938c-.664.845-2.021.375-2.021-.698V33.937a2.26 2.26 0 0 0-2.262-2.262H10.287c-.92 0-1.456-1.04-.92-1.788l7.48-10.471c1.07-1.497 0-3.578-1.842-3.578H1.237c-.92 0-1.456-1.04-.92-1.788L10.013.474c.214-.297.556-.474.92-.474h28.894c.92 0 1.456 1.04.92 1.788l-7.48 10.471c-1.07 1.498 0 3.579 1.842 3.579h11.377c.943 0 1.473 1.088.89 1.83L25.947 44.94z" style="fill:#863bff;fill:color(display-p3 .5252 .23 1);fill-opacity:1"/><mask id="a" width="48" height="46" x="0" y="0" maskUnits="userSpaceOnUse" style="mask-type:alpha"><path fill="#000" d="M25.842 44.938c-.664.844-2.021.375-2.021-.698V33.937a2.26 2.26 0 0 0-2.262-2.262H10.183c-.92 0-1.456-1.04-.92-1.788l7.48-10.471c1.07-1.498 0-3.579-1.842-3.579H1.133c-.92 0-1.456-1.04-.92-1.787L9.91.473c.214-.297.556-.474.92-.474h28.894c.92 0 1.456 1.04.92 1.788l-7.48 10.471c-1.07 1.498 0 3.578 1.842 3.578h11.377c.943 0 1.473 1.088.89 1.832L25.843 44.94z" style="fill:#000;fill-opacity:1"/></mask><g mask="url(#a)"><g filter="url(#b)"><ellipse cx="5.508" cy="14.704" fill="#ede6ff" rx="5.508" ry="14.704" style="fill:#ede6ff;fill:color(display-p3 .9275 .9033 1);fill-opacity:1" transform="matrix(.00324 1 1 -.00324 -4.47 31.516)"/></g><g filter="url(#c)"><ellipse cx="10.399" cy="29.851" fill="#ede6ff" rx="10.399" ry="29.851" style="fill:#ede6ff;fill:color(display-p3 .9275 .9033 1);fill-opacity:1" transform="matrix(.00324 1 1 -.00324 -39.328 7.883)"/></g><g filter="url(#d)"><ellipse cx="5.508" cy="30.487" fill="#7e14ff" rx="5.508" ry="30.487" style="fill:#7e14ff;fill:color(display-p3 .4922 .0767 1);fill-opacity:1" transform="rotate(89.814 -25.913 -14.639)scale(1 -1)"/></g><g filter="url(#e)"><ellipse cx="5.508" cy="30.599" fill="#7e14ff" rx="5.508" ry="30.599" style="fill:#7e14ff;fill:color(display-p3 .4922 .0767 1);fill-opacity:1" transform="rotate(89.814 -32.644 -3.334)scale(1 -1)"/></g><g filter="url(#f)"><ellipse cx="5.508" cy="30.599" fill="#7e14ff" rx="5.508" ry="30.599" style="fill:#7e14ff;fill:color(display-p3 .4922 .0767 1);fill-opacity:1" transform="matrix(.00324 1 1 -.00324 -34.34 30.47)"/></g><g filter="url(#g)"><ellipse cx="14.072" cy="22.078" fill="#ede6ff" rx="14.072" ry="22.078" style="fill:#ede6ff;fill:color(display-p3 .9275 .9033 1);fill-opacity:1" transform="rotate(93.35 24.506 48.493)scale(-1 1)"/></g><g filter="url(#h)"><ellipse cx="3.47" cy="21.501" fill="#7e14ff" rx="3.47" ry="21.501" style="fill:#7e14ff;fill:color(display-p3 .4922 .0767 1);fill-opacity:1" transform="rotate(89.009 28.708 47.59)scale(-1 1)"/></g><g filter="url(#i)"><ellipse cx="3.47" cy="21.501" fill="#7e14ff" rx="3.47" ry="21.501" style="fill:#7e14ff;fill:color(display-p3 .4922 .0767 1);fill-opacity:1" transform="rotate(89.009 28.708 47.59)scale(-1 1)"/></g><g filter="url(#j)"><ellipse cx=".387" cy="8.972" fill="#7e14ff" rx="4.407" ry="29.108" style="fill:#7e14ff;fill:color(display-p3 .4922 .0767 1);fill-opacity:1" transform="rotate(39.51 .387 8.972)"/></g><g filter="url(#k)"><ellipse cx="47.523" cy="-6.092" fill="#7e14ff" rx="4.407" ry="29.108" style="fill:#7e14ff;fill:color(display-p3 .4922 .0767 1);fill-opacity:1" transform="rotate(37.892 47.523 -6.092)"/></g><g filter="url(#l)"><ellipse cx="41.412" cy="6.333" fill="#47bfff" rx="5.971" ry="9.665" style="fill:#47bfff;fill:color(display-p3 .2799 .748 1);fill-opacity:1" transform="rotate(37.892 41.412 6.333)"/></g><g filter="url(#m)"><ellipse cx="-1.879" cy="38.332" fill="#7e14ff" rx="4.407" ry="29.108" style="fill:#7e14ff;fill:color(display-p3 .4922 .0767 1);fill-opacity:1" transform="rotate(37.892 -1.88 38.332)"/></g><g filter="url(#n)"><ellipse cx="-1.879" cy="38.332" fill="#7e14ff" rx="4.407" ry="29.108" style="fill:#7e14ff;fill:color(display-p3 .4922 .0767 1);fill-opacity:1" transform="rotate(37.892 -1.88 38.332)"/></g><g filter="url(#o)"><ellipse cx="35.651" cy="29.907" fill="#7e14ff" rx="4.407" ry="29.108" style="fill:#7e14ff;fill:color(display-p3 .4922 .0767 1);fill-opacity:1" transform="rotate(37.892 35.651 29.907)"/></g><g filter="url(#p)"><ellipse cx="38.418" cy="32.4" fill="#47bfff" rx="5.971" ry="15.297" style="fill:#47bfff;fill:color(display-p3 .2799 .748 1);fill-opacity:1" transform="rotate(37.892 38.418 32.4)"/></g></g><defs><filter id="b" width="60.045" height="41.654" x="-19.77" y="16.149" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="7.659"/></filter><filter id="c" width="90.34" height="51.437" x="-54.613" y="-7.533" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="7.659"/></filter><filter id="d" width="79.355" height="29.4" x="-49.64" y="2.03" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="e" width="79.579" height="29.4" x="-45.045" y="20.029" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="f" width="79.579" height="29.4" x="-43.513" y="21.178" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="g" width="74.749" height="58.852" x="15.756" y="-17.901" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="7.659"/></filter><filter id="h" width="61.377" height="25.362" x="23.548" y="2.284" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="i" width="61.377" height="25.362" x="23.548" y="2.284" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="j" width="56.045" height="63.649" x="-27.636" y="-22.853" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="k" width="54.814" height="64.646" x="20.116" y="-38.415" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="l" width="33.541" height="35.313" x="24.641" y="-11.323" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="m" width="54.814" height="64.646" x="-29.286" y="6.009" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="n" width="54.814" height="64.646" x="-29.286" y="6.009" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="o" width="54.814" height="64.646" x="8.244" y="-2.416" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter><filter id="p" width="39.409" height="43.623" x="18.713" y="10.588" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17158" stdDeviation="4.596"/></filter></defs></svg>
+</file>
+
+<file path="public/icons.svg">
+<svg xmlns="http://www.w3.org/2000/svg">
+  <symbol id="bluesky-icon" viewBox="0 0 16 17">
+    <g clip-path="url(#bluesky-clip)"><path fill="#08060d" d="M7.75 7.735c-.693-1.348-2.58-3.86-4.334-5.097-1.68-1.187-2.32-.981-2.74-.79C.188 2.065.1 2.812.1 3.251s.241 3.602.398 4.13c.52 1.744 2.367 2.333 4.07 2.145-2.495.37-4.71 1.278-1.805 4.512 3.196 3.309 4.38-.71 4.987-2.746.608 2.036 1.307 5.91 4.93 2.746 2.72-2.746.747-4.143-1.747-4.512 1.702.189 3.55-.4 4.07-2.145.156-.528.397-3.691.397-4.13s-.088-1.186-.575-1.406c-.42-.19-1.06-.395-2.741.79-1.755 1.24-3.64 3.752-4.334 5.099"/></g>
+    <defs><clipPath id="bluesky-clip"><path fill="#fff" d="M.1.85h15.3v15.3H.1z"/></clipPath></defs>
+  </symbol>
+  <symbol id="discord-icon" viewBox="0 0 20 19">
+    <path fill="#08060d" d="M16.224 3.768a14.5 14.5 0 0 0-3.67-1.153c-.158.286-.343.67-.47.976a13.5 13.5 0 0 0-4.067 0c-.128-.306-.317-.69-.476-.976A14.4 14.4 0 0 0 3.868 3.77C1.546 7.28.916 10.703 1.231 14.077a14.7 14.7 0 0 0 4.5 2.306q.545-.748.965-1.587a9.5 9.5 0 0 1-1.518-.74q.191-.14.372-.293c2.927 1.369 6.107 1.369 8.999 0q.183.152.372.294-.723.437-1.52.74.418.838.963 1.588a14.6 14.6 0 0 0 4.504-2.308c.37-3.911-.63-7.302-2.644-10.309m-9.13 8.234c-.878 0-1.599-.82-1.599-1.82 0-.998.705-1.82 1.6-1.82.894 0 1.614.82 1.599 1.82.001 1-.705 1.82-1.6 1.82m5.91 0c-.878 0-1.599-.82-1.599-1.82 0-.998.705-1.82 1.6-1.82.893 0 1.614.82 1.599 1.82 0 1-.706 1.82-1.6 1.82"/>
+  </symbol>
+  <symbol id="documentation-icon" viewBox="0 0 21 20">
+    <path fill="none" stroke="#aa3bff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35" d="m15.5 13.333 1.533 1.322c.645.555.967.833.967 1.178s-.322.623-.967 1.179L15.5 18.333m-3.333-5-1.534 1.322c-.644.555-.966.833-.966 1.178s.322.623.966 1.179l1.534 1.321"/>
+    <path fill="none" stroke="#aa3bff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35" d="M17.167 10.836v-4.32c0-1.41 0-2.117-.224-2.68-.359-.906-1.118-1.621-2.08-1.96-.599-.21-1.349-.21-2.848-.21-2.623 0-3.935 0-4.983.369-1.684.591-3.013 1.842-3.641 3.428C3 6.449 3 7.684 3 10.154v2.122c0 2.558 0 3.838.706 4.726q.306.383.713.671c.76.536 1.79.64 3.581.66"/>
+    <path fill="none" stroke="#aa3bff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35" d="M3 10a2.78 2.78 0 0 1 2.778-2.778c.555 0 1.209.097 1.748-.047.48-.129.854-.503.982-.982.145-.54.048-1.194.048-1.749a2.78 2.78 0 0 1 2.777-2.777"/>
+  </symbol>
+  <symbol id="github-icon" viewBox="0 0 19 19">
+    <path fill="#08060d" fill-rule="evenodd" d="M9.356 1.85C5.05 1.85 1.57 5.356 1.57 9.694a7.84 7.84 0 0 0 5.324 7.44c.387.079.528-.168.528-.376 0-.182-.013-.805-.013-1.454-2.165.467-2.616-.935-2.616-.935-.349-.91-.864-1.143-.864-1.143-.71-.48.051-.48.051-.48.787.051 1.2.805 1.2.805.695 1.194 1.817.857 2.268.649.064-.507.27-.857.49-1.052-1.728-.182-3.545-.857-3.545-3.87 0-.857.31-1.558.8-2.104-.078-.195-.349-1 .077-2.078 0 0 .657-.208 2.14.805a7.5 7.5 0 0 1 1.946-.26c.657 0 1.328.092 1.946.26 1.483-1.013 2.14-.805 2.14-.805.426 1.078.155 1.883.078 2.078.502.546.799 1.247.799 2.104 0 3.013-1.818 3.675-3.558 3.87.284.247.528.714.528 1.454 0 1.052-.012 1.896-.012 2.156 0 .208.142.455.528.377a7.84 7.84 0 0 0 5.324-7.441c.013-4.338-3.48-7.844-7.773-7.844" clip-rule="evenodd"/>
+  </symbol>
+  <symbol id="social-icon" viewBox="0 0 20 20">
+    <path fill="none" stroke="#aa3bff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35" d="M12.5 6.667a4.167 4.167 0 1 0-8.334 0 4.167 4.167 0 0 0 8.334 0"/>
+    <path fill="none" stroke="#aa3bff" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.35" d="M2.5 16.667a5.833 5.833 0 0 1 8.75-5.053m3.837.474.513 1.035c.07.144.257.282.414.309l.93.155c.596.1.736.536.307.965l-.723.73a.64.64 0 0 0-.152.531l.207.903c.164.715-.213.991-.84.618l-.872-.52a.63.63 0 0 0-.577 0l-.872.52c-.624.373-1.003.094-.84-.618l.207-.903a.64.64 0 0 0-.152-.532l-.723-.729c-.426-.43-.289-.864.306-.964l.93-.156a.64.64 0 0 0 .412-.31l.513-1.034c.28-.562.735-.562 1.012 0"/>
+  </symbol>
+  <symbol id="x-icon" viewBox="0 0 19 19">
+    <path fill="#08060d" fill-rule="evenodd" d="M1.893 1.98c.052.072 1.245 1.769 2.653 3.77l2.892 4.114c.183.261.333.48.333.486s-.068.089-.152.183l-.522.593-.765.867-3.597 4.087c-.375.426-.734.834-.798.905a1 1 0 0 0-.118.148c0 .01.236.017.664.017h.663l.729-.83c.4-.457.796-.906.879-.999a692 692 0 0 0 1.794-2.038c.034-.037.301-.34.594-.675l.551-.624.345-.392a7 7 0 0 1 .34-.374c.006 0 .93 1.306 2.052 2.903l2.084 2.965.045.063h2.275c1.87 0 2.273-.003 2.266-.021-.008-.02-1.098-1.572-3.894-5.547-2.013-2.862-2.28-3.246-2.273-3.266.008-.019.282-.332 2.085-2.38l2-2.274 1.567-1.782c.022-.028-.016-.03-.65-.03h-.674l-.3.342a871 871 0 0 1-1.782 2.025c-.067.075-.405.458-.75.852a100 100 0 0 1-.803.91c-.148.172-.299.344-.99 1.127-.304.343-.32.358-.345.327-.015-.019-.904-1.282-1.976-2.808L6.365 1.85H1.8zm1.782.91 8.078 11.294c.772 1.08 1.413 1.973 1.425 1.984.016.017.241.02 1.05.017l1.03-.004-2.694-3.766L7.796 5.75 5.722 2.852l-1.039-.004-1.039-.004z" clip-rule="evenodd"/>
+  </symbol>
+</svg>
+</file>
+
+<file path="src/api/axiosConfig.js">
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Inyección automática del token JWT en cada solicitud
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Interceptor con encadenamiento opcional para evitar lecturas de 'undefined'
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Si expira la sesión (401), limpia el almacenamiento y redirige
+    if (error?.response?.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('usuario');
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
+export default api;
+</file>
+
+<file path="src/assets/react.svg">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--logos" width="35.93" height="32" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 228"><path fill="#00D8FF" d="M210.483 73.824a171.49 171.49 0 0 0-8.24-2.597c.465-1.9.893-3.777 1.273-5.621c6.238-30.281 2.16-54.676-11.769-62.708c-13.355-7.7-35.196.329-57.254 19.526a171.23 171.23 0 0 0-6.375 5.848a155.866 155.866 0 0 0-4.241-3.917C100.759 3.829 77.587-4.822 63.673 3.233C50.33 10.957 46.379 33.89 51.995 62.588a170.974 170.974 0 0 0 1.892 8.48c-3.28.932-6.445 1.924-9.474 2.98C17.309 83.498 0 98.307 0 113.668c0 15.865 18.582 31.778 46.812 41.427a145.52 145.52 0 0 0 6.921 2.165a167.467 167.467 0 0 0-2.01 9.138c-5.354 28.2-1.173 50.591 12.134 58.266c13.744 7.926 36.812-.22 59.273-19.855a145.567 145.567 0 0 0 5.342-4.923a168.064 168.064 0 0 0 6.92 6.314c21.758 18.722 43.246 26.282 56.54 18.586c13.731-7.949 18.194-32.003 12.4-61.268a145.016 145.016 0 0 0-1.535-6.842c1.62-.48 3.21-.974 4.76-1.488c29.348-9.723 48.443-25.443 48.443-41.52c0-15.417-17.868-30.326-45.517-39.844Zm-6.365 70.984c-1.4.463-2.836.91-4.3 1.345c-3.24-10.257-7.612-21.163-12.963-32.432c5.106-11 9.31-21.767 12.459-31.957c2.619.758 5.16 1.557 7.61 2.4c23.69 8.156 38.14 20.213 38.14 29.504c0 9.896-15.606 22.743-40.946 31.14Zm-10.514 20.834c2.562 12.94 2.927 24.64 1.23 33.787c-1.524 8.219-4.59 13.698-8.382 15.893c-8.067 4.67-25.32-1.4-43.927-17.412a156.726 156.726 0 0 1-6.437-5.87c7.214-7.889 14.423-17.06 21.459-27.246c12.376-1.098 24.068-2.894 34.671-5.345a134.17 134.17 0 0 1 1.386 6.193ZM87.276 214.515c-7.882 2.783-14.16 2.863-17.955.675c-8.075-4.657-11.432-22.636-6.853-46.752a156.923 156.923 0 0 1 1.869-8.499c10.486 2.32 22.093 3.988 34.498 4.994c7.084 9.967 14.501 19.128 21.976 27.15a134.668 134.668 0 0 1-4.877 4.492c-9.933 8.682-19.886 14.842-28.658 17.94ZM50.35 144.747c-12.483-4.267-22.792-9.812-29.858-15.863c-6.35-5.437-9.555-10.836-9.555-15.216c0-9.322 13.897-21.212 37.076-29.293c2.813-.98 5.757-1.905 8.812-2.773c3.204 10.42 7.406 21.315 12.477 32.332c-5.137 11.18-9.399 22.249-12.634 32.792a134.718 134.718 0 0 1-6.318-1.979Zm12.378-84.26c-4.811-24.587-1.616-43.134 6.425-47.789c8.564-4.958 27.502 2.111 47.463 19.835a144.318 144.318 0 0 1 3.841 3.545c-7.438 7.987-14.787 17.08-21.808 26.988c-12.04 1.116-23.565 2.908-34.161 5.309a160.342 160.342 0 0 1-1.76-7.887Zm110.427 27.268a347.8 347.8 0 0 0-7.785-12.803c8.168 1.033 15.994 2.404 23.343 4.08c-2.206 7.072-4.956 14.465-8.193 22.045a381.151 381.151 0 0 0-7.365-13.322Zm-45.032-43.861c5.044 5.465 10.096 11.566 15.065 18.186a322.04 322.04 0 0 0-30.257-.006c4.974-6.559 10.069-12.652 15.192-18.18ZM82.802 87.83a323.167 323.167 0 0 0-7.227 13.238c-3.184-7.553-5.909-14.98-8.134-22.152c7.304-1.634 15.093-2.97 23.209-3.984a321.524 321.524 0 0 0-7.848 12.897Zm8.081 65.352c-8.385-.936-16.291-2.203-23.593-3.793c2.26-7.3 5.045-14.885 8.298-22.6a321.187 321.187 0 0 0 7.257 13.246c2.594 4.48 5.28 8.868 8.038 13.147Zm37.542 31.03c-5.184-5.592-10.354-11.779-15.403-18.433c4.902.192 9.899.29 14.978.29c5.218 0 10.376-.117 15.453-.343c-4.985 6.774-10.018 12.97-15.028 18.486Zm52.198-57.817c3.422 7.8 6.306 15.345 8.596 22.52c-7.422 1.694-15.436 3.058-23.88 4.071a382.417 382.417 0 0 0 7.859-13.026a347.403 347.403 0 0 0 7.425-13.565Zm-16.898 8.101a358.557 358.557 0 0 1-12.281 19.815a329.4 329.4 0 0 1-23.444.823c-7.967 0-15.716-.248-23.178-.732a310.202 310.202 0 0 1-12.513-19.846h.001a307.41 307.41 0 0 1-10.923-20.627a310.278 310.278 0 0 1 10.89-20.637l-.001.001a307.318 307.318 0 0 1 12.413-19.761c7.613-.576 15.42-.876 23.31-.876H128c7.926 0 15.743.303 23.354.883a329.357 329.357 0 0 1 12.335 19.695a358.489 358.489 0 0 1 11.036 20.54a329.472 329.472 0 0 1-11 20.722Zm22.56-122.124c8.572 4.944 11.906 24.881 6.52 51.026c-.344 1.668-.73 3.367-1.15 5.09c-10.622-2.452-22.155-4.275-34.23-5.408c-7.034-10.017-14.323-19.124-21.64-27.008a160.789 160.789 0 0 1 5.888-5.4c18.9-16.447 36.564-22.941 44.612-18.3ZM128 90.808c12.625 0 22.86 10.235 22.86 22.86s-10.235 22.86-22.86 22.86s-22.86-10.235-22.86-22.86s10.235-22.86 22.86-22.86Z"></path></svg>
+</file>
+
+<file path="src/assets/vite.svg">
+<svg xmlns="http://www.w3.org/2000/svg" width="77" height="47" fill="none" aria-labelledby="vite-logo-title" viewBox="0 0 77 47"><title id="vite-logo-title">Vite</title><style>.parenthesis{fill:#000}@media (prefers-color-scheme:dark){.parenthesis{fill:#fff}}</style><path fill="#9135ff" d="M40.151 45.71c-.663.844-2.02.374-2.02-.699V34.708a2.26 2.26 0 0 0-2.262-2.262H24.493c-.92 0-1.457-1.04-.92-1.788l7.479-10.471c1.07-1.498 0-3.578-1.842-3.578H15.443c-.92 0-1.456-1.04-.92-1.788l9.696-13.576c.213-.297.556-.474.92-.474h28.894c.92 0 1.456 1.04.92 1.788l-7.48 10.472c-1.07 1.497 0 3.578 1.842 3.578h11.376c.944 0 1.474 1.087.89 1.83L40.153 45.712z"/><mask id="a" width="48" height="47" x="14" y="0" maskUnits="userSpaceOnUse" style="mask-type:alpha"><path fill="#000" d="M40.047 45.71c-.663.843-2.02.374-2.02-.699V34.708a2.26 2.26 0 0 0-2.262-2.262H24.389c-.92 0-1.457-1.04-.92-1.788l7.479-10.472c1.07-1.497 0-3.578-1.842-3.578H15.34c-.92 0-1.456-1.04-.92-1.788l9.696-13.575c.213-.297.556-.474.92-.474H53.93c.92 0 1.456 1.04.92 1.788L47.37 13.03c-1.07 1.498 0 3.578 1.842 3.578h11.376c.944 0 1.474 1.088.89 1.831L40.049 45.712z"/></mask><g mask="url(#a)"><g filter="url(#b)"><ellipse cx="5.508" cy="14.704" fill="#eee6ff" rx="5.508" ry="14.704" transform="rotate(269.814 20.96 11.29)scale(-1 1)"/></g><g filter="url(#c)"><ellipse cx="10.399" cy="29.851" fill="#eee6ff" rx="10.399" ry="29.851" transform="rotate(89.814 -16.902 -8.275)scale(1 -1)"/></g><g filter="url(#d)"><ellipse cx="5.508" cy="30.487" fill="#8900ff" rx="5.508" ry="30.487" transform="rotate(89.814 -19.197 -7.127)scale(1 -1)"/></g><g filter="url(#e)"><ellipse cx="5.508" cy="30.599" fill="#8900ff" rx="5.508" ry="30.599" transform="rotate(89.814 -25.928 4.177)scale(1 -1)"/></g><g filter="url(#f)"><ellipse cx="5.508" cy="30.599" fill="#8900ff" rx="5.508" ry="30.599" transform="rotate(89.814 -25.738 5.52)scale(1 -1)"/></g><g filter="url(#g)"><ellipse cx="14.072" cy="22.078" fill="#eee6ff" rx="14.072" ry="22.078" transform="rotate(93.35 31.245 55.578)scale(-1 1)"/></g><g filter="url(#h)"><ellipse cx="3.47" cy="21.501" fill="#8900ff" rx="3.47" ry="21.501" transform="rotate(89.009 35.419 55.202)scale(-1 1)"/></g><g filter="url(#i)"><ellipse cx="3.47" cy="21.501" fill="#8900ff" rx="3.47" ry="21.501" transform="rotate(89.009 35.419 55.202)scale(-1 1)"/></g><g filter="url(#j)"><ellipse cx="14.592" cy="9.743" fill="#8900ff" rx="4.407" ry="29.108" transform="rotate(39.51 14.592 9.743)"/></g><g filter="url(#k)"><ellipse cx="61.728" cy="-5.321" fill="#8900ff" rx="4.407" ry="29.108" transform="rotate(37.892 61.728 -5.32)"/></g><g filter="url(#l)"><ellipse cx="55.618" cy="7.104" fill="#00c2ff" rx="5.971" ry="9.665" transform="rotate(37.892 55.618 7.104)"/></g><g filter="url(#m)"><ellipse cx="12.326" cy="39.103" fill="#8900ff" rx="4.407" ry="29.108" transform="rotate(37.892 12.326 39.103)"/></g><g filter="url(#n)"><ellipse cx="12.326" cy="39.103" fill="#8900ff" rx="4.407" ry="29.108" transform="rotate(37.892 12.326 39.103)"/></g><g filter="url(#o)"><ellipse cx="49.857" cy="30.678" fill="#8900ff" rx="4.407" ry="29.108" transform="rotate(37.892 49.857 30.678)"/></g><g filter="url(#p)"><ellipse cx="52.623" cy="33.171" fill="#00c2ff" rx="5.971" ry="15.297" transform="rotate(37.892 52.623 33.17)"/></g></g><path d="M6.919 0c-9.198 13.166-9.252 33.575 0 46.789h6.215c-9.25-13.214-9.196-33.623 0-46.789zm62.424 0h-6.215c9.198 13.166 9.252 33.575 0 46.789h6.215c9.25-13.214 9.196-33.623 0-46.789" class="parenthesis"/><defs><filter id="b" width="60.045" height="41.654" x="-5.564" y="16.92" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="7.659"/></filter><filter id="c" width="90.34" height="51.437" x="-40.407" y="-6.762" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="7.659"/></filter><filter id="d" width="79.355" height="29.4" x="-35.435" y="2.801" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="e" width="79.579" height="29.4" x="-30.84" y="20.8" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="f" width="79.579" height="29.4" x="-29.307" y="21.949" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="g" width="74.749" height="58.852" x="29.961" y="-17.13" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="7.659"/></filter><filter id="h" width="61.377" height="25.362" x="37.754" y="3.055" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="i" width="61.377" height="25.362" x="37.754" y="3.055" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="j" width="56.045" height="63.649" x="-13.43" y="-22.082" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="k" width="54.814" height="64.646" x="34.321" y="-37.644" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="l" width="33.541" height="35.313" x="38.847" y="-10.552" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="m" width="54.814" height="64.646" x="-15.081" y="6.78" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="n" width="54.814" height="64.646" x="-15.081" y="6.78" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="o" width="54.814" height="64.646" x="22.45" y="-1.645" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter><filter id="p" width="39.409" height="43.623" x="32.919" y="11.36" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_2002_17286" stdDeviation="4.596"/></filter></defs></svg>
+</file>
+
+<file path="src/components/layout/AppShell.jsx">
+import React, { useState, useEffect } from 'react';
+import { 
+  LayoutGrid, 
+  FileSpreadsheet, 
+  LogOut, 
+  Stethoscope, 
+  Building2, 
+  Users, 
+  Handshake, 
+  Sliders,
+  MapPin
+} from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useSedeContext } from '../../context/SedeContext';
+import api from '../../api/axiosConfig';
+
+export default function AppShell({ children }) {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const [sedesDB, setSedesDB] = useState([]);
+
+  let selectedSede = 'ibague';
+  let setSelectedSede = () => {};
+
+  try {
+    const sedeCtx = useSedeContext();
+    if (sedeCtx) {
+      selectedSede = sedeCtx.selectedSede || 'ibague';
+      setSelectedSede = sedeCtx.setSelectedSede || (() => {});
+    }
+  } catch {
+    // Fallback de contexto
+  }
+
+  // Cargar sedes dinámicamente desde la BD
+  useEffect(() => {
+    const cargarSedesReales = async () => {
+      try {
+        const res = await api.get('/sedes');
+        if (Array.isArray(res.data) && res.data.length > 0) {
+          setSedesDB(res.data);
+        }
+      } catch (err) {
+        console.warn('No se pudieron consultar las sedes dinámicas:', err.message);
+      }
+    };
+    cargarSedesReales();
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('usuario');
+    navigate('/login');
+  };
+
+  const hasModulePermission = (modulo) => {
+    try {
+      const stored = localStorage.getItem('usuario');
+      if (!stored) return true;
+      const usuario = JSON.parse(stored);
+
+      const rol = String(usuario.rol || usuario.role || usuario.rol_nombre || '').toUpperCase();
+      if (rol === 'ADMINISTRADOR' || usuario.id === 1) return true;
+
+      const permisos = usuario.permisos;
+      if (Array.isArray(permisos)) return permisos.length === 0 || permisos.includes(modulo);
+      if (typeof permisos === 'object' && permisos !== null) {
+        if (permisos[modulo] === undefined) return true;
+        if (typeof permisos[modulo] === 'object') return permisos[modulo].view !== false;
+        return Boolean(permisos[modulo]);
+      }
+      return true;
+    } catch {
+      return true;
+    }
+  };
+
+  const navItems = [
+    { path: '/', label: 'Consolidado Multisitio', icon: LayoutGrid, key: 'dashboard' },
+    { path: '/evaluador', label: 'Evaluador por Sede', icon: FileSpreadsheet, key: 'dashboard' },
+    { path: '/sedes', label: 'Sedes', icon: Building2, key: 'sedes' },
+    { path: '/personal', label: 'Personal', icon: Users, key: 'personal' },
+    { path: '/equipos', label: 'Equipos Biomédicos', icon: Stethoscope, key: 'equipos' },
+    { path: '/convenios', label: 'Convenios', icon: Handshake, key: 'convenios' },
+    { path: '/insumos', label: 'Insumos', icon: FileSpreadsheet, key: 'insumos' },
+    { path: '/simulador', label: 'Simulador', icon: Sliders, key: 'simulador' },
+    { path: '/usuarios', label: 'Usuarios y perfiles', icon: FileSpreadsheet, key: 'usuarios' },
+  ].filter((item) => hasModulePermission(item.key));
+
+  let nombreUsuario = 'Usuario';
+  let rolUsuario = 'ADMINISTRADOR';
+  try {
+    const u = JSON.parse(localStorage.getItem('usuario') || '{}');
+    if (u.nombre) nombreUsuario = u.nombre;
+    else if (u.email) nombreUsuario = u.email.split('@')[0];
+    if (u.rol || u.role) rolUsuario = u.rol || u.role;
+  } catch {}
+
+  return (
+    <div className="flex min-h-screen bg-slate-100 text-slate-900 font-sans antialiased">
+      {/* Menú Lateral */}
+      <aside className="w-64 bg-[#0b0f19] border-r border-slate-800 flex flex-col justify-between p-4 shrink-0 min-h-screen select-none">
+        <div>
+          <div className="mb-8 px-2 pt-2">
+            <h1 className="text-xl font-bold text-white tracking-tight">CardioCosting</h1>
+            <p className="text-xs text-slate-400 mt-0.5">Cardiología Siglo XXI 2026</p>
+          </div>
+
+          <nav className="space-y-1.5">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = location.pathname === item.path;
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-semibold transition-all ${
+                    isActive
+                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
+                      : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/60'
+                  }`}
+                >
+                  <Icon className="w-4 h-4 shrink-0" />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-slate-400 hover:text-rose-400 transition"
+        >
+          <LogOut className="w-4 h-4" />
+          Cerrar Sesión
+        </button>
+      </aside>
+
+      {/* Contenido Principal */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-slate-100 text-slate-900">
+        <header className="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between shrink-0 shadow-sm z-10">
+          <div className="flex items-center gap-3">
+            <MapPin className="w-4 h-4 text-blue-600" />
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Sede Activa:</span>
+            <select
+              value={selectedSede}
+              onChange={(e) => setSelectedSede(e.target.value)}
+              className="bg-slate-50 border border-slate-300 text-slate-900 text-xs font-bold rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer shadow-sm"
+            >
+              {sedesDB.length > 0 ? (
+                sedesDB.map((s) => (
+                  <option key={s.id || s.slug} value={s.id || s.slug}>
+                    {s.nombre || (s.id || '').toUpperCase()}
+                  </option>
+                ))
+              ) : (
+                <option value={selectedSede}>
+                  {selectedSede.toUpperCase()}
+                </option>
+              )}
+            </select>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="text-right">
+              <p className="text-xs font-bold text-slate-800 capitalize">{nombreUsuario}</p>
+              <p className="text-[10px] font-semibold text-blue-600 uppercase tracking-wider">{rolUsuario}</p>
+            </div>
+            <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">
+              {nombreUsuario.charAt(0).toUpperCase()}
+            </div>
+          </div>
+        </header>
+
+        <main className="flex-1 overflow-y-auto p-6 bg-slate-100 text-slate-900">
+          {children}
+        </main>
+      </div>
+    </div>
+  );
+}
+</file>
+
+<file path="src/components/Sidebar.jsx">
+import { 
+  LayoutGrid, 
+  FileSpreadsheet, 
+  LogOut, 
+  Stethoscope, 
+  Building2, 
+  Users, 
+  Handshake, 
+  Sliders 
+} from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+
+export default function Sidebar() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('usuario');
+    navigate('/login');
+  };
+
+  const navItems = [
+    { path: '/', label: 'Consolidado Multisitio', icon: LayoutGrid },
+    { path: '/evaluador', label: 'Evaluador por Sede', icon: FileSpreadsheet },
+    { path: '/sedes', label: 'Sedes', icon: Building2 },
+    { path: '/personal', label: 'Personal', icon: Users },
+    { path: '/equipos', label: 'Equipos Biomédicos', icon: Stethoscope },
+    { path: '/convenios', label: 'Convenios', icon: Handshake },
+    { path: '/insumos', label: 'Insumos', icon: FileSpreadsheet },
+    { path: '/simulador', label: 'Simulador', icon: Sliders },
+    { path: '/usuarios', label: 'Usuarios y perfiles', icon: FileSpreadsheet },
+  ];
+
+  return (
+    <aside className="w-64 bg-[#0b0f19] border-r border-slate-800/80 flex flex-col justify-between p-4 shrink-0 min-h-screen select-none">
+      <div>
+        <div className="mb-8 px-2 pt-2">
+          <h1 className="text-xl font-bold text-white tracking-tight">CardioCosting</h1>
+          <p className="text-xs text-slate-400 mt-0.5">Cardiología Siglo XXI 2026</p>
+        </div>
+
+        <nav className="space-y-1.5">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = location.pathname === item.path;
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-semibold transition-all ${
+                  isActive
+                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                }`}
+              >
+                <Icon className="w-4 h-4" />
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
+      </div>
+
+      <button
+        onClick={handleLogout}
+        className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-slate-400 hover:text-rose-400 transition"
+      >
+        <LogOut className="w-4 h-4" />
+        Cerrar Sesión
+      </button>
+    </aside>
+  );
+}
+</file>
+
+<file path="src/context/SedeContext.jsx">
+import { createContext, useContext, useMemo, useState } from 'react';
+
+export const SedeContext = createContext(null);
+
+export function SedeProvider({ children }) {
+  const [sedes, setSedes] = useState([]);
+  const [selectedSede, setSelectedSede] = useState(() => {
+    try {
+      return localStorage.getItem('selectedSede') || 'ibague';
+    } catch {
+      return 'ibague';
+    }
+  });
+
+  const value = useMemo(
+    () => ({ sedes, setSedes, selectedSede, setSelectedSede }),
+    [sedes, selectedSede]
+  );
+
+  return <SedeContext.Provider value={value}>{children}</SedeContext.Provider>;
+}
+
+export function useSedeContext() {
+  const context = useContext(SedeContext);
+  if (!context) {
+    throw new Error('useSedeContext debe usarse dentro de SedeProvider');
+  }
+  return context;
+}
+
+export const useSede = useSedeContext;
+</file>
+
+<file path="src/pages/Convenios.jsx">
+import { useEffect, useState } from 'react';
+import api from '../api/axiosConfig';
+
+export default function Convenios() {
+  const [convenios, setConvenios] = useState([]);
+  const [selectedConvenioId, setSelectedConvenioId] = useState('');
+  const [tarifas, setTarifas] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+  const [newConvenio, setNewConvenio] = useState({ nombre_eps: '' });
+  const [creating, setCreating] = useState(false);
+
+  const fetchConvenios = async () => {
+    setLoading(true);
+    try {
+      const res = await api.get('/convenios');
+      const items = Array.isArray(res?.data) ? res.data : [];
+      setConvenios(items);
+      if (!selectedConvenioId && items[0]?.id) {
+        setSelectedConvenioId(String(items[0].id));
+      }
+      setError('');
+    } catch (err) {
+      setError(err?.response?.data?.error || 'No se pudieron cargar los convenios.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchTarifas = async (convenioId) => {
+    if (!convenioId) return;
+    try {
+      const res = await api.get(`/convenios/${convenioId}/tarifas`);
+      setTarifas(Array.isArray(res?.data) ? res.data : []);
+    } catch (err) {
+      setError(err?.response?.data?.error || 'No se pudieron cargar las tarifas.');
+    }
+  };
+
+  useEffect(() => {
+    fetchConvenios();
+  }, []);
+
+  useEffect(() => {
+    if (selectedConvenioId) {
+      fetchTarifas(selectedConvenioId);
+    }
+  }, [selectedConvenioId]);
+
+  const handleCreate = async (e) => {
+    e.preventDefault();
+    setCreating(true);
+    setError('');
+    try {
+      const res = await api.post('/convenios', { nombre_eps: newConvenio.nombre_eps });
+      const nuevoId = res?.data?.data?.id ?? res?.data?.id;
+      if (nuevoId) {
+        setSelectedConvenioId(String(nuevoId));
+      }
+      setNewConvenio({ nombre_eps: '' });
+      await fetchConvenios();
+    } catch (err) {
+      setError(err?.response?.data?.error || 'No se pudo crear el convenio.');
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const handleTarifaChange = (index, value) => {
+    setTarifas((current) =>
+      current.map((item, idx) => (idx === index ? { ...item, tarifa_acordada: value } : item))
+    );
+  };
+
+  const handleSave = async (tarifa) => {
+    setSaving(true);
+    setError('');
+    try {
+      await api.put('/convenios/tarifa', {
+        convenio_id: Number(selectedConvenioId),
+        examen_id: tarifa.examen_id,
+        nueva_tarifa: Number(tarifa.tarifa_acordada) || 0,
+      });
+      await fetchTarifas(selectedConvenioId);
+    } catch (err) {
+      setError(err?.response?.data?.error || 'No se pudo guardar la tarifa.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) return <div className="p-8 text-slate-300">Cargando convenios...</div>;
+
+  return (
+    <div className="p-6 max-w-6xl mx-auto">
+      <div className="mb-6">
+        <p className="text-sm uppercase tracking-[0.2em] text-amber-400">Convenios</p>
+        <h1 className="text-3xl font-bold text-slate-900">Matriz de Tarifas</h1>
+      </div>
+
+      {error && <div className="mb-4 rounded border border-rose-900 bg-rose-950/40 p-3 text-sm text-rose-200">{error}</div>}
+
+      <form onSubmit={handleCreate} className="mb-5 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 md:flex-row md:items-center">
+        <input value={newConvenio.nombre_eps} onChange={(e) => setNewConvenio({ nombre_eps: e.target.value })} placeholder="Nombre del convenio" className="flex-1 rounded border border-slate-200 bg-slate-50 p-2 text-slate-800" required />
+        <button type="submit" disabled={creating} className="rounded bg-amber-500 px-4 py-2 font-medium text-slate-950 disabled:opacity-60">
+          {creating ? 'Creando...' : 'Adicionar convenio'}
+        </button>
+      </form>
+
+      <div className="mb-5 flex items-center gap-3">
+        <label className="text-sm font-medium text-slate-300">Convenio</label>
+        <select value={selectedConvenioId} onChange={(e) => setSelectedConvenioId(e.target.value)} className="rounded border border-slate-600 bg-slate-800 p-2 text-white">
+          {convenios.map((item) => (
+            <option key={item.id} value={item.id}>{item.nombre_eps}</option>
+          ))}
+        </select>
+      </div>
+
+      <div className="overflow-x-auto rounded-2xl border border-slate-700 bg-slate-800">
+        <table className="min-w-full text-left text-sm">
+          <thead className="bg-slate-900 text-slate-300">
+            <tr>
+              <th className="p-3">Examen</th>
+              <th className="p-3">Código</th>
+              <th className="p-3">Tarifa acordada</th>
+              <th className="p-3">Guardar</th>
+            </tr>
+          </thead>
+          <tbody>
+            {tarifas.map((item, index) => (
+              <tr key={item.id ?? `${item.examen_id}-${index}`} className="border-t border-slate-700">
+                <td className="p-3 text-white">{item.examen}</td>
+                <td className="p-3 text-slate-300">{item.codigo_cups || '-'}</td>
+                <td className="p-3"><input value={item.tarifa_acordada ?? 0} onChange={(e) => handleTarifaChange(index, e.target.value)} className="w-40 rounded border border-slate-600 bg-slate-900 p-2 text-white" /></td>
+                <td className="p-3">
+                  <button disabled={saving} onClick={() => handleSave(item)} className="rounded bg-amber-500 px-3 py-2 font-medium text-slate-950 disabled:opacity-60">
+                    {saving ? 'Guardando...' : 'Guardar'}
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+</file>
+
+<file path="src/pages/Dashboard.jsx">
+import React, { useState, useEffect, Fragment } from 'react';
+import { useNavigate } from 'react-router-dom';
+import api from '../api/axiosConfig';
+import { useSedeContext } from '../context/SedeContext';
+import { 
+  Activity,
+  Building2, Clock, Microscope, TrendingUp, Scale, 
+  Hospital, Mail, Phone, MapPin, Sliders, AlertCircle, LogOut, User, RefreshCw, Save,
+  Stethoscope,
+  Users
+} from 'lucide-react';
+
+export default function Dashboard() {
+  const navigate = useNavigate();
+  const { selectedSede } = useSedeContext();
+  const [activeTab, setActiveTab] = useState('evaluador');
+  const [data, setData] = useState(null);
+  const [convenios, setConvenios] = useState([]);
+  const [insumosDetalle, setInsumosDetalle] = useState([]);
+  const [selectedConvenioId, setSelectedConvenioId] = useState('');
+  const [expandedExamenes, setExpandedExamenes] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
+  
+  // Estados para el Simulador
+  const [simIncremento, setSimIncremento] = useState(0);
+  const [simVolumen, setSimVolumen] = useState(0);
+
+  let usuarioGuardado = {};
+  try {
+    usuarioGuardado = JSON.parse(localStorage.getItem('usuario') || '{}');
+  } catch {
+    usuarioGuardado = {};
+  }
+  const usuarioNombre = usuarioGuardado?.nombre || usuarioGuardado?.email || 'Usuario';
+
+  const cargarDatosBD = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [sedesRes, personalRes, conveniosRes, insumosRes] = await Promise.all([
+        api.get('/sedes'),
+        api.get('/personal'),
+        api.get('/convenios'),
+        api.get('/insumos')
+      ]);
+
+      const sedes = Array.isArray(sedesRes?.data) ? sedesRes.data : [];
+      const roles = Array.isArray(personalRes?.data) ? personalRes.data : [];
+      const conveniosList = Array.isArray(conveniosRes?.data) ? conveniosRes.data : [];
+      const insumos = Array.isArray(insumosRes?.data) ? insumosRes.data : [];
+      setConvenios(conveniosList);
+      setInsumosDetalle(insumos);
+
+      const generalConvenioId = conveniosList.find((item) => String(item.nombre_eps || '').trim().toLowerCase() === 'general')?.id;
+      if (!selectedConvenioId && generalConvenioId) {
+        setSelectedConvenioId(String(generalConvenioId));
+      }
+
+      const sedeActual = sedes.find((s) => s.id === selectedSede)
+        || sedes.find((s) => s.id === 'ibague')
+        || sedes[0]
+        || null;
+
+      let examenes = [];
+      if (sedeActual) {
+        const query = selectedConvenioId ? `?convenioId=${encodeURIComponent(selectedConvenioId)}` : '';
+        const evaluacionRes = await api.get(`/evaluador/sede/${sedeActual.id}${query}`);
+        examenes = Array.isArray(evaluacionRes?.data?.evaluacion)
+          ? evaluacionRes.data.evaluacion.map((item) => ({
+              ...item,
+              tarifaConvenio: Number(item.tarifaConvenio ?? item.tarifa_convenio ?? 0),
+              tarifa_convenio: Number(item.tarifaConvenio ?? item.tarifa_convenio ?? 0)
+            }))
+          : [];
+      }
+
+      setData({ sedes, roles, examenes, sedeActual });
+    } catch (err) {
+      const apiError = err?.response?.data?.error || err?.message || 'Error de conexión';
+      setError(apiError);
+      setData({ sedes: [], roles: [], examenes: [], sedeActual: null });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    cargarDatosBD();
+  }, [selectedSede, selectedConvenioId]);
+
+  const formatCOP = (val) =>
+    new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(Number(val) || 0);
+
+  const toggleExamen = (id) => {
+    setExpandedExamenes((prev) => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
+
+  const guardarCambioBD = async (endpoint, payload) => {
+    setSaving(true);
+    try {
+      let ruta = endpoint || '/sedes';
+      if (!ruta.startsWith('/')) ruta = `/${ruta}`;
+      if (!ruta.startsWith('/sedes') && !ruta.startsWith('/personal')) {
+        ruta = `/sedes/${ruta.replace(/^\//, '')}`;
+      }
+
+      await api.put(ruta, payload);
+      await cargarDatosBD();
+    } catch (err) {
+      const apiError = err?.response?.data?.error || err?.message || 'Error al guardar en la BD';
+      alert(apiError);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex min-h-[480px] items-center justify-center rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="flex flex-col items-center gap-3 text-slate-600">
+          <RefreshCw className="h-8 w-8 animate-spin text-cyan-600" />
+          <p className="text-sm font-medium">Cargando módulos desde PostgreSQL...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <div className="flex min-h-[360px] items-center justify-center rounded-2xl border border-rose-200 bg-white p-6 shadow-sm">
+        <div className="max-w-md text-center">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-rose-100 text-rose-600">
+            <AlertCircle className="h-7 w-7" />
+          </div>
+          <h2 className="text-xl font-bold text-slate-900">Error al conectar con el servidor</h2>
+          <p className="mt-2 text-sm text-slate-600">No fue posible cargar la información financiera en este momento.</p>
+          <button
+            onClick={cargarDatosBD}
+            className="mt-5 inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800"
+          >
+            Reintentar
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const roles = Array.isArray(data?.roles) ? data.roles : [];
+  const sedes = Array.isArray(data?.sedes) ? data.sedes : [];
+  const examenes = Array.isArray(data?.examenes) ? data.examenes : [];
+  const sedeActual = data?.sedeActual || sedes.find((s) => s.id === selectedSede) || sedes.find((s) => s.id === 'ibague') || sedes[0] || { arriendo: 0, servicios: 0, admin: 0, mtto: 0, volumen: 1, nombre: 'Sin sede' };
+
+  const med = roles.find((r) => r.id === 'medico' || r.nombre?.toLowerCase().includes('médico') || r.cargo?.toLowerCase().includes('médico')) || { sueldo_base: 0, prov_pct: 0, horas_mes: 1 };
+  const asis = roles.find((r) => r.id === 'asistencial' || r.nombre?.toLowerCase().includes('asistencial') || r.cargo?.toLowerCase().includes('asistencial')) || { sueldo_base: 0, prov_pct: 0, horas_mes: 1 };
+
+  const costMinMed = (((Number(med.sueldo_base) || 0) * (1 + (Number(med.prov_pct) || 0) / 100)) / (Number(med.horas_mes) || 1)) / 60;
+  const costMinAsis = (((Number(asis.sueldo_base) || 0) * (1 + (Number(asis.prov_pct) || 0) / 100)) / (Number(asis.horas_mes) || 1)) / 60;
+
+  const cfijoUnitActual = ((Number(sedeActual.arriendo) || 0) + (Number(sedeActual.servicios) || 0) + (Number(sedeActual.admin) || 0) + (Number(sedeActual.mtto) || 0)) / (Number(sedeActual.volumen) || 1);
+
+  let totalBalance = 0;
+  let countPerdida = 0;
+  let countGanancia = 0;
+
+  const evaluadorRows = examenes.map((ex) => {
+    const minMed = Number(ex.min_medico) || 0;
+    const minAsis = Number(ex.min_asis) || 0;
+    const manoObra = (minMed * costMinMed) + (minAsis * costMinAsis);
+    const costoTotalReal = manoObra + (Number(ex.insumos) || 0) + (Number(ex.cips) || 0) + cfijoUnitActual;
+    const tarifaBase = Number(ex.tarifaConvenio ?? ex.tarifa_convenio ?? 0) || 0;
+    const tarifaSimulada = tarifaBase * (1 + simIncremento / 100);
+    const margenUnit = tarifaSimulada - costoTotalReal;
+
+    totalBalance += margenUnit * ((Number(ex.vol_mes) || 0) * (1 + simVolumen / 100));
+    if (margenUnit < 0) countPerdida++; else countGanancia++;
+
+    return { ...ex, manoObra, costoTotalReal, tarifaSimulada, margenUnit };
+  });
+
+  const kpiCards = [
+    {
+      label: 'Margen proyectado total',
+      value: formatCOP(totalBalance),
+      tone: 'emerald',
+      helper: `${countGanancia} procedimientos ganando`,
+    },
+    {
+      label: 'Volumen total',
+      value: `${examenes.reduce((sum, ex) => sum + (Number(ex.vol_mes) || 0), 0).toLocaleString('es-CO')}`,
+      tone: 'slate',
+      helper: 'pacientes / mes proyectado',
+    },
+    {
+      label: 'Sede actual',
+      value: sedeActual?.nombre || 'Sin sede',
+      tone: 'cyan',
+      helper: `${formatCOP(cfijoUnitActual)} costo fijo unitario`,
+    },
+    {
+      label: 'Estado general',
+      value: totalBalance >= 0 ? 'Rentable' : 'No rentable',
+      tone: totalBalance >= 0 ? 'emerald' : 'rose',
+      helper: `${countPerdida} en pérdida / ${countGanancia} en ganancia`,
+    },
+  ];
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:flex-row md:items-center md:justify-between">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">Convenio activo</p>
+          <h3 className="mt-1 text-lg font-bold text-slate-900">Tarifa aplicada al dashboard</h3>
+        </div>
+        <select
+          value={selectedConvenioId || convenios.find((item) => String(item.nombre_eps || '').trim().toLowerCase() === 'general')?.id || ''}
+          onChange={(e) => setSelectedConvenioId(e.target.value)}
+          className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-800 shadow-sm"
+        >
+          {convenios.map((convenio) => (
+            <option key={convenio.id} value={String(convenio.id)}>{convenio.nombre_eps}</option>
+          ))}
+        </select>
+      </div>
+
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {kpiCards.map((item) => (
+          <div
+            key={item.label}
+            className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-md"
+          >
+            <div className="mb-3 flex items-center justify-between">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">{item.label}</p>
+              <span
+                className={`inline-flex rounded-full px-2 py-1 text-[10px] font-semibold ${
+                  item.tone === 'emerald'
+                    ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200'
+                    : item.tone === 'rose'
+                      ? 'bg-rose-50 text-rose-700 ring-1 ring-rose-200'
+                      : item.tone === 'cyan'
+                        ? 'bg-cyan-50 text-cyan-700 ring-1 ring-cyan-200'
+                        : 'bg-slate-100 text-slate-600 ring-1 ring-slate-200'
+                }`}
+              >
+                {item.tone === 'emerald' ? 'OK' : item.tone === 'rose' ? 'ALERTA' : 'INFO'}
+              </span>
+            </div>
+
+            <div className="space-y-1">
+              <p className="text-2xl font-bold tracking-tight text-slate-900">{item.value}</p>
+              <p className="text-xs text-slate-500">{item.helper}</p>
+            </div>
+          </div>
+        ))}
+      </section>
+
+      <section className="grid gap-6 xl:grid-cols-[1.45fr_0.8fr]">
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="mb-5 flex items-center justify-between gap-3">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">Rendimiento médico</p>
+              <h3 className="mt-1 text-xl font-bold text-slate-900">Matriz de rentabilidad por examen</h3>
+            </div>
+            <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600">
+              <span className="h-2 w-2 rounded-full bg-emerald-500" />
+              Ganando
+            </div>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-left text-sm">
+              <thead>
+                <tr className="border-b border-slate-200 bg-slate-50 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                  <th className="px-3 py-3">Examen</th>
+                  <th className="px-3 py-3 text-right">MOD</th>
+                  <th className="px-3 py-3 text-right">Insumos</th>
+                  <th className="px-3 py-3 text-right">Dep.</th>
+                  <th className="px-3 py-3 text-right">Fijo</th>
+                  <th className="px-3 py-3 text-right">Costo real</th>
+                  <th className="px-3 py-3 text-right">Tarifa</th>
+                  <th className="px-3 py-3 text-right">Margen</th>
+                  <th className="px-3 py-3 text-center">Estado</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {evaluadorRows.map((row) => {
+                  const detalleInsumos = insumosDetalle.filter((item) => item.examen_id === row.id);
+
+                  return (
+                    <Fragment key={row.id}>
+                      <tr className="hover:bg-slate-50/80">
+                        <td className="px-3 py-3 font-semibold text-slate-900">
+                          <div className="flex items-center gap-2">
+                            <span>{row.nombre}</span>
+                            {detalleInsumos.length > 0 && (
+                              <button
+                                type="button"
+                                onClick={() => toggleExamen(row.id)}
+                                className="rounded-full border border-slate-200 bg-slate-100 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-slate-600 transition hover:border-slate-300 hover:bg-slate-200"
+                              >
+                                {expandedExamenes[row.id] ? 'Ocultar' : 'Insumos'}
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-3 py-3 text-right text-slate-600">{formatCOP(row.manoObra)}</td>
+                        <td className="px-3 py-3 text-right text-slate-600">{formatCOP(row.insumos)}</td>
+                        <td className="px-3 py-3 text-right text-slate-600">{formatCOP(row.cips)}</td>
+                        <td className="px-3 py-3 text-right text-slate-600">{formatCOP(cfijoUnitActual)}</td>
+                        <td className="px-3 py-3 text-right font-semibold text-slate-900">{formatCOP(row.costoTotalReal)}</td>
+                        <td className="px-3 py-3 text-right font-semibold text-cyan-700">{formatCOP(row.tarifaSimulada)}</td>
+                        <td className={`px-3 py-3 text-right font-bold ${row.margenUnit >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                          {formatCOP(row.margenUnit)}
+                        </td>
+                        <td className="px-3 py-3 text-center">
+                          <span
+                            className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-bold ${
+                              row.margenUnit >= 0
+                                ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200'
+                                : 'bg-rose-50 text-rose-700 ring-1 ring-rose-200'
+                            }`}
+                          >
+                            {row.margenUnit >= 0 ? 'GANANDO' : 'PERDIENDO'}
+                          </span>
+                        </td>
+                      </tr>
+
+                      {detalleInsumos.length > 0 && expandedExamenes[row.id] && (
+                        <tr className="bg-slate-50/70">
+                          <td colSpan={9} className="px-3 py-3">
+                            <div className="rounded-xl border border-slate-200 bg-white p-3">
+                              <div className="mb-2 flex items-center justify-between">
+                                <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">Detalle de insumos</p>
+                                <span className="text-xs font-medium text-slate-600">Subtotal: {formatCOP(detalleInsumos.reduce((sum, item) => sum + Number(item.cantidad || 0) * Number(item.valor_unitario || 0), 0))}</span>
+                              </div>
+                              <div className="space-y-1 text-xs text-slate-600">
+                                {detalleInsumos.map((item) => (
+                                  <div key={item.id} className="flex items-center justify-between gap-3 rounded-lg bg-slate-50 px-2 py-1.5">
+                                    <span>{item.nombre_insumo}</span>
+                                    <span className="font-medium text-slate-700">
+                                      {Number(item.cantidad || 0)} × {formatCOP(item.valor_unitario || 0)}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </Fragment>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div className="space-y-6">
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">Resumen</p>
+            <h3 className="mt-1 text-xl font-bold text-slate-900">Estructura operativa</h3>
+
+            <div className="mt-5 space-y-4">
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                <p className="text-xs text-slate-500">Costo fijo unitario</p>
+                <p className="mt-1 text-xl font-bold text-slate-900">{formatCOP(cfijoUnitActual)}</p>
+              </div>
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                <p className="text-xs text-slate-500">Costo minuto médico</p>
+                <p className="mt-1 text-xl font-bold text-slate-900">{formatCOP(costMinMed)}</p>
+              </div>
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                <p className="text-xs text-slate-500">Costo minuto asistencial</p>
+                <p className="mt-1 text-xl font-bold text-slate-900">{formatCOP(costMinAsis)}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">Indicadores</p>
+            <div className="mt-4 space-y-3">
+              <div className="flex items-center justify-between rounded-xl bg-emerald-50 px-3 py-2 text-sm text-emerald-700 ring-1 ring-emerald-200">
+                <span>Ganando</span>
+                <strong>{countGanancia}</strong>
+              </div>
+              <div className="flex items-center justify-between rounded-xl bg-rose-50 px-3 py-2 text-sm text-rose-700 ring-1 ring-rose-200">
+                <span>Perdiendo</span>
+                <strong>{countPerdida}</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="mb-5 flex items-center justify-between gap-3">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">Módulos</p>
+            <h3 className="mt-1 text-xl font-bold text-slate-900">Configuración operativa</h3>
+          </div>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+          {[
+            { id: 'evaluador', label: 'Evaluador', icon: Activity, badge: `${countGanancia} en crecimiento` },
+            { id: 'personal_tiempo', label: 'Personal', icon: Users, badge: `${roles.length} perfiles` },
+            { id: 'sedes_cfijo', label: 'Sedes', icon: Building2, badge: `${sedes.length} sedes activas` },
+            { id: 'examenes_insumos', label: 'Exámenes', icon: Stethoscope, badge: `${examenes.length} procedimientos` },
+            { id: 'simulador', label: 'Simulador', icon: TrendingUp, badge: 'Qué pasaría si...' },
+          ].map((tab) => {
+            const Icon = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`rounded-2xl border p-4 text-left transition ${
+                  activeTab === tab.id
+                    ? 'border-cyan-200 bg-cyan-50 shadow-sm'
+                    : 'border-slate-200 bg-slate-50 hover:bg-white'
+                }`}
+              >
+                <div className="mb-3 inline-flex rounded-xl bg-white p-2 text-cyan-700 ring-1 ring-slate-200">
+                  <Icon className="h-4 w-4" />
+                </div>
+                <p className="text-base font-bold text-slate-900">{tab.label}</p>
+                <p className="mt-1 text-xs text-slate-500">{tab.badge}</p>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+    </div>
+  );
+}
+</file>
+
+<file path="src/pages/Equipos.jsx">
+import React, { useState, useEffect } from 'react';
+import api from '../api/axiosConfig';
+import { useSedeContext } from '../context/SedeContext';
+
+export default function Equipos() {
+  let selectedSede = 'ibague';
+  try {
+    const sedeCtx = useSedeContext();
+    selectedSede = sedeCtx?.selectedSede || 'ibague';
+  } catch {
+    // Fallback de seguridad
+  }
+
+  const [equipos, setEquipos] = useState([]);
+  const [examenes, setExamenes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  const [formData, setFormData] = useState({
+    nombre: '',
+    valor_compra: '',
+    vida_util_meses: 60,
+    costo_mantenimiento_anual: '',
+    minutos_disponibles_mes: 9600,
+    examen_id: '',
+    tiempo_uso_minutos: ''
+  });
+
+  useEffect(() => {
+    cargarDatos();
+  }, [selectedSede]);
+
+  const cargarDatos = async () => {
+    setLoading(true);
+    try {
+      const [resEquipos, resExamenes] = await Promise.all([
+        api.get(`/equipos/${selectedSede}`),
+        api.get('/examenes')
+      ]);
+
+      const listaEquipos = Array.isArray(resEquipos.data) ? resEquipos.data : [];
+      const listaExamenes = Array.isArray(resExamenes.data) ? resExamenes.data : [];
+
+      setEquipos(listaEquipos);
+      setExamenes(listaExamenes);
+
+      if (listaExamenes.length > 0) {
+        setFormData(prev => ({ 
+          ...prev, 
+          examen_id: prev.examen_id || listaExamenes[0].id 
+        }));
+      }
+    } catch (err) {
+      console.error('Error al consultar la API:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.examen_id || !formData.tiempo_uso_minutos) {
+      alert('Debe seleccionar un examen y especificar los minutos de uso');
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const payload = {
+        equipoData: {
+          sede_id: selectedSede,
+          nombre: formData.nombre,
+          valor_compra: Number(formData.valor_compra),
+          vida_util_meses: Number(formData.vida_util_meses),
+          costo_mantenimiento_anual: Number(formData.costo_mantenimiento_anual || 0),
+          minutos_disponibles_mes: Number(formData.minutos_disponibles_mes)
+        },
+        examenId: formData.examen_id,
+        tiempoUsoMinutos: Number(formData.tiempo_uso_minutos)
+      };
+
+      await api.post('/equipos', payload);
+
+      setFormData({
+        nombre: '',
+        valor_compra: '',
+        vida_util_meses: 60,
+        costo_mantenimiento_anual: '',
+        minutos_disponibles_mes: 9600,
+        examen_id: examenes[0]?.id || '',
+        tiempo_uso_minutos: ''
+      });
+
+      await cargarDatos();
+    } catch (err) {
+      alert('Error guardando equipo: ' + (err.response?.data?.error || err.message));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (equipoId) => {
+    if (!window.confirm('¿Desea eliminar este equipo biomédico?')) return;
+    try {
+      await api.delete(`/equipos/${equipoId}`);
+      await cargarDatos();
+    } catch (err) {
+      alert('Error al eliminar equipo: ' + (err.response?.data?.error || err.message));
+    }
+  };
+
+  const calcularCIPS = (eq, tiempoMinutos) => {
+    const depMes = Number(eq.valor_compra || 0) / Number(eq.vida_util_meses || 1);
+    const mantMes = Number(eq.costo_mantenimiento_anual || 0) / 12;
+    const costoMesTotal = depMes + mantMes;
+    const costoMinuto = costoMesTotal / Number(eq.minutos_disponibles_mes || 1);
+    return costoMinuto * Number(tiempoMinutos || 0);
+  };
+
+  if (loading) {
+    return <div className="p-6 text-slate-600 font-medium">Cargando inventario de equipos biomédicos...</div>;
+  }
+
+  return (
+    <div className="p-6 space-y-6">
+      <header className="border-b border-slate-200 pb-4">
+        <h1 className="text-2xl font-bold text-slate-800">Módulo de Equipos Biomédicos y Depreciación CIPS</h1>
+        <p className="text-sm text-slate-500 mt-1">Sede Activa: <span className="font-semibold text-blue-600 capitalize">{selectedSede}</span></p>
+      </header>
+
+      <div className="bg-slate-50 p-5 rounded-xl border border-slate-200 shadow-sm">
+        <h2 className="text-base font-semibold text-slate-700 mb-4">Registrar Nuevo Equipo Biomédico</h2>
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div>
+            <label className="block text-xs font-bold text-slate-600 mb-1">Nombre del Equipo</label>
+            <input required name="nombre" value={formData.nombre} onChange={handleInputChange} placeholder="Ej: Ecocardiógrafo Vivid E95" className="w-full p-2 border border-slate-200 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-600 mb-1">Valor de Compra ($)</label>
+            <input required type="number" name="valor_compra" value={formData.valor_compra} onChange={handleInputChange} placeholder="180000000" className="w-full p-2 border border-slate-200 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-600 mb-1">Vida Útil (Meses)</label>
+            <input required type="number" name="vida_util_meses" value={formData.vida_util_meses} onChange={handleInputChange} className="w-full p-2 border border-slate-200 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-600 mb-1">Mantenimiento Anual ($)</label>
+            <input type="number" name="costo_mantenimiento_anual" value={formData.costo_mantenimiento_anual} onChange={handleInputChange} placeholder="12000000" className="w-full p-2 border border-slate-200 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-600 mb-1">Min. Disponibles/Mes</label>
+            <input required type="number" name="minutos_disponibles_mes" value={formData.minutos_disponibles_mes} onChange={handleInputChange} className="w-full p-2 border border-slate-200 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-600 mb-1">Examen Principal Asociado</label>
+            <select name="examen_id" value={formData.examen_id} onChange={handleInputChange} className="w-full p-2 border border-slate-200 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500">
+              {examenes.map(ex => (
+                <option key={ex.id} value={ex.id}>{ex.nombre} ({ex.codigo_cups || 'Sin CUPS'})</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-600 mb-1">Uso por Examen (Minutos)</label>
+            <input required type="number" name="tiempo_uso_minutos" value={formData.tiempo_uso_minutos} onChange={handleInputChange} placeholder="45" className="w-full p-2 border border-slate-200 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" />
+          </div>
+
+          <div className="md:col-span-2 lg:col-span-4 mt-2">
+            <button type="submit" disabled={saving} className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2 rounded-lg text-sm transition-colors disabled:opacity-50">
+              {saving ? 'Guardando en Servidor...' : 'Guardar y Vincular Equipo'}
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div className="overflow-x-auto border border-slate-200 rounded-xl shadow-sm">
+        <table className="w-full text-left text-sm border-collapse">
+          <thead>
+            <tr className="bg-slate-900 text-white text-xs uppercase tracking-wider">
+              <th className="p-3">Equipo Biomédico</th>
+              <th className="p-3">Valor Activo</th>
+              <th className="p-3">Depreciación/Mes</th>
+              <th className="p-3">Mantenimiento/Mes</th>
+              <th className="p-3">Examen Asignado</th>
+              <th className="p-3">Min. Uso</th>
+              <th className="p-3">CIPS Unitario ($)</th>
+              <th className="p-3 text-center">Acción</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-200 bg-white">
+            {equipos.length === 0 ? (
+              <tr>
+                <td colSpan="8" className="p-4 text-center text-slate-500 italic">No hay equipos biomédicos registrados en esta sede.</td>
+              </tr>
+            ) : (
+              equipos.map(eq => {
+                const depMes = Number(eq.valor_compra || 0) / Number(eq.vida_util_meses || 1);
+                const mantMes = Number(eq.costo_mantenimiento_anual || 0) / 12;
+                const asignaciones = eq.servicio_equipo || [];
+
+                return asignaciones.length > 0 ? (
+                  asignaciones.map((asig, idx) => {
+                    const cipsVal = calcularCIPS(eq, asig.tiempo_uso_minutos);
+                    return (
+                      <tr key={`${eq.id}-${asig.id}`} className="hover:bg-slate-50">
+                        {idx === 0 && (
+                          <>
+                            <td rowSpan={asignaciones.length} className="p-3 font-semibold text-slate-800 align-top">{eq.nombre}</td>
+                            <td rowSpan={asignaciones.length} className="p-3 align-top">${Number(eq.valor_compra).toLocaleString()}</td>
+                            <td rowSpan={asignaciones.length} className="p-3 align-top">${depMes.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+                            <td rowSpan={asignaciones.length} className="p-3 align-top">${mantMes.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+                          </>
+                        )}
+                        <td className="p-3">{asig.examenes?.nombre || asig.examen_id}</td>
+                        <td className="p-3">{asig.tiempo_uso_minutos} min</td>
+                        <td className="p-3 font-bold text-emerald-600">
+                          ${cipsVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </td>
+                        {idx === 0 && (
+                          <td rowSpan={asignaciones.length} className="p-3 text-center align-top">
+                            <button onClick={() => handleDelete(eq.id)} className="bg-rose-500 hover:bg-rose-600 text-white text-xs px-3 py-1.5 rounded transition-colors">
+                              Eliminar
+                            </button>
+                          </td>
+                        )}
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr key={eq.id} className="hover:bg-slate-50">
+                    <td className="p-3 font-semibold text-slate-800">{eq.nombre}</td>
+                    <td className="p-3">${Number(eq.valor_compra).toLocaleString()}</td>
+                    <td className="p-3">${depMes.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+                    <td className="p-3">${mantMes.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+                    <td colSpan="3" className="p-3 text-slate-400 italic">Sin examen vinculado</td>
+                    <td className="p-3 text-center">
+                      <button onClick={() => handleDelete(eq.id)} className="bg-rose-500 hover:bg-rose-600 text-white text-xs px-3 py-1.5 rounded transition-colors">
+                        Eliminar
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+</file>
+
+<file path="src/pages/EvaluadorSede.jsx">
+import React, { useState, useEffect } from 'react';
+import api from '../api/axiosConfig';
+import { useSedeContext } from '../context/SedeContext';
+import { Activity, Clock, PieChart, Sliders } from 'lucide-react';
+
+export default function EvaluadorSede() {
+  const { sedes = [], selectedSede, setSelectedSede } = useSedeContext();
+  const [evaluacionData, setEvaluacionData] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  // Estados del Motor de Drivers
+  const [criterio, setCriterio] = useState('tiempo'); // 'volumen' | 'tiempo' | 'ocupacion'
+  const [costoFijoBolsa, setCostoFijoBolsa] = useState(0);
+  const [capacidadSalaMinutos, setCapacidadSalaMinutos] = useState(9600);
+
+  useEffect(() => {
+    if (!selectedSede) return;
+    setLoading(true);
+
+    api.get(`/evaluador/sede/${selectedSede}`)
+      .then((res) => {
+        const rows = Array.isArray(res?.data?.evaluacion) ? res.data.evaluacion : [];
+        setEvaluacionData(res.data);
+        if (res.data?.costoFijoBolsa !== undefined && res.data?.costoFijoBolsa !== null) {
+          setCostoFijoBolsa(Number(res.data.costoFijoBolsa));
+        }
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error('Error al evaluar la sede:', err.response?.data?.error || err.message);
+        setEvaluacionData({ evaluacion: [] });
+        setLoading(false);
+      });
+  }, [selectedSede]);
+
+  const listaExamenes = evaluacionData?.evaluacion || [];
+
+  // Cálculos globales para inductores
+  const volumenTotal = listaExamenes.reduce((acc, item) => acc + (Number(item.volumen) || 0), 0);
+  const minutosTotalesGlobal = listaExamenes.reduce(
+    (acc, item) => acc + ((Number(item.volumen) || 0) * (Number(item.tiempoMinutos) || 0)),
+    0
+  );
+
+  const ocupaciones = listaExamenes.map(item => {
+    const minP = (Number(item.volumen) || 0) * (Number(item.tiempoMinutos) || 0);
+    return capacidadSalaMinutos > 0 ? (minP / capacidadSalaMinutos) : 0;
+  });
+  const ocupacionTotalSuma = ocupaciones.reduce((acc, val) => acc + val, 0);
+
+  // Motor dinámico de absorción
+  const calcularAbsorcion = (item) => {
+    const vol = Number(item.volumen) || 0;
+    const tMin = Number(item.tiempoMinutos) || 0;
+    const minP = vol * tMin;
+
+    if (vol === 0) return { factorPct: 0, costoTotalProc: 0, costoUnitarioProc: 0 };
+
+    let factor = 0;
+    if (criterio === 'volumen') {
+      factor = volumenTotal > 0 ? vol / volumenTotal : 0;
+    } else if (criterio === 'tiempo') {
+      factor = minutosTotalesGlobal > 0 ? minP / minutosTotalesGlobal : 0;
+    } else if (criterio === 'ocupacion') {
+      const ocupP = capacidadSalaMinutos > 0 ? minP / capacidadSalaMinutos : 0;
+      factor = ocupacionTotalSuma > 0 ? ocupP / ocupacionTotalSuma : 0;
+    }
+
+    const costoTotalProc = costoFijoBolsa * factor;
+    const costoUnitarioProc = costoTotalProc / vol;
+
+    return { factorPct: factor * 100, costoTotalProc, costoUnitarioProc };
+  };
+
+  return (
+    <div className="p-6 max-w-7xl mx-auto space-y-6">
+      {/* Encabezado */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gray-200 pb-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800">Evaluador Dynamic Driver de Costos Fijos</h1>
+          <p className="text-xs text-gray-500 mt-1">Análisis de absorción e impacto unitario por procedimiento</p>
+        </div>
+        <select
+          value={selectedSede}
+          onChange={(e) => setSelectedSede(e.target.value)}
+          className="border border-gray-300 p-2 rounded-lg bg-white shadow-sm font-semibold text-sm text-gray-700"
+        >
+          {sedes.map((s) => (
+            <option key={s.id} value={s.id}>
+              {s.nombre || `Sede #${s.id}`}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Panel de Controles del Motor */}
+      <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+          <label className="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">
+            Inductor de Costo (Driver)
+          </label>
+          <div className="grid grid-cols-3 gap-2">
+            <button
+              onClick={() => setCriterio('volumen')}
+              className={`p-2 rounded-lg text-xs font-bold flex flex-col items-center justify-center gap-1 transition ${
+                criterio === 'volumen'
+                  ? 'bg-blue-600 text-white shadow-md'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              <Activity className="w-4 h-4" />
+              Volumen
+            </button>
+            <button
+              onClick={() => setCriterio('tiempo')}
+              className={`p-2 rounded-lg text-xs font-bold flex flex-col items-center justify-center gap-1 transition ${
+                criterio === 'tiempo'
+                  ? 'bg-blue-600 text-white shadow-md'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              <Clock className="w-4 h-4" />
+              Tiempo
+            </button>
+            <button
+              onClick={() => setCriterio('ocupacion')}
+              className={`p-2 rounded-lg text-xs font-bold flex flex-col items-center justify-center gap-1 transition ${
+                criterio === 'ocupacion'
+                  ? 'bg-blue-600 text-white shadow-md'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              <PieChart className="w-4 h-4" />
+              Ocupación
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">
+            Bolsa de Costo Fijo ($)
+          </label>
+          <input
+            type="number"
+            value={costoFijoBolsa}
+            onChange={(e) => setCostoFijoBolsa(Number(e.target.value))}
+            className="w-full p-2.5 border border-gray-300 rounded-lg text-sm font-bold text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">
+            Capacidad Sala (Minutos/Mes)
+          </label>
+          <input
+            type="number"
+            value={capacidadSalaMinutos}
+            onChange={(e) => setCapacidadSalaMinutos(Number(e.target.value))}
+            className="w-full p-2.5 border border-gray-300 rounded-lg text-sm font-bold text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+      </div>
+
+      {/* Tabla Dinámica de Resultados */}
+      {loading ? (
+        <p className="text-gray-500 font-medium p-4">Calculando estructura de costos dinámicos...</p>
+      ) : listaExamenes.length ? (
+        <div className="bg-white shadow border border-gray-200 rounded-xl overflow-hidden">
+          <div className="p-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
+            <h2 className="text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-2">
+              <Sliders className="w-4 h-4 text-blue-600" />
+              Resultados de Absorción y Márgenes por Examen
+            </h2>
+            <span className="text-xs font-extrabold px-3 py-1 bg-blue-50 text-blue-700 rounded-full border border-blue-200 uppercase">
+              Driver Activo: {criterio}
+            </span>
+          </div>
+
+          <table className="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr className="bg-gray-900 text-white uppercase tracking-wider">
+                <th className="p-3">Examen</th>
+                <th className="p-3">Volumen</th>
+                <th className="p-3">Tiempo (min)</th>
+                <th className="p-3">% Absorción</th>
+                <th className="p-3">Costo Fijo Unit. ($)</th>
+                <th className="p-3">Tarifa Convenio</th>
+                <th className="p-3">Costo Total</th>
+                <th className="p-3">Utilidad</th>
+                <th className="p-3">Margen %</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {listaExamenes.map((item) => {
+                const { factorPct, costoUnitarioProc } = calcularAbsorcion(item);
+                const costoDirecto = Number(item.costoTotal || item.costoDirecto || 0);
+                const costoTotalExamen = costoDirecto + costoUnitarioProc;
+                const tarifa = Number(item.tarifaConvenio || 0);
+                const utilidadFinal = tarifa - costoTotalExamen;
+                const margenPctFinal = tarifa > 0 ? (utilidadFinal / tarifa) * 100 : 0;
+
+                const volDisplay = Number(item.volumen) || 30;
+                const minDisplay = Number(item.tiempoMinutos) || 30;
+
+                return (
+                  <tr key={item.examenId} className="hover:bg-gray-50 transition-colors">
+                    <td className="p-3 font-semibold text-gray-800">{item.nombre}</td>
+                    <td className="p-3 text-gray-700">{volDisplay} proc</td>
+                    <td className="p-3 text-gray-700">{minDisplay} min</td>
+                    <td className="p-3 font-bold text-blue-600">{factorPct.toFixed(2)}%</td>
+                    <td className="p-3 font-bold text-purple-700">
+                      ${costoUnitarioProc.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </td>
+                    <td className="p-3 font-medium">${tarifa.toLocaleString()}</td>
+                    <td className="p-3 text-red-600 font-semibold">
+                      ${costoTotalExamen.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                    </td>
+                    <td className={`p-3 font-bold ${utilidadFinal >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      ${utilidadFinal.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                    </td>
+                    <td className="p-3">
+                      <span className={`px-2 py-1 rounded text-[11px] font-bold ${margenPctFinal >= 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                        {margenPctFinal.toFixed(1)}%
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <p className="text-gray-500 p-4">Seleccione una sede válida para ver el análisis de costos.</p>
+      )}
+    </div>
+  );
+}
+</file>
+
+<file path="src/pages/Insumos.jsx">
+import { useEffect, useMemo, useState } from 'react';
+import { Boxes, Package2, Pencil, Plus, Trash2, TrendingUp } from 'lucide-react';
+import api from '../api/axiosConfig';
+
+const formatCOP = (value) =>
+  new Intl.NumberFormat('es-CO', {
+    style: 'currency',
+    currency: 'COP',
+    maximumFractionDigits: 0,
+  }).format(Number(value) || 0);
+
+const emptyForm = {
+  examen_id: '',
+  nombre_insumo: '',
+  cantidad: 1,
+  valor_unitario: 0,
+};
+
+export default function Insumos() {
+  const [insumos, setInsumos] = useState([]);
+  const [examenes, setExamenes] = useState([]);
+  const [form, setForm] = useState(emptyForm);
+  const [editingId, setEditingId] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  const cargarExamenes = async () => {
+    try {
+      const res = await api.get('/examenes');
+      const items = Array.isArray(res?.data) ? res.data : [];
+      setExamenes(items);
+      if (items.length > 0 && !form.examen_id) {
+        setForm((prev) => ({ ...prev, examen_id: items[0].id }));
+      }
+    } catch (err) {
+      console.error('No se pudieron cargar los exámenes:', err);
+    }
+  };
+
+  const cargarInsumos = async () => {
+    try {
+      const res = await api.get('/insumos');
+      const items = Array.isArray(res?.data) ? res.data : [];
+      setInsumos(items);
+    } catch (err) {
+      console.error('No se pudieron cargar los insumos:', err);
+      setError(err?.response?.data?.error || 'No se pudieron cargar los insumos.');
+    }
+  };
+
+  useEffect(() => {
+    const load = async () => {
+      setLoading(true);
+      try {
+        await Promise.all([cargarExamenes(), cargarInsumos()]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    load();
+  }, []);
+
+  const resumen = useMemo(() => {
+    const total = insumos.reduce((sum, item) => sum + Number(item.cantidad || 0) * Number(item.valor_unitario || 0), 0);
+    const grupos = new Map();
+
+    insumos.forEach((item) => {
+      const key = String(item.examen_id || 'sin-examen');
+      if (!grupos.has(key)) grupos.set(key, []);
+      grupos.get(key).push(item);
+    });
+
+    return {
+      total,
+      examenes: grupos.size,
+      registros: insumos.length,
+    };
+  }, [insumos]);
+
+  const handleChange = (field, value) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const resetForm = () => {
+    setEditingId(null);
+    setForm({
+      examen_id: examenes[0]?.id || '',
+      nombre_insumo: '',
+      cantidad: 1,
+      valor_unitario: 0,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    setError('');
+
+    try {
+      const payload = {
+        examen_id: form.examen_id,
+        nombre_insumo: form.nombre_insumo,
+        cantidad: Number(form.cantidad) || 1,
+        valor_unitario: Number(form.valor_unitario) || 0,
+      };
+
+      if (editingId) {
+        await api.put(`/insumos/${editingId}`, payload);
+      } else {
+        await api.post('/insumos', payload);
+      }
+
+      await cargarInsumos();
+      resetForm();
+    } catch (err) {
+      setError(err?.response?.data?.error || 'No se pudo guardar el insumo.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleEdit = (item) => {
+    setEditingId(item.id);
+    setForm({
+      examen_id: item.examen_id,
+      nombre_insumo: item.nombre_insumo,
+      cantidad: item.cantidad,
+      valor_unitario: item.valor_unitario,
+    });
+  };
+
+  const handleDelete = async (id) => {
+    setError('');
+    try {
+      await api.delete(`/insumos/${id}`);
+      await cargarInsumos();
+      if (editingId === id) resetForm();
+    } catch (err) {
+      setError(err?.response?.data?.error || 'No se pudo eliminar el insumo.');
+    }
+  };
+
+  if (loading) {
+    return <div className="rounded-2xl border border-slate-200 bg-white p-8 text-slate-500">Cargando insumos...</div>;
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="grid gap-4 md:grid-cols-3">
+        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Registros</span>
+            <Package2 className="h-4 w-4 text-cyan-600" />
+          </div>
+          <p className="mt-4 text-2xl font-bold text-slate-900">{resumen.registros}</p>
+        </div>
+
+        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Exámenes</span>
+            <Boxes className="h-4 w-4 text-emerald-600" />
+          </div>
+          <p className="mt-4 text-2xl font-bold text-slate-900">{resumen.examenes}</p>
+        </div>
+
+        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Valor total</span>
+            <TrendingUp className="h-4 w-4 text-violet-600" />
+          </div>
+          <p className="mt-4 text-2xl font-bold text-slate-900">{formatCOP(resumen.total)}</p>
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="mb-4 flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-700">
+            <Plus className="h-4 w-4" />
+          </div>
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">Gestión</p>
+            <h3 className="text-lg font-bold text-slate-900">{editingId ? 'Editar insumo' : 'Adicionar insumo'}</h3>
+          </div>
+        </div>
+
+        {error && (
+          <div className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">{error}</div>
+        )}
+
+        <form onSubmit={handleSubmit} className="grid gap-3 md:grid-cols-5">
+          <select
+            value={form.examen_id}
+            onChange={(e) => handleChange('examen_id', e.target.value)}
+            className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-800 focus:border-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-100"
+            required
+          >
+            <option value="">Seleccione examen</option>
+            {examenes.map((examen) => (
+              <option key={examen.id} value={examen.id}>
+                {examen.nombre} ({examen.id})
+              </option>
+            ))}
+          </select>
+
+          <input
+            value={form.nombre_insumo}
+            onChange={(e) => handleChange('nombre_insumo', e.target.value)}
+            placeholder="Nombre del insumo"
+            className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-800 focus:border-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-100"
+            required
+          />
+
+          <input
+            type="number"
+            min="1"
+            step="1"
+            value={form.cantidad}
+            onChange={(e) => handleChange('cantidad', e.target.value)}
+            placeholder="Cantidad"
+            className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-800 focus:border-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-100"
+            required
+          />
+
+          <input
+            type="number"
+            min="0"
+            step="0.01"
+            value={form.valor_unitario}
+            onChange={(e) => handleChange('valor_unitario', e.target.value)}
+            placeholder="Valor unitario"
+            className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-800 focus:border-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-100"
+            required
+          />
+
+          <div className="flex gap-2">
+            <button
+              type="submit"
+              disabled={saving}
+              className="flex-1 rounded-xl bg-cyan-600 px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-cyan-500 disabled:opacity-60"
+            >
+              {saving ? 'Guardando...' : editingId ? 'Guardar' : 'Adicionar'}
+            </button>
+            {editingId && (
+              <button
+                type="button"
+                onClick={resetForm}
+                className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+              >
+                Cancelar
+              </button>
+            )}
+          </div>
+        </form>
+      </div>
+
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="border-b border-slate-200 bg-slate-50 px-5 py-4">
+          <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-600">Detalle de insumos</h3>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-left text-sm text-slate-700">
+            <thead className="bg-slate-50 text-xs uppercase tracking-[0.12em] text-slate-500">
+              <tr>
+                <th className="px-4 py-3">Examen</th>
+                <th className="px-4 py-3">Insumo</th>
+                <th className="px-4 py-3 text-right">Cantidad</th>
+                <th className="px-4 py-3 text-right">Valor unitario</th>
+                <th className="px-4 py-3 text-right">Subtotal</th>
+                <th className="px-4 py-3 text-center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {insumos.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-4 py-8 text-center text-slate-500">
+                    No hay insumos registrados.
+                  </td>
+                </tr>
+              ) : (
+                insumos.map((item) => (
+                  <tr key={item.id} className="border-t border-slate-200 hover:bg-slate-50/70">
+                    <td className="px-4 py-3 font-medium text-slate-900">{item.examen_id}</td>
+                    <td className="px-4 py-3">{item.nombre_insumo}</td>
+                    <td className="px-4 py-3 text-right">{Number(item.cantidad || 0)}</td>
+                    <td className="px-4 py-3 text-right">{formatCOP(item.valor_unitario || 0)}</td>
+                    <td className="px-4 py-3 text-right font-semibold text-slate-900">{formatCOP(Number(item.cantidad || 0) * Number(item.valor_unitario || 0))}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex justify-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleEdit(item)}
+                          className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs font-medium text-slate-700 hover:border-slate-300 hover:bg-slate-50"
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                          Editar
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(item.id)}
+                          className="inline-flex items-center gap-1 rounded-lg border border-rose-200 bg-rose-50 px-2 py-1.5 text-xs font-medium text-rose-700 hover:bg-rose-100"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                          Eliminar
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+</file>
+
+<file path="src/pages/Login.jsx">
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Activity, ShieldCheck, Stethoscope } from 'lucide-react';
+import api from '../api/axiosConfig';
+
+export default function Login() {
+  const [email, setEmail] = useState('gerencia@cardiologiasigloxxi.com');
+  const [password, setPassword] = useState('Admin123');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    try {
+      const res = await api.post('/auth/login', { email, password });
+
+      localStorage.setItem('token', res.data.token);
+      if (res.data.usuario) {
+        localStorage.setItem('usuario', JSON.stringify(res.data.usuario));
+      }
+
+      navigate('/');
+    } catch (err) {
+      if (err.response && err.response.data && err.response.data.error) {
+        setError(err.response.data.error);
+      } else {
+        setError('Error al conectar con el servidor. Revisa tu conexión.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-950 px-4 py-10 text-slate-100">
+      <div className="mx-auto grid max-w-6xl overflow-hidden rounded-[28px] border border-slate-800 bg-slate-900 shadow-2xl shadow-slate-950/40 lg:grid-cols-[1.1fr_0.9fr]">
+        <div className="relative hidden overflow-hidden bg-[radial-gradient(circle_at_top_left,_rgba(34,211,238,0.22),_transparent_40%),linear-gradient(135deg,_#0f172a,_#111827)] p-8 lg:flex lg:flex-col lg:justify-between">
+          <div className="absolute inset-0 bg-[linear-gradient(120deg,transparent,rgba(255,255,255,0.04),transparent)]" />
+          <div className="relative z-10">
+            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-500/10 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.25em] text-cyan-200">
+              <Activity className="h-3.5 w-3.5" />
+              CardioCosting 2026
+            </div>
+            <h1 className="max-w-md text-4xl font-black tracking-tight text-white">
+              Control financiero clínico y operativo para la red de atención.
+            </h1>
+            <p className="mt-4 max-w-md text-sm leading-6 text-slate-300">
+              Centraliza costos, rentabilidad por procedimiento, convenios y simulación de escenarios del negocio médico.
+            </p>
+          </div>
+
+          <div className="relative z-10 space-y-4">
+            <div className="flex items-center gap-3 rounded-2xl border border-slate-700 bg-slate-900/60 p-4">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-300 ring-1 ring-emerald-400/20">
+                <ShieldCheck className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-white">Datos seguros y trazables</p>
+                <p className="text-xs text-slate-400">Autenticación JWT y control por rol</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 rounded-2xl border border-slate-700 bg-slate-900/60 p-4">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-300 ring-1 ring-cyan-400/20">
+                <Stethoscope className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-white">Operación clínica y financiera</p>
+                <p className="text-xs text-slate-400">Módulos de sede, personal, tarifas y simulación</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-center p-6 sm:p-10">
+          <div className="w-full max-w-md">
+            <div className="mb-8 text-center lg:text-left">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-cyan-300">Acceso autorizado</p>
+              <h2 className="mt-2 text-3xl font-black tracking-tight text-white">Iniciar sesión</h2>
+            </div>
+
+            {error && (
+              <div className="mb-5 rounded-2xl border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-200">
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div>
+                <label className="mb-2 block text-sm font-medium text-slate-300">Correo electrónico</label>
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full rounded-2xl border border-slate-700 bg-slate-950/80 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/20"
+                  placeholder="gerencia@cardiologiasigloxxi.com"
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-slate-300">Contraseña</label>
+                <input
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full rounded-2xl border border-slate-700 bg-slate-950/80 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/20"
+                  placeholder="••••••••"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="inline-flex w-full items-center justify-center rounded-2xl bg-cyan-500 px-4 py-3 text-sm font-bold text-slate-950 transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {loading ? 'Validando credenciales...' : 'Ingresar al dashboard'}
+              </button>
+            </form>
+
+            <div className="mt-6 rounded-2xl border border-slate-700 bg-slate-950/40 p-3 text-xs text-slate-400">
+              Credencial válida verificada: <span className="font-semibold text-cyan-300">gerencia@cardiologiasigloxxi.com</span> / <span className="font-semibold text-cyan-300">Admin123</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+</file>
+
+<file path="src/pages/Personal.jsx">
+import { useEffect, useState } from 'react';
+import api from '../api/axiosConfig';
+
+export default function Personal() {
+  const [personal, setPersonal] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [savingId, setSavingId] = useState(null);
+  const [newRol, setNewRol] = useState({
+    id: '',
+    cargo: '',
+    sueldo_base: 0,
+    prov_pct: 0,
+    horas_mes: 160,
+  });
+  const [creating, setCreating] = useState(false);
+
+  const fetchPersonal = async () => {
+    setLoading(true);
+    try {
+      const res = await api.get('/personal');
+      setPersonal(Array.isArray(res?.data) ? res.data : []);
+      setError('');
+    } catch (err) {
+      setError(err?.response?.data?.error || 'No se pudo cargar el personal.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPersonal();
+  }, []);
+
+  const handleCreate = async (e) => {
+    e.preventDefault();
+    setCreating(true);
+    setError('');
+    try {
+      await api.post('/personal', {
+        id: newRol.id,
+        cargo: newRol.cargo,
+        sueldo_base: Number(newRol.sueldo_base) || 0,
+        prov_pct: Number(newRol.prov_pct) || 0,
+        horas_mes: Number(newRol.horas_mes) || 1,
+      });
+      setNewRol({ id: '', cargo: '', sueldo_base: 0, prov_pct: 0, horas_mes: 160 });
+      await fetchPersonal();
+    } catch (err) {
+      setError(err?.response?.data?.error || 'No se pudo crear el rol.');
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const handleSave = async (rol) => {
+    setSavingId(rol.id);
+    setError('');
+    try {
+      await api.put(`/personal/${rol.id}`, {
+        sueldo_base: Number(rol.sueldo_base) || 0,
+        prov_pct: Number(rol.prov_pct) || 0,
+        horas_mes: Number(rol.horas_mes) || 1,
+      });
+      await fetchPersonal();
+    } catch (err) {
+      setError(err?.response?.data?.error || 'No se pudo actualizar el rol.');
+    } finally {
+      setSavingId(null);
+    }
+  };
+
+  const updateField = (id, field, value) => {
+    setPersonal((current) => current.map((item) => item.id === id ? { ...item, [field]: value } : item));
+  };
+
+  if (loading) return <div className="p-8 text-slate-300">Cargando personal...</div>;
+
+  return (
+    <div className="p-6 max-w-6xl mx-auto">
+      <div className="mb-6">
+        <p className="text-sm uppercase tracking-[0.2em] text-sky-400">Nomina</p>
+        <h1 className="text-3xl font-bold text-slate-900">Personal y Costos por Rol</h1>
+      </div>
+
+      {error && <div className="mb-4 rounded border border-rose-900 bg-rose-950/40 p-3 text-sm text-rose-200">{error}</div>}
+
+      <form onSubmit={handleCreate} className="mb-6 grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 md:grid-cols-6">
+        <input value={newRol.id} onChange={(e) => setNewRol({ ...newRol, id: e.target.value })} placeholder="ID" className="rounded border border-slate-200 bg-slate-50 p-2 text-slate-800" required />
+        <input value={newRol.cargo} onChange={(e) => setNewRol({ ...newRol, cargo: e.target.value })} placeholder="Cargo / rol" className="rounded border border-slate-200 bg-slate-50 p-2 text-slate-800 md:col-span-2" required />
+        <input type="number" value={newRol.sueldo_base} onChange={(e) => setNewRol({ ...newRol, sueldo_base: e.target.value })} placeholder="Sueldo base" className="rounded border border-slate-200 bg-slate-50 p-2 text-slate-800" />
+        <input type="number" value={newRol.prov_pct} onChange={(e) => setNewRol({ ...newRol, prov_pct: e.target.value })} placeholder="% provisiones" className="rounded border border-slate-200 bg-slate-50 p-2 text-slate-800" />
+        <button type="submit" disabled={creating} className="rounded bg-sky-600 px-3 py-2 font-medium text-white disabled:opacity-60">
+          {creating ? 'Creando...' : 'Adicionar rol'}
+        </button>
+      </form>
+
+      <div className="overflow-x-auto rounded-2xl border border-slate-700 bg-slate-800">
+        <table className="min-w-full text-left text-sm">
+          <thead className="bg-slate-900 text-slate-300">
+            <tr>
+              <th className="p-3">Rol</th>
+              <th className="p-3">Sueldo base</th>
+              <th className="p-3">% provisiones</th>
+              <th className="p-3">Horas/mes</th>
+              <th className="p-3">Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            {personal.map((rol) => (
+              <tr key={rol.id} className="border-t border-slate-700">
+                <td className="p-3 font-semibold text-white">{rol.cargo || rol.nombre}</td>
+                <td className="p-3"><input value={rol.sueldo_base ?? 0} onChange={(e) => updateField(rol.id, 'sueldo_base', e.target.value)} className="w-36 rounded border border-slate-600 bg-slate-900 p-2 text-white" /></td>
+                <td className="p-3"><input value={rol.prov_pct ?? 0} onChange={(e) => updateField(rol.id, 'prov_pct', e.target.value)} className="w-24 rounded border border-slate-600 bg-slate-900 p-2 text-white" /></td>
+                <td className="p-3"><input value={rol.horas_mes ?? 1} onChange={(e) => updateField(rol.id, 'horas_mes', e.target.value)} className="w-24 rounded border border-slate-600 bg-slate-900 p-2 text-white" /></td>
+                <td className="p-3">
+                  <button onClick={() => handleSave(rol)} disabled={savingId === rol.id} className="rounded bg-sky-600 px-3 py-2 font-medium text-white disabled:opacity-50">
+                    {savingId === rol.id ? 'Guardando...' : 'Guardar'}
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+</file>
+
+<file path="src/pages/Sedes.jsx">
+import React, { useState, useEffect } from 'react';
+import api from '../api/axiosConfig';
+import { useSedeContext } from '../context/SedeContext';
+import { Building2, Save, Plus, Trash2, Calculator, Layers } from 'lucide-react';
+
+export default function Sedes() {
+  let selectedSede = 'ibague';
+  try {
+    const sedeCtx = useSedeContext();
+    if (sedeCtx?.selectedSede) selectedSede = sedeCtx.selectedSede;
+  } catch {}
+
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  // Datos generales de la sede
+  const [datosSede, setDatosSede] = useState({
+    arriendo: 15000000,
+    servicios: 8300000,
+    admin: 18000000,
+    mtto: 7000000,
+    volumen: 500
+  });
+
+  // Sub-bolsas por Área
+  const [areas, setAreas] = useState([
+    { id: 1, nombre: 'Consulta Externa / EKG', m2: 45, esDirecto: true, costoAsignadoDirecto: 9400000 },
+    { id: 2, nombre: 'Hemodinamia y Procedimientos Especiales', m2: 186, esDirecto: true, costoAsignadoDirecto: 38900000 }
+  ]);
+
+  useEffect(() => {
+    cargarDatosSede();
+  }, [selectedSede]);
+
+  const cargarDatosSede = async () => {
+    setLoading(true);
+    try {
+      // 1. Cargar datos generales de las sedes
+      const resSedes = await api.get('/sedes');
+      if (Array.isArray(resSedes.data)) {
+        const actual = resSedes.data.find((s) => s.id === selectedSede);
+        if (actual) {
+          setDatosSede({
+            arriendo: Number(actual.arriendo) || 0,
+            servicios: Number(actual.servicios) || 0,
+            admin: Number(actual.admin) || 0,
+            mtto: Number(actual.mtto) || 0,
+            volumen: Number(actual.volumen) || 1
+          });
+        }
+      }
+
+      // 2. Cargar sub-bolsas por área
+      const resAreas = await api.get(`/sedes/${selectedSede}/areas`);
+      if (Array.isArray(resAreas.data) && resAreas.data.length > 0) {
+        setAreas(resAreas.data);
+      }
+    } catch (err) {
+      console.warn('Cargando valores base para sede:', err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Cálculos consolidados de costos fijos
+  const costoFijoTotalSede = 
+    Number(datosSede.arriendo) + 
+    Number(datosSede.servicios) + 
+    Number(datosSede.admin) + 
+    Number(datosSede.mtto);
+
+  const m2Totales = areas.reduce((acc, a) => acc + (Number(a.m2) || 0), 0);
+
+  const handleGeneralChange = (field, value) => {
+    setDatosSede(prev => ({ ...prev, [field]: Number(value) || 0 }));
+  };
+
+  const handleAreaChange = (index, field, value) => {
+    const copy = [...areas];
+    copy[index][field] = value;
+    setAreas(copy);
+  };
+
+  const agregarArea = () => {
+    setAreas([...areas, { nombre: 'Nueva Área', m2: 10, esDirecto: false, costoAsignadoDirecto: 0 }]);
+  };
+
+  const eliminarArea = (index) => {
+    setAreas(areas.filter((_, i) => i !== index));
+  };
+
+  const guardarTodo = async () => {
+    setSaving(true);
+    try {
+      // Guardar datos generales de sede
+      await api.put(`/sedes/${selectedSede}`, datosSede);
+
+      // Guardar sub-bolsas por área
+      await api.post(`/sedes/${selectedSede}/areas`, { areas });
+
+      alert('Configuración de la sede y sub-bolsas guardada correctamente.');
+    } catch (err) {
+      alert('Error al guardar: ' + (err.response?.data?.error || err.message));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return <div className="p-6 text-slate-600 font-medium">Cargando configuración de la sede...</div>;
+  }
+
+  return (
+    <div className="p-6 space-y-6">
+      {/* Encabezado */}
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-200 pb-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">Gestión de Sedes y Sub-bolsas ($m^2$)</h1>
+          <p className="text-xs text-slate-500 mt-1">Sede activa: <span className="font-bold text-blue-600 uppercase">{selectedSede}</span></p>
+        </div>
+        <button
+          onClick={guardarTodo}
+          disabled={saving}
+          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-blue-700 shadow-sm transition disabled:opacity-50"
+        >
+          <Save className="w-4 h-4" />
+          {saving ? 'Guardando...' : 'Guardar Todo'}
+        </button>
+      </header>
+
+      {/* 1. Costos Fijos Generales de la Sede */}
+      <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <h2 className="text-sm font-bold text-slate-800 flex items-center gap-2">
+            <Calculator className="w-4 h-4 text-blue-600" />
+            Estructura de Costos Fijos Generales
+          </h2>
+          <span className="text-xs font-extrabold text-slate-700 bg-slate-100 px-3 py-1 rounded-full">
+            Total Sede: ${costoFijoTotalSede.toLocaleString()}
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+          <div>
+            <label className="block text-xs font-bold text-slate-600 mb-1">Arriendo Mensual ($)</label>
+            <input
+              type="number"
+              value={datosSede.arriendo}
+              onChange={(e) => handleGeneralChange('arriendo', e.target.value)}
+              className="w-full p-2 border border-slate-300 rounded-lg text-xs font-bold text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-slate-600 mb-1">Servicios Públicos ($)</label>
+            <input
+              type="number"
+              value={datosSede.servicios}
+              onChange={(e) => handleGeneralChange('servicios', e.target.value)}
+              className="w-full p-2 border border-slate-300 rounded-lg text-xs font-bold text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-slate-600 mb-1">Nómina Admin / General ($)</label>
+            <input
+              type="number"
+              value={datosSede.admin}
+              onChange={(e) => handleGeneralChange('admin', e.target.value)}
+              className="w-full p-2 border border-slate-300 rounded-lg text-xs font-bold text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-slate-600 mb-1">Mantenimiento y Otros ($)</label>
+            <input
+              type="number"
+              value={datosSede.mtto}
+              onChange={(e) => handleGeneralChange('mtto', e.target.value)}
+              className="w-full p-2 border border-slate-300 rounded-lg text-xs font-bold text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* 2. Sub-bolsas por Área ($m^2$ y Asignación Directa) */}
+      <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+        <div className="p-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+          <div>
+            <h2 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+              <Layers className="w-4 h-4 text-blue-600" />
+              Distribución de Áreas y Sub-bolsas por Sede
+            </h2>
+            <p className="text-[11px] text-slate-500 mt-0.5">Total Superficie Registrada: <strong className="text-slate-800">{m2Totales} m²</strong></p>
+          </div>
+          <button
+            onClick={agregarArea}
+            className="flex items-center gap-1 bg-slate-900 text-white text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-slate-800 transition"
+          >
+            <Plus className="w-3.5 h-3.5" /> Agregar Área
+          </button>
+        </div>
+
+        <table className="w-full text-left text-xs border-collapse">
+          <thead>
+            <tr className="bg-slate-900 text-white uppercase tracking-wider">
+              <th className="p-3">Área / Sub-bolsa</th>
+              <th className="p-3">Superficie (m²)</th>
+              <th className="p-3">% Participación</th>
+              <th className="p-3">Criterio Asignación</th>
+              <th className="p-3">Valor Sub-bolsa ($)</th>
+              <th className="p-3 text-center">Acción</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-200">
+            {areas.map((area, idx) => {
+              const pct = m2Totales > 0 ? ((Number(area.m2) || 0) / m2Totales) * 100 : 0;
+              const costoProrrateado = (pct / 100) * costoFijoTotalSede;
+
+              return (
+                <tr key={idx} className="hover:bg-slate-50 transition-colors">
+                  <td className="p-3">
+                    <input
+                      type="text"
+                      value={area.nombre}
+                      onChange={(e) => handleAreaChange(idx, 'nombre', e.target.value)}
+                      className="w-full border border-slate-300 rounded px-2 py-1.5 text-xs font-semibold text-slate-800 focus:ring-1 focus:ring-blue-500"
+                    />
+                  </td>
+                  <td className="p-3">
+                    <input
+                      type="number"
+                      value={area.m2}
+                      onChange={(e) => handleAreaChange(idx, 'm2', Number(e.target.value))}
+                      className="w-24 border border-slate-300 rounded px-2 py-1.5 text-xs font-bold text-slate-700 focus:ring-1 focus:ring-blue-500"
+                    />
+                  </td>
+                  <td className="p-3 font-bold text-slate-600">{pct.toFixed(2)}%</td>
+                  <td className="p-3">
+                    <select
+                      value={area.esDirecto ? 'directo' : 'm2'}
+                      onChange={(e) => handleAreaChange(idx, 'esDirecto', e.target.value === 'directo')}
+                      className="border border-slate-300 rounded px-2 py-1.5 text-xs font-semibold text-slate-700 focus:ring-1 focus:ring-blue-500 cursor-pointer bg-white"
+                    >
+                      <option value="directo">Asignación Directa</option>
+                      <option value="m2">Prorrateo por m²</option>
+                    </select>
+                  </td>
+                  <td className="p-3 font-extrabold text-blue-700">
+                    {area.esDirecto ? (
+                      <input
+                        type="number"
+                        value={area.costoAsignadoDirecto}
+                        onChange={(e) => handleAreaChange(idx, 'costoAsignadoDirecto', Number(e.target.value))}
+                        className="w-36 border border-slate-300 rounded px-2 py-1.5 text-xs font-bold text-emerald-700 focus:ring-1 focus:ring-blue-500"
+                      />
+                    ) : (
+                      <span className="text-sm">${costoProrrateado.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                    )}
+                  </td>
+                  <td className="p-3 text-center">
+                    <button
+                      onClick={() => eliminarArea(idx)}
+                      className="text-slate-400 hover:text-rose-600 transition p-1"
+                      title="Eliminar Área"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+</file>
+
+<file path="src/pages/Simulador.jsx">
+import { useEffect, useMemo, useState } from 'react';
+import api from '../api/axiosConfig';
+import { useSedeContext } from '../context/SedeContext';
+
+export default function Simulador() {
+  const { sedes, selectedSede, setSelectedSede } = useSedeContext();
+  const [convenios, setConvenios] = useState([]);
+  const [insumosDetalle, setInsumosDetalle] = useState([]);
+  const [selectedConvenioId, setSelectedConvenioId] = useState('');
+  const [expandedExamenes, setExpandedExamenes] = useState({});
+  const [evaluacion, setEvaluacion] = useState([]);
+  const [incremento, setIncremento] = useState(0);
+  const [volumen, setVolumen] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const cargarConvenios = async () => {
+      try {
+        const res = await api.get('/convenios');
+        const items = Array.isArray(res?.data) ? res.data : [];
+        setConvenios(items);
+
+        const generalConvenioId = items.find((item) => String(item.nombre_eps || '').trim().toLowerCase() === 'general')?.id;
+        if (!selectedConvenioId && generalConvenioId) {
+          setSelectedConvenioId(String(generalConvenioId));
+        }
+      } catch (err) {
+        console.error('No se pudieron cargar los convenios:', err);
+      }
+    };
+
+    const cargarInsumos = async () => {
+      try {
+        const res = await api.get('/insumos');
+        const items = Array.isArray(res?.data) ? res.data : [];
+        setInsumosDetalle(items);
+      } catch (err) {
+        console.error('No se pudieron cargar los insumos:', err);
+      }
+    };
+
+    cargarConvenios();
+    cargarInsumos();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      if (!selectedSede) return;
+      const query = selectedConvenioId ? `?convenioId=${encodeURIComponent(selectedConvenioId)}` : '';
+      const evaluacionRes = await api.get(`/evaluador/sede/${selectedSede}${query}`);
+      const rows = Array.isArray(evaluacionRes?.data?.evaluacion)
+        ? evaluacionRes.data.evaluacion.map((item) => ({
+            ...item,
+            tarifaConvenio: Number(item.tarifaConvenio ?? item.tarifa_convenio ?? 0),
+            tarifa_convenio: Number(item.tarifaConvenio ?? item.tarifa_convenio ?? 0)
+          }))
+        : [];
+      setEvaluacion(rows);
+      setError('');
+    } catch (err) {
+      setError(err?.response?.data?.error || 'No se pudo cargar el simulador.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!selectedSede && sedes.length > 0) {
+      setSelectedSede(sedes[0].id);
+      return;
+    }
+    if (selectedSede) {
+      fetchData();
+    }
+  }, [selectedSede, sedes, selectedConvenioId]);
+
+  const filas = useMemo(() =>
+    evaluacion.map((item) => {
+      const tarifaSimulada = Number(item.tarifaConvenio || 0) * (1 + incremento / 100);
+      const margen = tarifaSimulada - Number(item.costoTotal || 0);
+      const volumenAfectado = Number(item.vol_mes || 0) * (1 + volumen / 100);
+      const balance = margen * volumenAfectado;
+      return { ...item, tarifaSimulada, margen, volumenAfectado, balance };
+    }),
+    [evaluacion, incremento, volumen]
+  );
+
+  const totalBalance = filas.reduce((sum, item) => sum + Number(item.balance || 0), 0);
+
+  const toggleExamen = (id) => {
+    setExpandedExamenes((prev) => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
+
+  if (loading) return <div className="p-8 text-slate-300">Cargando simulador...</div>;
+
+  return (
+    <div className="p-6 max-w-7xl mx-auto">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <p className="text-sm uppercase tracking-[0.2em] text-rose-400">Simulación</p>
+          <h1 className="text-3xl font-bold text-slate-900">Proyección de Escenarios</h1>
+        </div>
+        <div className="rounded-xl border border-lime-700 bg-lime-950/30 px-4 py-3 text-right text-lime-200">
+          <div className="text-xs uppercase tracking-[0.2em] text-lime-300">Balance proyectado</div>
+          <div className="text-2xl font-bold">{new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(totalBalance || 0)}</div>
+        </div>
+      </div>
+
+      {error && <div className="mb-4 rounded border border-rose-900 bg-rose-950/40 p-3 text-sm text-rose-200">{error}</div>}
+
+      <div className="mb-6 grid gap-4 rounded-2xl border border-slate-700 bg-slate-800 p-4 md:grid-cols-4">
+        <div>
+          <label className="mb-2 block text-sm text-slate-300">Sede</label>
+          <select value={selectedSede} onChange={(e) => setSelectedSede(e.target.value)} className="w-full rounded border border-slate-600 bg-slate-900 p-2 text-white">
+            {sedes.map((sede) => (
+              <option key={sede.id} value={sede.id}>{sede.nombre}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="mb-2 block text-sm text-slate-300">Convenio</label>
+          <select
+            value={selectedConvenioId || convenios.find((item) => String(item.nombre_eps || '').trim().toLowerCase() === 'general')?.id || ''}
+            onChange={(e) => setSelectedConvenioId(e.target.value)}
+            className="w-full rounded border border-slate-600 bg-slate-900 p-2 text-white"
+          >
+            {convenios.length === 0 ? <option value="">Cargando...</option> : null}
+            {convenios.map((convenio) => (
+              <option key={convenio.id} value={convenio.id}>{convenio.nombre_eps}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="mb-2 block text-sm text-slate-300">Incremento %</label>
+          <input type="number" value={incremento} onChange={(e) => setIncremento(Number(e.target.value) || 0)} className="w-full rounded border border-slate-600 bg-slate-900 p-2 text-white" />
+        </div>
+        <div>
+          <label className="mb-2 block text-sm text-slate-300">Volumen %</label>
+          <input type="number" value={volumen} onChange={(e) => setVolumen(Number(e.target.value) || 0)} className="w-full rounded border border-slate-600 bg-slate-900 p-2 text-white" />
+        </div>
+      </div>
+
+      <div className="overflow-x-auto rounded-2xl border border-slate-700 bg-slate-800">
+        <table className="min-w-full text-left text-sm">
+          <thead className="bg-slate-900 text-slate-300">
+            <tr>
+              <th className="p-3">Examen</th>
+              <th className="p-3">Tarifa base</th>
+              <th className="p-3">Tarifa simulada</th>
+              <th className="p-3">Costo real</th>
+              <th className="p-3">Margen</th>
+              <th className="p-3">Balance</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filas.map((item) => {
+              const detalleInsumos = insumosDetalle.filter((insumo) => insumo.examen_id === item.examenId);
+              const subtotalInsumos = detalleInsumos.reduce((sum, insumo) => sum + Number(insumo.cantidad || 0) * Number(insumo.valor_unitario || 0), 0);
+
+              return (
+                <>
+                  <tr key={item.examenId} className="border-t border-slate-700">
+                    <td className="p-3 text-white">
+                      <div className="flex items-center gap-2">
+                        <span>{item.nombre}</span>
+                        {detalleInsumos.length > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => toggleExamen(item.examenId)}
+                            className="rounded-full border border-slate-600 bg-slate-700 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-slate-200 transition hover:border-slate-500 hover:bg-slate-600"
+                          >
+                            {expandedExamenes[item.examenId] ? 'Ocultar' : 'Insumos'}
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                    <td className="p-3 text-slate-300">{new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(Number(item.tarifaConvenio || 0))}</td>
+                    <td className="p-3 text-sky-300">{new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(Number(item.tarifaSimulada || 0))}</td>
+                    <td className="p-3 text-rose-300">{new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(Number(item.costoTotal || 0))}</td>
+                    <td className={`p-3 font-semibold ${Number(item.margen || 0) >= 0 ? 'text-lime-400' : 'text-rose-400'}`}>
+                      {new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(Number(item.margen || 0))}
+                    </td>
+                    <td className="p-3 font-semibold text-white">{new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(Number(item.balance || 0))}</td>
+                  </tr>
+
+                  {detalleInsumos.length > 0 && expandedExamenes[item.examenId] && (
+                    <tr key={`${item.examenId}-insumos`} className="border-b border-slate-700 bg-slate-900/50">
+                      <td colSpan={6} className="p-3">
+                        <div className="rounded-xl border border-slate-700 bg-slate-900/60 p-3">
+                          <div className="mb-2 flex items-center justify-between">
+                            <span className="text-[10px] uppercase tracking-[0.2em] text-slate-400">Detalle de insumos</span>
+                            <span className="text-xs text-slate-300">Subtotal: {new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(subtotalInsumos)}</span>
+                          </div>
+                          <div className="space-y-1.5 text-xs text-slate-200">
+                            {detalleInsumos.map((insumo) => (
+                              <div key={insumo.id} className="flex items-center justify-between gap-3 rounded bg-slate-800 px-2 py-1">
+                                <span>{insumo.nombre_insumo}</span>
+                                <span className="text-slate-300">{Number(insumo.cantidad || 0)} × {new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(Number(insumo.valor_unitario || 0))}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+</file>
+
+<file path="src/pages/Usuarios.jsx">
+import { useEffect, useState } from 'react';
+import api from '../api/axiosConfig';
+
+const tabs = [
+  { id: 'roles', label: 'Perfiles' },
+  { id: 'usuarios', label: 'Usuarios' },
+  { id: 'perfil', label: 'Mi perfil' },
+];
+
+const MODULOS_PERMISO = [
+  'dashboard',
+  'sedes',
+  'personal',
+  'equipos',
+  'convenios',
+  'insumos',
+  'simulador',
+  'usuarios',
+];
+
+const ACCIONES_PERMISO = ['view', 'create', 'edit', 'delete'];
+
+const permisosBase = () =>
+  MODULOS_PERMISO.reduce(
+    (acc, modulo) => ({
+      ...acc,
+      [modulo]: ACCIONES_PERMISO.reduce((accAcc, accion) => ({ ...accAcc, [accion]: false }), {}),
+    }),
+    {}
+  );
+
+export default function Usuarios() {
+  const [activeTab, setActiveTab] = useState('usuarios');
+  const [usuarios, setUsuarios] = useState([]);
+  const [roles, setRoles] = useState([]);
+  const [sedes, setSedes] = useState([]);
+  const [filterRole, setFilterRole] = useState('all');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [creatingRole, setCreatingRole] = useState(false);
+  const [creatingUser, setCreatingUser] = useState(false);
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [profile, setProfile] = useState(null);
+
+  const [newRole, setNewRole] = useState({ nombre: '', descripcion: '', permisos: permisosBase() });
+  const [newUser, setNewUser] = useState({
+    nombre: '',
+    email: '',
+    password: '',
+    role_id: '',
+    sede_id: '',
+    activo: true,
+  });
+  const [profileForm, setProfileForm] = useState({
+    nombre: '',
+    email: '',
+    password: '',
+  });
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const [rolesRes, usuariosRes, sedesRes] = await Promise.all([
+        api.get('/roles'),
+        api.get('/usuarios'),
+        api.get('/sedes'),
+      ]);
+
+      setRoles(Array.isArray(rolesRes?.data) ? rolesRes.data : []);
+      setUsuarios(Array.isArray(usuariosRes?.data) ? usuariosRes.data : []);
+      setSedes(Array.isArray(sedesRes?.data) ? sedesRes.data : []);
+      setError('');
+    } catch (err) {
+      setError(err?.response?.data?.error || 'No se pudieron cargar los usuarios y roles.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchPerfil = async () => {
+    try {
+      const res = await api.get('/usuarios/perfil');
+      setProfile(res.data || null);
+      setProfileForm({
+        nombre: res.data?.nombre || '',
+        email: res.data?.email || '',
+        password: '',
+      });
+    } catch (err) {
+      setError(err?.response?.data?.error || 'No se pudo cargar el perfil.');
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    if (activeTab === 'perfil') {
+      fetchPerfil();
+    }
+  }, [activeTab]);
+
+  const handleCreateRole = async (e) => {
+    e.preventDefault();
+    setCreatingRole(true);
+    setError('');
+
+    try {
+      await api.post('/roles', newRole);
+      setNewRole({ nombre: '', descripcion: '', permisos: permisosBase() });
+      await fetchData();
+    } catch (err) {
+      setError(err?.response?.data?.error || 'No se pudo crear el rol.');
+    } finally {
+      setCreatingRole(false);
+    }
+  };
+
+  const handleCreateUser = async (e) => {
+    e.preventDefault();
+    setCreatingUser(true);
+    setError('');
+
+    try {
+      await api.post('/usuarios', {
+        ...newUser,
+        role_id: newUser.role_id ? Number(newUser.role_id) : null,
+        perfil_id: newUser.role_id ? Number(newUser.role_id) : null,
+        sede_id: newUser.sede_id || null,
+      });
+
+      setNewUser({ nombre: '', email: '', password: '', role_id: '', sede_id: '', activo: true });
+      await fetchData();
+    } catch (err) {
+      setError(err?.response?.data?.error || 'No se pudo crear el usuario.');
+    } finally {
+      setCreatingUser(false);
+    }
+  };
+
+  const handleToggleUsuario = async (usuario) => {
+    setSaving(true);
+    setError('');
+
+    try {
+      await api.put(`/usuarios/${usuario.id}`, {
+        activo: !usuario.activo,
+      });
+      await fetchData();
+    } catch (err) {
+      setError(err?.response?.data?.error || 'No se pudo actualizar el usuario.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleUpdatePermisos = async (usuarioId, payload) => {
+    setSaving(true);
+    setError('');
+
+    try {
+      await api.put(`/usuarios/${usuarioId}`, {
+        ...payload,
+        role_id: payload.role_id ?? payload.perfil_id ?? null,
+        perfil_id: payload.role_id ?? payload.perfil_id ?? null,
+      });
+      await fetchData();
+    } catch (err) {
+      setError(err?.response?.data?.error || 'No se pudo actualizar el permiso del usuario.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleSavePerfil = async (e) => {
+    e.preventDefault();
+    setSavingProfile(true);
+    setError('');
+
+    try {
+      const payload = {
+        nombre: profileForm.nombre,
+        email: profileForm.email,
+        ...(profileForm.password ? { password: profileForm.password } : {}),
+      };
+
+      const res = await api.put('/usuarios/perfil', payload);
+      const usuarioGuardado = res?.data?.data || res?.data || null;
+
+      if (usuarioGuardado?.nombre || usuarioGuardado?.email) {
+        const stored = JSON.parse(localStorage.getItem('usuario') || '{}');
+        localStorage.setItem('usuario', JSON.stringify({ ...stored, ...usuarioGuardado }));
+      }
+
+      await fetchPerfil();
+      await fetchData();
+    } catch (err) {
+      setError(err?.response?.data?.error || 'No se pudo actualizar el perfil.');
+    } finally {
+      setSavingProfile(false);
+    }
+  };
+
+  const usuariosFiltrados = filterRole === 'all'
+    ? usuarios
+    : usuarios.filter((usuario) => String(usuario.role_id ?? '') === String(filterRole));
+
+  const parsePermisos = (permisosRaw) => {
+    if (!permisosRaw) return {};
+    if (typeof permisosRaw === 'string') {
+      try {
+        return JSON.parse(permisosRaw);
+      } catch {
+        return {};
+      }
+    }
+    return typeof permisosRaw === 'object' ? permisosRaw : {};
+  };
+
+  if (loading) return <div className="p-8 text-slate-600">Cargando usuarios, roles y perfiles...</div>;
+
+  return (
+    <div className="space-y-6 p-1">
+      {error && (
+        <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+          {error}
+        </div>
+      )}
+
+      <div className="flex flex-wrap gap-2 rounded-2xl border border-slate-200 bg-white p-2 shadow-sm">
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            type="button"
+            onClick={() => setActiveTab(tab.id)}
+            className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
+              activeTab === tab.id
+                ? 'bg-slate-900 text-white'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {activeTab === 'roles' && (
+        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="mb-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-600">Perfiles</p>
+            <h3 className="mt-1 text-xl font-bold text-slate-900">Roles del sistema</h3>
+          </div>
+
+          <form onSubmit={handleCreateRole} className="mb-6 rounded-xl border border-slate-200 bg-slate-50 p-4">
+            <div className="grid gap-3 md:grid-cols-[1.2fr_2fr_auto]">
+              <input
+                value={newRole.nombre}
+                onChange={(e) => setNewRole({ ...newRole, nombre: e.target.value })}
+                placeholder="Nombre del rol"
+                className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-slate-800"
+                required
+              />
+              <input
+                value={newRole.descripcion}
+                onChange={(e) => setNewRole({ ...newRole, descripcion: e.target.value })}
+                placeholder="Descripción del perfil"
+                className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-slate-800"
+              />
+              <button type="submit" disabled={creatingRole} className="rounded-lg bg-cyan-600 px-4 py-2 font-medium text-white disabled:opacity-60">
+                {creatingRole ? 'Guardando...' : 'Agregar rol'}
+              </button>
+            </div>
+
+            <div className="mt-6 space-y-4">
+              {MODULOS_PERMISO.map((modulo) => (
+                <div key={modulo} className="rounded-lg border border-slate-200 bg-white p-4">
+                  <p className="mb-2 text-sm font-semibold text-slate-800 capitalize">{modulo}</p>
+                  <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-4">
+                    {ACCIONES_PERMISO.map((accion) => (
+                      <label key={`${modulo}-${accion}`} className="flex cursor-pointer items-center gap-2 rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700">
+                        <input
+                          type="checkbox"
+                          checked={Boolean(newRole.permisos?.[modulo]?.[accion])}
+                          onChange={(e) => setNewRole({
+                            ...newRole,
+                            permisos: {
+                              ...newRole.permisos,
+                              [modulo]: {
+                                ...newRole.permisos?.[modulo],
+                                [accion]: e.target.checked,
+                              },
+                            },
+                          })}
+                        />
+                        <span className="capitalize">{accion === 'view' ? 'Ver' : accion === 'create' ? 'Crear' : accion === 'edit' ? 'Editar' : 'Eliminar'}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </form>
+
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {roles.map((rol) => {
+              const permisosObj = parsePermisos(rol.permisos);
+              return (
+                <div key={rol.id} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                  <div className="mb-2 flex items-center justify-between">
+                    <span className="rounded-full bg-cyan-100 px-2.5 py-1 text-xs font-semibold text-cyan-700">
+                      {rol.nombre}
+                    </span>
+                    <span className="text-xs text-slate-500">#{rol.id}</span>
+                  </div>
+                  <p className="mb-3 text-sm text-slate-600">{rol.descripcion || 'Sin descripción'}</p>
+                  <div className="space-y-2">
+                    {Object.entries(permisosObj).map(([modulo, acciones]) => {
+                      const accionesHabilitadas = typeof acciones === 'object' && acciones !== null
+                        ? Object.entries(acciones)
+                            .filter(([, enabled]) => Boolean(enabled))
+                            .map(([key]) => key)
+                        : [];
+                      return accionesHabilitadas.length > 0 ? (
+                        <div key={modulo} className="text-xs">
+                          <span className="inline-block rounded-full bg-slate-100 px-2 py-1 font-semibold text-slate-700 capitalize">
+                            {modulo}:
+                          </span>
+                          <div className="mt-1 flex flex-wrap gap-1">
+                            {accionesHabilitadas.map((accion) => (
+                              <span key={`${modulo}-${accion}`} className="rounded-full bg-cyan-100 px-1.5 py-0.5 text-[9px] font-semibold uppercase text-cyan-700">
+                                {accion}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      ) : null;
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {activeTab === 'usuarios' && (
+        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="mb-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-violet-600">Usuarios</p>
+            <h3 className="mt-1 text-xl font-bold text-slate-900">Gestión de accesos</h3>
+          </div>
+
+          <form onSubmit={handleCreateUser} className="mb-6 grid gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 lg:grid-cols-6">
+            <input
+              value={newUser.nombre}
+              onChange={(e) => setNewUser({ ...newUser, nombre: e.target.value })}
+              placeholder="Nombre completo"
+              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-slate-800 lg:col-span-2"
+              required
+            />
+            <input
+              type="email"
+              value={newUser.email}
+              onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+              placeholder="Correo electrónico"
+              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-slate-800"
+              required
+            />
+            <input
+              type="password"
+              value={newUser.password}
+              onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+              placeholder="Contraseña"
+              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-slate-800"
+              required
+            />
+            <select
+              value={newUser.role_id}
+              onChange={(e) => setNewUser({ ...newUser, role_id: e.target.value })}
+              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-slate-800"
+            >
+              <option value="">Perfil</option>
+              {roles.map((rol) => (
+                <option key={rol.id} value={rol.id}>{rol.nombre}</option>
+              ))}
+            </select>
+            <select
+              value={newUser.sede_id}
+              onChange={(e) => setNewUser({ ...newUser, sede_id: e.target.value })}
+              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-slate-800"
+            >
+              <option value="">Sede</option>
+              {sedes.map((sede) => (
+                <option key={sede.id} value={sede.id}>{sede.nombre}</option>
+              ))}
+            </select>
+            <button type="submit" disabled={creatingUser} className="rounded-lg bg-violet-600 px-4 py-2 font-medium text-white disabled:opacity-60">
+              {creatingUser ? 'Creando...' : 'Agregar usuario'}
+            </button>
+          </form>
+
+          <div className="mb-4 flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Filtrar por perfil</p>
+            </div>
+            <select
+              value={filterRole}
+              onChange={(e) => setFilterRole(e.target.value)}
+              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
+            >
+              <option value="all">Todos los perfiles</option>
+              {roles.map((rol) => (
+                <option key={rol.id} value={rol.id}>{rol.nombre}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="overflow-x-auto rounded-xl border border-slate-200">
+            <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
+              <thead className="bg-slate-100 text-slate-600">
+                <tr>
+                  <th className="px-4 py-3 font-semibold">Usuario</th>
+                  <th className="px-4 py-3 font-semibold">Correo</th>
+                  <th className="px-4 py-3 font-semibold">Perfil / Permiso</th>
+                  <th className="px-4 py-3 font-semibold">Sede</th>
+                  <th className="px-4 py-3 font-semibold">Estado</th>
+                  <th className="px-4 py-3 font-semibold">Acción</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200 bg-white">
+                {usuariosFiltrados.map((usuario) => (
+                  <tr key={usuario.id}>
+                    <td className="px-4 py-3">
+                      <div className="font-medium text-slate-800">{usuario.nombre}</div>
+                    </td>
+                    <td className="px-4 py-3 text-slate-600">{usuario.email}</td>
+                    <td className="px-4 py-3">
+                      <select
+                        value={usuario.role_id ?? ''}
+                        onChange={(e) => handleUpdatePermisos(usuario.id, { role_id: e.target.value ? Number(e.target.value) : null, perfil_id: e.target.value ? Number(e.target.value) : null })}
+                        className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5 text-slate-700"
+                      >
+                        <option value="">Sin perfil</option>
+                        {roles.map((rol) => (
+                          <option key={rol.id} value={rol.id}>{rol.nombre}</option>
+                        ))}
+                      </select>
+                    </td>
+                    <td className="px-4 py-3">
+                      <select
+                        value={usuario.sede_id ?? ''}
+                        onChange={(e) => handleUpdatePermisos(usuario.id, { sede_id: e.target.value || null })}
+                        className="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5 text-slate-700"
+                      >
+                        <option value="">Sin sede</option>
+                        {sedes.map((sede) => (
+                          <option key={sede.id} value={sede.id}>{sede.nombre}</option>
+                        ))}
+                      </select>
+                    </td>
+                    <td className="px-4 py-3">
+                      <button
+                        type="button"
+                        onClick={() => handleToggleUsuario(usuario)}
+                        disabled={saving}
+                        className={`rounded-full px-3 py-1 text-xs font-semibold ${usuario.activo ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-700'}`}
+                      >
+                        {usuario.activo ? 'Activo' : 'Inactivo'}
+                      </button>
+                    </td>
+                    <td className="px-4 py-3">
+                      <button
+                        type="button"
+                        onClick={() => handleToggleUsuario(usuario)}
+                        disabled={saving}
+                        className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:border-slate-300"
+                      >
+                        Guardar estado
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
+
+      {activeTab === 'perfil' && (
+        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="mb-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600">Mi perfil</p>
+            <h3 className="mt-1 text-xl font-bold text-slate-900">Datos del usuario autenticado</h3>
+          </div>
+
+          <form onSubmit={handleSavePerfil} className="grid gap-4 rounded-xl border border-slate-200 bg-slate-50 p-5 md:grid-cols-2">
+            <div className="md:col-span-2">
+              <label className="mb-2 block text-sm font-medium text-slate-600">Nombre completo</label>
+              <input
+                value={profileForm.nombre}
+                onChange={(e) => setProfileForm({ ...profileForm, nombre: e.target.value })}
+                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-slate-800"
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-medium text-slate-600">Correo electrónico</label>
+              <input
+                type="email"
+                value={profileForm.email}
+                onChange={(e) => setProfileForm({ ...profileForm, email: e.target.value })}
+                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-slate-800"
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-medium text-slate-600">Nueva contraseña</label>
+              <input
+                type="password"
+                value={profileForm.password}
+                onChange={(e) => setProfileForm({ ...profileForm, password: e.target.value })}
+                placeholder="Dejar vacío para conservar la actual"
+                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-slate-800"
+              />
+            </div>
+
+            <div className="md:col-span-2 rounded-xl border border-cyan-100 bg-cyan-50 p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-700">Estado actual</p>
+              <div className="mt-2 flex flex-wrap gap-3 text-sm text-slate-700">
+                <span className="rounded-full bg-white px-3 py-1 font-medium">
+                  {profile?.rol_nombre || 'Sin perfil'}
+                </span>
+                <span className="rounded-full bg-white px-3 py-1 font-medium">
+                  {profile?.sede_nombre || 'Sin sede'}
+                </span>
+                <span className={`rounded-full px-3 py-1 font-medium ${profile?.activo ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-700'}`}>
+                  {profile?.activo ? 'Activo' : 'Inactivo'}
+                </span>
+              </div>
+            </div>
+
+            <div className="md:col-span-2 flex justify-end">
+              <button
+                type="submit"
+                disabled={savingProfile}
+                className="rounded-xl bg-emerald-600 px-5 py-2.5 font-semibold text-white disabled:opacity-60"
+              >
+                {savingProfile ? 'Guardando...' : 'Guardar perfil'}
+              </button>
+            </div>
+          </form>
+        </section>
+      )}
+    </div>
+  );
+}
+</file>
+
+<file path="src/App.css">
+.counter {
+  font-size: 16px;
+  padding: 5px 10px;
+  border-radius: 5px;
+  color: var(--accent);
+  background: var(--accent-bg);
+  border: 2px solid transparent;
+  transition: border-color 0.3s;
+  margin-bottom: 24px;
+
+  &:hover {
+    border-color: var(--accent-border);
+  }
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+}
+
+.hero {
+  position: relative;
+
+  .base,
+  .framework,
+  .vite {
+    inset-inline: 0;
+    margin: 0 auto;
+  }
+
+  .base {
+    width: 170px;
+    position: relative;
+    z-index: 0;
+  }
+
+  .framework,
+  .vite {
+    position: absolute;
+  }
+
+  .framework {
+    z-index: 1;
+    top: 34px;
+    height: 28px;
+    transform: perspective(2000px) rotateZ(300deg) rotateX(44deg) rotateY(39deg)
+      scale(1.4);
+  }
+
+  .vite {
+    z-index: 0;
+    top: 107px;
+    height: 26px;
+    width: auto;
+    transform: perspective(2000px) rotateZ(300deg) rotateX(40deg) rotateY(39deg)
+      scale(0.8);
+  }
+}
+
+#center {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  place-content: center;
+  place-items: center;
+  flex-grow: 1;
+
+  @media (max-width: 1024px) {
+    padding: 32px 20px 24px;
+    gap: 18px;
+  }
+}
+
+#next-steps {
+  display: flex;
+  border-top: 1px solid var(--border);
+  text-align: left;
+
+  & > div {
+    flex: 1 1 0;
+    padding: 32px;
+    @media (max-width: 1024px) {
+      padding: 24px 20px;
+    }
+  }
+
+  .icon {
+    margin-bottom: 16px;
+    width: 22px;
+    height: 22px;
+  }
+
+  @media (max-width: 1024px) {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+#docs {
+  border-right: 1px solid var(--border);
+
+  @media (max-width: 1024px) {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+}
+
+#next-steps ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  gap: 8px;
+  margin: 32px 0 0;
+
+  .logo {
+    height: 18px;
+  }
+
+  a {
+    color: var(--text-h);
+    font-size: 16px;
+    border-radius: 6px;
+    background: var(--social-bg);
+    display: flex;
+    padding: 6px 12px;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    transition: box-shadow 0.3s;
+
+    &:hover {
+      box-shadow: var(--shadow);
+    }
+    .button-icon {
+      height: 18px;
+      width: 18px;
+    }
+  }
+
+  @media (max-width: 1024px) {
+    margin-top: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+
+    li {
+      flex: 1 1 calc(50% - 8px);
+    }
+
+    a {
+      width: 100%;
+      justify-content: center;
+      box-sizing: border-box;
+    }
+  }
+}
+
+#spacer {
+  height: 88px;
+  border-top: 1px solid var(--border);
+  @media (max-width: 1024px) {
+    height: 48px;
+  }
+}
+
+.ticks {
+  position: relative;
+  width: 100%;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    top: -4.5px;
+    border: 5px solid transparent;
+  }
+
+  &::before {
+    left: 0;
+    border-left-color: var(--border);
+  }
+  &::after {
+    right: 0;
+    border-right-color: var(--border);
+  }
+}
+</file>
+
+<file path="src/App.jsx">
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import AppShell from './components/layout/AppShell';
+import { SedeProvider } from './context/SedeContext';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+import EvaluadorSede from './pages/EvaluadorSede';
+import Sedes from './pages/Sedes';
+import Personal from './pages/Personal';
+import Convenios from './pages/Convenios';
+import Insumos from './pages/Insumos';
+import Equipos from './pages/Equipos';
+import Simulador from './pages/Simulador';
+import Usuarios from './pages/Usuarios';
+
+const hasModulePermission = (modulo, accion = 'view') => {
+  try {
+    const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+    
+    // Si el usuario es ADMINISTRADOR, otorgar acceso completo por defecto
+    if (usuario.rol === 'ADMINISTRADOR' || usuario.role === 'ADMINISTRADOR') {
+      return true;
+    }
+
+    const permisos = usuario.permisos;
+    
+    // Si los permisos vienen como array de strings (ej. ['dashboard', 'sedes'])
+    if (Array.isArray(permisos)) {
+      return permisos.includes(modulo);
+    }
+
+    // Si los permisos vienen como objeto estructurado { dashboard: { view: true } }
+    if (typeof permisos === 'object' && permisos !== null) {
+      return !!permisos?.[modulo]?.[accion];
+    }
+
+    // Si no hay objeto de permisos definido, permitir acceso si hay token activo
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+const ProtectedRoute = ({ children, requiredPermission, requiredAction = 'view' }) => {
+  const token = localStorage.getItem('token');
+  if (!token) return <Navigate to="/login" replace />;
+
+  if (requiredPermission && !hasModulePermission(requiredPermission, requiredAction)) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
+};
+
+const withShell = (PageComponent) => (
+  <AppShell>
+    <PageComponent />
+  </AppShell>
+);
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <SedeProvider>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute requiredPermission="dashboard">
+                {withShell(Dashboard)}
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/evaluador"
+            element={
+              <ProtectedRoute requiredPermission="dashboard">
+                {withShell(EvaluadorSede)}
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/sedes"
+            element={
+              <ProtectedRoute requiredPermission="sedes">
+                {withShell(Sedes)}
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/personal"
+            element={
+              <ProtectedRoute requiredPermission="personal">
+                {withShell(Personal)}
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/equipos"
+            element={
+              <ProtectedRoute requiredPermission="equipos">
+                {withShell(Equipos)}
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/convenios"
+            element={
+              <ProtectedRoute requiredPermission="convenios">
+                {withShell(Convenios)}
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/insumos"
+            element={
+              <ProtectedRoute requiredPermission="insumos">
+                {withShell(Insumos)}
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/simulador"
+            element={
+              <ProtectedRoute requiredPermission="simulador">
+                {withShell(Simulador)}
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/usuarios"
+            element={
+              <ProtectedRoute requiredPermission="usuarios">
+                {withShell(Usuarios)}
+              </ProtectedRoute>
+            }
+          />
+
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </SedeProvider>
+    </BrowserRouter>
+  );
+}
+</file>
+
+<file path="src/index.css">
+@import "tailwindcss";
+
+@layer base {
+  body {
+    @apply bg-slate-900 text-slate-100 antialiased min-h-screen;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+}
+</file>
+
+<file path="src/main.jsx">
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App.jsx'
+import './index.css' // ← Esta línea debe estar presente
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)
+</file>
+
+<file path=".env.example">
+VITE_API_URL=http://localhost:5000/api/v1
+</file>
+
+<file path=".gitignore">
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+</file>
+
+<file path=".oxlintrc.json">
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "oxc"],
+  "rules": {
+    "react/rules-of-hooks": "error",
+    "react/only-export-components": ["warn", { "allowConstantExport": true }]
+  }
+}
+</file>
+
+<file path="index.html">
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>frontend</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+</file>
+
+<file path="package.json">
+{
+  "name": "frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "oxlint",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "axios": "^1.20.0",
+    "lucide-react": "^1.47.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-router-dom": "^7.18.4",
+    "recharts": "^3.10.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
+    "@vitejs/plugin-react": "^6.1.1",
+    "autoprefixer": "^10.6.1",
+    "oxlint": "^1.81.0",
+    "postcss": "^8.5.28",
+    "tailwindcss": "^4.3.3",
+    "vite": "^8.3.0"
+  }
+}
+</file>
+
+<file path="postcss.config.js">
+export default {
+  plugins: {
+    '@tailwindcss/postcss': {},
+    autoprefixer: {},
+  },
+}
+</file>
+
+<file path="README.md">
+# React + Vite
+
+This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+
+Currently, two official plugins are available:
+
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+
+## React Compiler
+
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+
+## Expanding the Oxlint configuration
+
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+</file>
+
+<file path="tailwind.config.js">
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+</file>
+
+<file path="vite.config.js">
+import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite'
+
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    host: '0.0.0.0',
+    port: 5175,
+    strictPort: false,
+  },
+  preview: {
+    host: '0.0.0.0',
+    port: 4173,
+    strictPort: false,
+  },
+})
+</file>
+
+</files>

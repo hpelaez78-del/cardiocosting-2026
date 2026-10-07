@@ -1,105 +1,119 @@
-const pool = require('../config/db');
+const db = require('../config/db');
 
-const createSede = async (req, res) => {
-  const { id, nombre, arriendo, servicios, admin, mtto, volumen } = req.body;
+const resolverSedeId = async (idOrSlug) => {
+  if (!idOrSlug) return null;
+  const result = await db.query(
+    `SELECT id FROM sedes
+     WHERE id::text = $1 OR LOWER(nombre) = LOWER($1)
+     LIMIT 1;`,
+    [String(idOrSlug).trim()]
+  );
+  return result.rows[0]?.id || null;
+};
 
-  if (!id || !nombre) {
-    return res.status(400).json({ error: 'Falta el id o nombre de la sede' });
-  }
-
+const getSedes = async (req, res, next) => {
   try {
-    const result = await pool.query(
-      `INSERT INTO sedes (id, nombre, arriendo_mensual, servicios_publicos, nomina_admin, mantenimiento_otros, volumen_mensual_esperado)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
-       RETURNING
-         id,
-         nombre,
-         arriendo_mensual AS arriendo,
-         servicios_publicos AS servicios,
-         nomina_admin AS admin,
-         mantenimiento_otros AS mtto,
-         volumen_mensual_esperado AS volumen;`,
-      [
-        String(id).trim(),
-        String(nombre).trim(),
-        Number(arriendo) || 0,
-        Number(servicios) || 0,
-        Number(admin) || 0,
-        Number(mtto) || 0,
-        Number(volumen) || 1,
-      ]
-    );
-
-    res.status(201).json({ message: 'Sede creada correctamente', data: result.rows[0] });
+    const query = 'SELECT * FROM sedes ORDER BY id ASC';
+    const result = await db.query(query);
+    res.json(result.rows || result);
   } catch (error) {
-    res.status(500).json({ error: 'Error al crear la sede: ' + error.message });
+    console.error('[ERROR GET SEDES]', error.message);
+    next(error);
   }
 };
 
-const getSedes = async (req, res) => {
+const updateSede = async (req, res, next) => {
   try {
-    const result = await pool.query(`
-      SELECT
-        id,
-        nombre,
-        arriendo_mensual AS arriendo,
-        servicios_publicos AS servicios,
-        nomina_admin AS admin,
-        mantenimiento_otros AS mtto,
-        volumen_mensual_esperado AS volumen
-      FROM sedes
-      ORDER BY id ASC;
-    `);
+    const { id } = req.params;
+    const numericId = await resolverSedeId(id);
+    const { arriendo, servicios, mtto, volumen } = req.body;
 
+    if (!numericId) return res.status(404).json({ error: 'Sede no encontrada' });
+
+    const query = `
+      UPDATE sedes 
+      SET arriendo_mensual = $1,
+          servicios_publicos = $2,
+          mantenimiento_otros = $3,
+          volumen_mensual_esperado = $4,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = $5
+      RETURNING *
+    `;
+    const result = await db.query(query, [
+      Number(arriendo) || 0,
+      Number(servicios) || 0,
+      Number(mtto) || 0,
+      Number(volumen) || 0,
+      numericId
+    ]);
+    res.json({ data: result.rows[0] });
+  } catch (error) {
+    console.error('[ERROR UPDATE SEDE]', error.message);
+    next(error);
+  }
+};
+
+const getAreasSede = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const sedeId = await resolverSedeId(id);
+    if (!sedeId) return res.status(404).json({ error: 'Sede no encontrada' });
+
+    const result = await db.query(
+      'SELECT * FROM sede_areas WHERE sede_id = $1 ORDER BY id ASC',
+      [sedeId]
+    );
     res.json(result.rows);
   } catch (error) {
-    res.status(500).json({ error: 'Error al consultar sedes: ' + error.message });
+    console.error('[ERROR AREAS SEDE]', error.message);
+    next(error);
   }
 };
 
-const updateSede = async (req, res) => {
-  const { id } = req.params;
-  const { arriendo, servicios, admin, mtto, volumen } = req.body;
-
+const saveAreasSede = async (req, res, next) => {
+  const client = await db.connect();
   try {
-    const result = await pool.query(
-      `UPDATE sedes
-       SET arriendo_mensual = $1,
-           servicios_publicos = $2,
-           nomina_admin = $3,
-           mantenimiento_otros = $4,
-           volumen_mensual_esperado = $5
-       WHERE id = $6
-       RETURNING
-         id,
-         nombre,
-         arriendo_mensual AS arriendo,
-         servicios_publicos AS servicios,
-         nomina_admin AS admin,
-         mantenimiento_otros AS mtto,
-         volumen_mensual_esperado AS volumen;`,
-      [
-        Number(arriendo) || 0,
-        Number(servicios) || 0,
-        Number(admin) || 0,
-        Number(mtto) || 0,
-        Number(volumen) || 1,
-        id
-      ]
-    );
+    const { id } = req.params;
+    const { areas } = req.body;
+    const sedeId = await resolverSedeId(id);
+    if (!sedeId) return res.status(404).json({ error: 'Sede no encontrada' });
+    if (!Array.isArray(areas)) return res.status(400).json({ error: 'El campo areas debe ser una lista' });
 
-    if (result.rowCount === 0) {
-      return res.status(404).json({ error: 'Sede no encontrada' });
+    await client.query('BEGIN');
+    await client.query('DELETE FROM sede_areas WHERE sede_id = $1', [sedeId]);
+    for (const area of areas) {
+      await client.query(
+        `INSERT INTO sede_areas (sede_id, nombre, m2, es_directo, costo_asignado_directo)
+         VALUES ($1, $2, $3, $4, $5);`,
+        [
+          sedeId,
+          String(area.nombre || '').trim(),
+          Number(area.m2) || 0,
+          Boolean(area.esDirecto ?? area.es_directo),
+          Number(area.costoAsignadoDirecto ?? area.costo_asignado_directo) || 0
+        ]
+      );
     }
-
-    res.json({ message: 'Sede actualizada exitosamente', data: result.rows[0] });
+    await client.query('COMMIT');
+    res.json({ mensaje: 'Áreas guardadas correctamente', sedeId, areas });
   } catch (error) {
-    res.status(500).json({ error: 'Error al actualizar sede: ' + error.message });
+    await client.query('ROLLBACK');
+    console.error('[ERROR GUARDAR AREAS SEDE]', error.message);
+    next(error);
+  } finally {
+    client.release();
   }
 };
 
 module.exports = {
-  createSede,
   getSedes,
-  updateSede
+  obtenerSedes: getSedes,
+  updateSede,
+  actualizarSede: updateSede,
+  getAreasSede,
+  obtenerAreasSede: getAreasSede,
+  saveAreasSede,
+  guardarAreasSede: saveAreasSede,
+  resolverSedeId
 };

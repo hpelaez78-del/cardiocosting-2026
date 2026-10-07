@@ -1,4 +1,13 @@
-import { LayoutGrid, FileSpreadsheet, LogOut } from 'lucide-react';
+import { 
+  LayoutGrid, 
+  FileSpreadsheet, 
+  LogOut, 
+  Stethoscope, 
+  Building2, 
+  Users, 
+  Handshake, 
+  Sliders 
+} from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 export default function Sidebar() {
@@ -14,7 +23,12 @@ export default function Sidebar() {
   const navItems = [
     { path: '/', label: 'Consolidado Multisitio', icon: LayoutGrid },
     { path: '/evaluador', label: 'Evaluador por Sede', icon: FileSpreadsheet },
+    { path: '/sedes', label: 'Sedes', icon: Building2 },
+    { path: '/personal', label: 'Personal', icon: Users },
+    { path: '/equipos', label: 'Equipos Biomédicos', icon: Stethoscope },
+    { path: '/convenios', label: 'Convenios', icon: Handshake },
     { path: '/insumos', label: 'Insumos', icon: FileSpreadsheet },
+    { path: '/simulador', label: 'Simulador', icon: Sliders },
     { path: '/usuarios', label: 'Usuarios y perfiles', icon: FileSpreadsheet },
   ];
 

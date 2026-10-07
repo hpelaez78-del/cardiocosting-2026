@@ -23,130 +23,190 @@ pool.on('error', (err) => {
     console.error('[DB] Error inesperado en cliente del pool:', err.message);
 });
 
-const ensureDefaultRoles = async () => {
-    try {
-        await pool.query(`
-            ALTER TABLE roles
-            ADD COLUMN IF NOT EXISTS permisos JSONB DEFAULT '{}'::jsonb;
-        `);
-
-        const existing = await pool.query(`
-            SELECT id, nombre, permisos
-            FROM roles
-            WHERE LOWER(TRIM(nombre)) IN ('administrador', 'finanzas', 'coordinador_sede')
-            ORDER BY id ASC;
-        `);
-
-        const permisosPorDefecto = {
-            view: true,
-            create: true,
-            edit: true,
-            delete: true
-        };
-
-        const rolesPorDefecto = [
-            {
-                nombre: 'ADMINISTRADOR',
-                descripcion: 'Acceso total y parametrización del sistema',
-                permisos: {
-                    dashboard: permisosPorDefecto,
-                    sedes: permisosPorDefecto,
-                    personal: permisosPorDefecto,
-                    convenios: permisosPorDefecto,
-                    insumos: permisosPorDefecto,
-                    simulador: permisosPorDefecto,
-                    usuarios: permisosPorDefecto
-                }
-            },
-            {
-                nombre: 'FINANZAS',
-                descripcion: 'Gestión de tarifas, convenios y simulación',
-                permisos: {
-                    dashboard: { view: true, create: false, edit: false, delete: false },
-                    convenios: permisosPorDefecto,
-                    insumos: permisosPorDefecto,
-                    simulador: permisosPorDefecto,
-                    usuarios: { view: true, create: false, edit: false, delete: false }
-                }
-            },
-            {
-                nombre: 'COORDINADOR_SEDE',
-                descripcion: 'Consulta y operación por sede',
-                permisos: {
-                    dashboard: { view: true, create: false, edit: false, delete: false },
-                    sedes: { view: true, create: false, edit: true, delete: false },
-                    personal: { view: true, create: true, edit: true, delete: false },
-                    insumos: { view: true, create: true, edit: true, delete: false }
-                }
-            }
-        ];
-
-        if (existing.rows.length === rolesPorDefecto.length) {
-            console.log('[DB] Roles base ya existen en la base de datos.');
-            return existing.rows;
-        }
-
-        for (const rol of rolesPorDefecto) {
-            await pool.query(`
-                INSERT INTO roles (nombre, descripcion, permisos)
-                VALUES ($1, $2, $3)
-                ON CONFLICT (nombre) DO UPDATE SET descripcion = EXCLUDED.descripcion, permisos = EXCLUDED.permisos;
-            `, [rol.nombre, rol.descripcion, JSON.stringify(rol.permisos)]);
-        }
-
-        console.log('[DB] Roles base creados automáticamente.');
-        const result = await pool.query(`
-            SELECT id, nombre, descripcion, permisos
-            FROM roles
-            WHERE LOWER(TRIM(nombre)) IN ('administrador', 'finanzas', 'coordinador_sede')
-            ORDER BY id ASC;
-        `);
-
-        return result.rows;
-    } catch (error) {
-        console.error('[DB] Error al asegurar los roles base:', error.message);
-        throw error;
-    }
+const ensurePermissionsSchema = async () => {
+    await pool.query(`
+        ALTER TABLE roles
+        ADD COLUMN IF NOT EXISTS permisos JSONB DEFAULT '{}'::jsonb;
+    `);
 };
 
-const ensureDefaultConvenio = async () => {
+const ensureEquipmentPermissions = async () => {
+    await pool.query(`
+        UPDATE roles
+        SET permisos = jsonb_set(
+            COALESCE(permisos, '{}'::jsonb),
+            '{equipos}',
+            COALESCE(permisos->'sedes', '{}'::jsonb),
+            true
+        )
+        WHERE NOT (COALESCE(permisos, '{}'::jsonb) ? 'equipos');
+    `);
+};
+
+const ensureSedeAreas = async () => {
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS sede_areas (
+            id BIGSERIAL PRIMARY KEY,
+            sede_id VARCHAR(20) NOT NULL REFERENCES sedes(id) ON DELETE CASCADE,
+            nombre VARCHAR(100) NOT NULL,
+            m2 NUMERIC(10, 2) NOT NULL DEFAULT 0,
+            es_directo BOOLEAN NOT NULL DEFAULT FALSE,
+            costo_asignado_directo NUMERIC(12, 2) NOT NULL DEFAULT 0
+        );
+    `);
+};
+
+const ensureEquiposSchema = async () => {
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS equipos (
+            id BIGSERIAL PRIMARY KEY,
+            sede_id VARCHAR(20) NOT NULL REFERENCES sedes(id) ON DELETE CASCADE,
+            nombre VARCHAR(150) NOT NULL,
+            valor_compra NUMERIC(14, 2) NOT NULL,
+            vida_util_meses INTEGER NOT NULL,
+            costo_mantenimiento_anual NUMERIC(14, 2) NOT NULL DEFAULT 0,
+            minutos_disponibles_mes INTEGER NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS servicio_equipo (
+            id BIGSERIAL PRIMARY KEY,
+            equipo_id BIGINT NOT NULL REFERENCES equipos(id) ON DELETE CASCADE,
+            examen_id VARCHAR(50) NOT NULL REFERENCES examenes(id) ON DELETE CASCADE,
+            tiempo_uso_minutos NUMERIC(8, 2) NOT NULL
+        );
+
+        ALTER TABLE equipos
+        ADD COLUMN IF NOT EXISTS ubicacion_estimada BOOLEAN NOT NULL DEFAULT FALSE;
+    `);
+};
+
+const ensureCostingDataSchema = async () => {
+    await pool.query(`
+        ALTER TABLE examenes
+        ADD COLUMN IF NOT EXISTS capacidad_sala_minutos INTEGER;
+
+        CREATE TABLE IF NOT EXISTS personal_sede (
+            id BIGSERIAL PRIMARY KEY,
+            sede_id VARCHAR(20) NOT NULL REFERENCES sedes(id) ON DELETE CASCADE,
+            cargo_key VARCHAR(80) NOT NULL,
+            cargo VARCHAR(120) NOT NULL,
+            grupo_costeo VARCHAR(20) NOT NULL CHECK (grupo_costeo IN ('medico', 'asistencial', 'administrativo')),
+            cantidad INTEGER NOT NULL CHECK (cantidad > 0),
+            sueldo_base NUMERIC(12, 2) NOT NULL CHECK (sueldo_base >= 0),
+            porcentaje_provisiones NUMERIC(5, 2) NOT NULL CHECK (porcentaje_provisiones >= 0),
+            horas_mes NUMERIC(6, 2) NOT NULL CHECK (horas_mes > 0),
+            UNIQUE (sede_id, cargo_key)
+        );
+
+        CREATE TABLE IF NOT EXISTS equipos_costo_referencia (
+            id BIGSERIAL PRIMARY KEY,
+            examen_id VARCHAR(50) NOT NULL UNIQUE REFERENCES examenes(id) ON DELETE CASCADE,
+            nombre VARCHAR(150) NOT NULL,
+            valor_compra NUMERIC(14, 2) NOT NULL CHECK (valor_compra >= 0),
+            vida_util_meses INTEGER NOT NULL CHECK (vida_util_meses > 0),
+            costo_mantenimiento_anual NUMERIC(14, 2) NOT NULL CHECK (costo_mantenimiento_anual >= 0),
+            minutos_disponibles_mes INTEGER NOT NULL CHECK (minutos_disponibles_mes > 0),
+            tiempo_uso_minutos NUMERIC(8, 2) NOT NULL CHECK (tiempo_uso_minutos > 0),
+            costo_unitario_examen NUMERIC(14, 2) NOT NULL CHECK (costo_unitario_examen >= 0)
+        );
+
+        CREATE TABLE IF NOT EXISTS volumen_sede_examen (
+            sede_id VARCHAR(20) NOT NULL REFERENCES sedes(id) ON DELETE CASCADE,
+            examen_id VARCHAR(50) NOT NULL REFERENCES examenes(id) ON DELETE CASCADE,
+            volumen_mes INTEGER NOT NULL CHECK (volumen_mes >= 0),
+            estimado BOOLEAN NOT NULL DEFAULT FALSE,
+            metodo_asignacion TEXT,
+            PRIMARY KEY (sede_id, examen_id)
+        );
+
+        ALTER TABLE volumen_sede_examen
+        ADD COLUMN IF NOT EXISTS estimado BOOLEAN NOT NULL DEFAULT FALSE;
+
+        ALTER TABLE volumen_sede_examen
+        ADD COLUMN IF NOT EXISTS metodo_asignacion TEXT;
+    `);
+};
+
+const ensureFormulaConfigSchema = async () => {
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS costing_formula_versions (
+            id BIGSERIAL PRIMARY KEY,
+            nombre VARCHAR(100) NOT NULL,
+            config JSONB NOT NULL,
+            activa BOOLEAN NOT NULL DEFAULT FALSE,
+            created_by INTEGER REFERENCES usuarios(id) ON DELETE SET NULL,
+            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+        );
+
+        CREATE UNIQUE INDEX IF NOT EXISTS costing_formula_one_active_idx
+        ON costing_formula_versions (activa)
+        WHERE activa = TRUE;
+    `);
+
+    await pool.query(`
+        INSERT INTO costing_formula_versions (nombre, config, activa)
+        SELECT 'Configuración base', $1::jsonb, TRUE
+        WHERE NOT EXISTS (
+            SELECT 1 FROM costing_formula_versions WHERE activa = TRUE
+        );
+    `, [JSON.stringify({
+        labor: { provisionsMode: 'per_role', provisionsPct: 48.5, minutesPerHour: 60 },
+        duration: { defaultMode: 'sequential_sum', examModes: {} },
+        fixedCost: { allocationMethod: 'practical_capacity', includeRent: true, includeServices: true, includeAdminPayroll: true, includeMaintenance: true },
+        supplies: { includeInCost: true },
+        equipment: { includeDepreciation: true, includeMaintenance: true },
+        tariff: { useSoatWhenContractMissing: true, honorZeroContracted: true }
+    })]);
+
+    await pool.query(`
+        UPDATE roles
+        SET permisos = jsonb_set(
+            COALESCE(permisos, '{}'::jsonb),
+            '{configuracion}',
+            '{"view":false,"edit":false}'::jsonb,
+            true
+        )
+        WHERE NOT (COALESCE(permisos, '{}'::jsonb) ? 'configuracion');
+    `);
+};
+
+const ensureInsumosSedeSchema = async () => {
+    const client = await pool.connect();
     try {
-        const existing = await pool.query(`
-            SELECT id, nombre_eps
-            FROM convenios
-            WHERE LOWER(TRIM(nombre_eps)) = 'general'
-            LIMIT 1;
+        await client.query('BEGIN');
+        await client.query(`
+            ALTER TABLE insumos_detalle
+            ADD COLUMN IF NOT EXISTS sede_id VARCHAR(20);
+        `);
+        await client.query(`
+            DO $migration$
+            BEGIN
+                IF NOT EXISTS (
+                    SELECT 1 FROM pg_constraint WHERE conname = 'insumos_detalle_sede_id_fkey'
+                ) THEN
+                    ALTER TABLE insumos_detalle
+                    ADD CONSTRAINT insumos_detalle_sede_id_fkey
+                    FOREIGN KEY (sede_id) REFERENCES sedes(id) ON DELETE CASCADE;
+                END IF;
+            END
+            $migration$;
         `);
 
-        if (existing.rows.length > 0) {
-            console.log('[DB] Convenio General ya existe en la base de datos.');
-            return existing.rows[0];
-        }
-
-        const created = await pool.query(`
-            INSERT INTO convenios (nombre_eps, fecha_ultimo_reajuste)
-            VALUES ('General', NOW())
-            RETURNING *;
+        await client.query(`
+            INSERT INTO insumos_detalle (examen_id, nombre_insumo, cantidad, valor_unitario, sede_id)
+            SELECT origen.examen_id, origen.nombre_insumo, origen.cantidad, origen.valor_unitario, sede.id
+            FROM insumos_detalle origen
+            CROSS JOIN sedes sede
+            WHERE origen.sede_id IS NULL;
         `);
-
-        const convenioId = created.rows[0].id;
-
-        await pool.query(`
-            INSERT INTO tarifas_convenios (convenio_id, examen_id, tarifa_acordada)
-            SELECT $1, e.id, 0
-            FROM examenes e
-            WHERE NOT EXISTS (
-                SELECT 1
-                FROM tarifas_convenios tc
-                WHERE tc.convenio_id = $1 AND tc.examen_id = e.id
-            );
-        `, [convenioId]);
-
-        console.log('[DB] Convenio General creado automáticamente con tarifas iniciales.');
-        return created.rows[0];
+        await client.query('DELETE FROM insumos_detalle WHERE sede_id IS NULL;');
+        await client.query('CREATE INDEX IF NOT EXISTS insumos_detalle_sede_examen_idx ON insumos_detalle (sede_id, examen_id);');
+        await client.query('CREATE UNIQUE INDEX IF NOT EXISTS insumos_detalle_sede_examen_nombre_key ON insumos_detalle (sede_id, examen_id, nombre_insumo);');
+        await client.query('COMMIT');
     } catch (error) {
-        console.error('[DB] Error al asegurar el convenio General:', error.message);
+        await client.query('ROLLBACK');
         throw error;
+    } finally {
+        client.release();
     }
 };
 
@@ -160,5 +220,10 @@ pool.connect()
     });
 
 module.exports = pool;
-module.exports.ensureDefaultRoles = ensureDefaultRoles;
-module.exports.ensureDefaultConvenio = ensureDefaultConvenio;
+module.exports.ensurePermissionsSchema = ensurePermissionsSchema;
+module.exports.ensureEquipmentPermissions = ensureEquipmentPermissions;
+module.exports.ensureSedeAreas = ensureSedeAreas;
+module.exports.ensureEquiposSchema = ensureEquiposSchema;
+module.exports.ensureCostingDataSchema = ensureCostingDataSchema;
+module.exports.ensureFormulaConfigSchema = ensureFormulaConfigSchema;
+module.exports.ensureInsumosSedeSchema = ensureInsumosSedeSchema;

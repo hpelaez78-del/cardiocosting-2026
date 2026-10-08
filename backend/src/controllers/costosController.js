@@ -67,14 +67,18 @@ const getCostosCompat = async (req, res) => {
       `, [selectedConvenioId]);
 
       tarifaMap = tarifasRes.rows.reduce((acc, row) => {
-        acc[String(row.examen_id)] = Number(row.tarifa_acordada || 0);
+        acc[String(row.examen_id)] = Number(row.tarifa_acordada);
         return acc;
       }, {});
     }
 
     const examenes = examenesRes.rows.map((examen) => ({
       ...examen,
-      tarifa_convenio: Number(tarifaMap[String(examen.id)] ?? examen.tarifa_convenio ?? examen.tarifa_soat_referencia ?? 0) || 0
+      tarifa_convenio: Object.hasOwn(tarifaMap, String(examen.id))
+        ? tarifaMap[String(examen.id)]
+        : examen.tarifa_soat_referencia === null || examen.tarifa_soat_referencia === undefined
+          ? null
+          : Number(examen.tarifa_soat_referencia)
     }));
 
     return res.json({

@@ -1,4 +1,5 @@
 const db = require('../config/db');
+const costingDataService = require('./costingDataService');
 
 const MODES_DURATION = ['sequential_sum', 'concurrent_max'];
 const validationError = (message) => Object.assign(new Error(message), { statusCode: 400 });
@@ -38,7 +39,7 @@ const normalizeFormulaConfig = (config) => {
   if (!Number.isFinite(provisionsPct) || provisionsPct < 0 || provisionsPct > 100) throw validationError('El porcentaje de provisiones debe estar entre 0 y 100');
   if (!Number.isFinite(minutesPerHour) || minutesPerHour <= 0 || minutesPerHour > 120) throw validationError('Los minutos por hora deben ser mayores que cero');
   if (!MODES_DURATION.includes(defaultMode)) throw validationError('Modo de duración inválido');
-  if (!['practical_capacity', 'per_procedure'].includes(allocationMethod)) throw validationError('Método de distribución fija inválido');
+  if (!['practical_capacity', 'per_procedure', 'area_based'].includes(allocationMethod)) throw validationError('Método de distribución fija inválido');
   if (!examModes || typeof examModes !== 'object' || Array.isArray(examModes)) throw validationError('Los modos por examen deben ser un objeto');
   for (const mode of Object.values(examModes)) {
     if (!MODES_DURATION.includes(mode)) throw validationError('Hay un modo de duración por examen inválido');
@@ -93,6 +94,15 @@ const readFormulaVersions = async () => {
 
 const createFormulaVersion = async ({ nombre, config, userId }) => {
   const normalized = normalizeFormulaConfig(config);
+  if (normalized.fixedCost.allocationMethod === 'area_based') {
+    const missing = await costingDataService.validarCoberturaAreaBased(normalized);
+    if (missing.length > 0) {
+      throw Object.assign(new Error('No se puede activar area_based: complete capacidades y conciliación de todas las sedes.'), {
+        statusCode: 400,
+        details: missing
+      });
+    }
+  }
   const client = await db.connect();
   try {
     await client.query('BEGIN');
@@ -113,6 +123,18 @@ const createFormulaVersion = async ({ nombre, config, userId }) => {
 };
 
 const activateFormulaVersion = async (id) => {
+  const versionRes = await db.query('SELECT config FROM costing_formula_versions WHERE id = $1;', [id]);
+  if (!versionRes.rows[0]) throw Object.assign(new Error('Versión de costeo no encontrada'), { statusCode: 404 });
+  const normalized = normalizeFormulaConfig(versionRes.rows[0].config);
+  if (normalized.fixedCost.allocationMethod === 'area_based') {
+    const missing = await costingDataService.validarCoberturaAreaBased(normalized);
+    if (missing.length > 0) {
+      throw Object.assign(new Error('No se puede activar area_based: complete capacidades y conciliación de todas las sedes.'), {
+        statusCode: 400,
+        details: missing
+      });
+    }
+  }
   const client = await db.connect();
   try {
     await client.query('BEGIN');

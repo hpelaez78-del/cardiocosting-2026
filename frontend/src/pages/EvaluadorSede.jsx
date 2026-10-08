@@ -32,13 +32,17 @@ export default function EvaluadorSede() {
         setLoading(false);
       })
       .catch((err) => {
-        setError(err.response?.data?.error || err.message || 'No se pudo calcular el costeo.');
+        const errorMessage = err.response?.data?.error || err.message || 'No se pudo calcular el costeo.';
+        const missing = err.response?.data?.faltantes || [];
+        const details = missing.map((item) => `${item.examen || item.examenId}: ${(item.campos || []).join(', ')}`).join('; ');
+        setError(details ? `${errorMessage} ${details}` : errorMessage);
         setEvaluacionData({ evaluacion: [] });
         setLoading(false);
       });
   }, [selectedSede, selectedConvenio]);
 
   const listaExamenes = evaluacionData?.evaluacion || [];
+  const usaAreas = evaluacionData?.allocationMethod === 'area_based';
   const tieneVolumenSede = listaExamenes.length > 0
     && listaExamenes.every((item) => item.volumen !== null && item.volumen !== undefined);
   const volumenPorExamenEstimado = listaExamenes.some((item) => item.volumen_estimado);
@@ -59,6 +63,15 @@ export default function EvaluadorSede() {
 
   // Motor dinámico de absorción
   const calcularAbsorcion = (item) => {
+    if (usaAreas) {
+      const costoUnitarioProc = Number(item.costoFijoProrrateado) || 0;
+      const volumen = item.volumen === null || item.volumen === undefined ? null : Number(item.volumen);
+      return {
+        factorPct: null,
+        costoTotalProc: volumen === null ? null : costoUnitarioProc * volumen,
+        costoUnitarioProc
+      };
+    }
     if (item.volumen === null || item.volumen === undefined) {
       return { factorPct: null, costoTotalProc: null, costoUnitarioProc: Number(item.costoFijoProrrateado) || 0 };
     }
@@ -118,7 +131,7 @@ export default function EvaluadorSede() {
           <div className="grid grid-cols-3 gap-2">
             <button
               onClick={() => setCriterio('volumen')}
-              disabled={!tieneVolumenSede}
+              disabled={usaAreas || !tieneVolumenSede}
               className={`p-2 rounded-lg text-xs font-bold flex flex-col items-center justify-center gap-1 transition ${
                 criterio === 'volumen'
                   ? 'bg-blue-600 text-white shadow-md'
@@ -130,7 +143,7 @@ export default function EvaluadorSede() {
             </button>
             <button
               onClick={() => setCriterio('tiempo')}
-              disabled={!tieneVolumenSede}
+              disabled={usaAreas || !tieneVolumenSede}
               className={`p-2 rounded-lg text-xs font-bold flex flex-col items-center justify-center gap-1 transition ${
                 criterio === 'tiempo'
                   ? 'bg-blue-600 text-white shadow-md'
@@ -142,7 +155,7 @@ export default function EvaluadorSede() {
             </button>
             <button
               onClick={() => setCriterio('ocupacion')}
-              disabled={!tieneVolumenSede || listaExamenes.some((item) => Number(item.capacidad_sala_minutos) <= 0)}
+              disabled={usaAreas || !tieneVolumenSede || listaExamenes.some((item) => Number(item.capacidad_sala_minutos) <= 0)}
               className={`p-2 rounded-lg text-xs font-bold flex flex-col items-center justify-center gap-1 transition ${
                 criterio === 'ocupacion'
                   ? 'bg-blue-600 text-white shadow-md'
@@ -154,6 +167,7 @@ export default function EvaluadorSede() {
             </button>
           </div>
         </div>
+        {usaAreas && <p className="text-xs text-slate-500 md:col-span-2">Costo fijo calculado por área y bolsa general; los drivers de absorción no se aplican.</p>}
 
         <div>
           <label className="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-2">
@@ -188,7 +202,7 @@ export default function EvaluadorSede() {
               Resultados de Absorción y Márgenes por Examen
             </h2>
             <span className="text-xs font-extrabold px-3 py-1 bg-blue-50 text-blue-700 rounded-full border border-blue-200 uppercase">
-              Driver Activo: {criterio}
+              Driver Activo: {usaAreas ? 'Por áreas' : criterio}
             </span>
           </div>
 
@@ -215,10 +229,11 @@ export default function EvaluadorSede() {
                   const costoDirectoBase = Number(item.costoPersonal || 0) + Number(item.costoInsumos || 0) + Number(item.costoCips || 0);
                   const costoDirecto = costoDirectoBase > 0 ? costoDirectoBase : Number(item.costoTotal || item.costoDirecto || 0);
                   
-                  const costoTotalExamen = costoDirecto + costoUnitarioProc;
-                  const tarifa = Number(item.tarifaConvenio || 0);
-                  const utilidadFinal = tarifa - costoTotalExamen;
-                  const margenPctFinal = tarifa > 0 ? (utilidadFinal / tarifa) * 100 : 0;
+                  const costoTotalExamen = usaAreas ? Number(item.costoTotal) : costoDirecto + costoUnitarioProc;
+                  const tarifaRaw = item.tarifaAplicada !== undefined ? item.tarifaAplicada : item.tarifaConvenio;
+                  const tarifa = tarifaRaw === null || tarifaRaw === undefined ? null : Number(tarifaRaw);
+                  const utilidadFinal = tarifa === null || item.costoTotal === null ? null : tarifa - costoTotalExamen;
+                  const margenPctFinal = tarifa > 0 && utilidadFinal !== null ? (utilidadFinal / tarifa) * 100 : 0;
 
                   const volDisplay = item.volumen === null || item.volumen === undefined ? 'N/D' : Number(item.volumen).toLocaleString('es-CO');
                   const minDisplay = Number(item.duracion_minutos ?? item.tiempoMinutos) || 0;
@@ -232,16 +247,16 @@ export default function EvaluadorSede() {
                       <td className="p-3 font-bold text-purple-700">
                         ${costoUnitarioProc.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </td>
-                      <td className="p-3 font-semibold text-blue-700">${tarifa.toLocaleString()}</td>
+                      <td className="p-3 font-semibold text-blue-700">{tarifa === null ? 'N/D' : `$${tarifa.toLocaleString()}`}</td>
                       <td className="p-3 text-slate-800 font-semibold">
-                        ${costoTotalExamen.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                        {item.costoTotal === null ? 'N/D' : `$${costoTotalExamen.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
                       </td>
-                      <td className={`p-3 font-bold ${utilidadFinal >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
-                        ${utilidadFinal.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                      <td className={`p-3 font-bold ${utilidadFinal === null ? 'text-slate-500' : utilidadFinal >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                        {utilidadFinal === null ? 'N/D' : `$${utilidadFinal.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
                       </td>
                       <td className="p-3">
-                        <span className={`px-2 py-1 rounded text-[11px] font-bold ${margenPctFinal >= 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}`}>
-                          {margenPctFinal.toFixed(1)}%
+                        <span className={`px-2 py-1 rounded text-[11px] font-bold ${utilidadFinal === null ? 'bg-slate-100 text-slate-600' : margenPctFinal >= 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}`}>
+                          {utilidadFinal === null ? 'N/D' : `${margenPctFinal.toFixed(1)}%`}
                         </span>
                       </td>
                     </tr>

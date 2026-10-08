@@ -98,14 +98,19 @@ export default function Dashboard() {
 
         examenes = rows.map((item) => ({
           ...item,
-          tarifaConvenio: Number(item.tarifaConvenio ?? item.tarifa_convenio ?? 0),
-          tarifa_convenio: Number(item.tarifaConvenio ?? item.tarifa_convenio ?? 0)
+          tarifaConvenio: item.tarifaAplicada !== undefined
+            ? item.tarifaAplicada
+            : item.tarifaConvenio ?? item.tarifa_convenio ?? null,
+          tarifa_convenio: item.tarifa_convenio ?? null
         }));
       }
 
       setData({ sedes, roles, examenes, sedeActual, costoFijoBolsa, tasasMinuto });
     } catch (err) {
-      const apiError = err?.response?.data?.error || err?.message || 'Error de conexión con la base de datos';
+      const errorMessage = err?.response?.data?.error || err?.message || 'Error de conexión con la base de datos';
+      const missing = err?.response?.data?.faltantes || [];
+      const details = missing.map((item) => `${item.examen || item.examenId}: ${(item.campos || []).join(', ')}`).join('; ');
+      const apiError = details ? `${errorMessage} ${details}` : errorMessage;
       setError(apiError);
       setData({ sedes: [], roles: [], examenes: [], sedeActual: null, costoFijoBolsa: null, tasasMinuto: {} });
     } finally {
@@ -176,21 +181,23 @@ export default function Dashboard() {
 
   const tieneVolumenPorExamen = examenes.length > 0 && examenes.every((examen) => examen.volumen !== null && examen.volumen !== undefined);
   const volumenPorExamenEstimado = examenes.some((examen) => examen.volumen_estimado);
-  let totalBalance = tieneVolumenPorExamen ? 0 : null;
+  let totalBalance = tieneVolumenPorExamen && examenes.every((examen) => examen.tarifaConvenio !== null && examen.costoTotal !== null) ? 0 : null;
   let countPerdida = 0;
   let countGanancia = 0;
 
   const evaluadorRows = examenes.map((ex) => {
     const manoObra = Number(ex.costoPersonal) || 0;
-    const costoTotalReal = Number(ex.costoTotal);
-    const tarifaBase = Number(ex.tarifaConvenio ?? ex.tarifa_convenio ?? 0) || 0;
-    const tarifaSimulada = tarifaBase * (1 + simIncremento / 100);
-    const margenUnit = tarifaSimulada - costoTotalReal;
+    const costoTotalReal = ex.costoTotal === null || ex.costoTotal === undefined ? null : Number(ex.costoTotal);
+    const tarifaBase = ex.tarifaConvenio === null || ex.tarifaConvenio === undefined ? null : Number(ex.tarifaConvenio);
+    const tarifaSimulada = tarifaBase === null ? null : tarifaBase * (1 + simIncremento / 100);
+    const margenUnit = tarifaSimulada === null || costoTotalReal === null ? null : tarifaSimulada - costoTotalReal;
 
-    if (tieneVolumenPorExamen) {
+    if (tieneVolumenPorExamen && margenUnit !== null && totalBalance !== null) {
       totalBalance += margenUnit * (Number(ex.volumen) * (1 + simVolumen / 100));
     }
-    if (margenUnit < 0) countPerdida++; else countGanancia++;
+    if (margenUnit !== null) {
+      if (margenUnit < 0) countPerdida++; else countGanancia++;
+    }
 
     return { ...ex, manoObra, costoTotalReal, tarifaSimulada, margenUnit };
   });
@@ -348,21 +355,21 @@ export default function Dashboard() {
                         <td className="px-3 py-3 text-right text-slate-600">{formatCOP(row.manoObra)}</td>
                         <td className="px-3 py-3 text-right text-slate-600">{formatCOP(row.insumos)}</td>
                         <td className="px-3 py-3 text-right text-slate-600">{formatCOP(row.cips)}</td>
-                        <td className="px-3 py-3 text-right text-slate-600">{formatCOP(cfijoUnitActual)}</td>
+                        <td className="px-3 py-3 text-right text-slate-600">{formatCOP(row.costoFijoProrrateado ?? cfijoUnitActual)}</td>
                         <td className="px-3 py-3 text-right font-semibold text-slate-900">{formatCOP(row.costoTotalReal)}</td>
-                        <td className="px-3 py-3 text-right font-semibold text-blue-700">{formatCOP(row.tarifaSimulada)}</td>
-                        <td className={`px-3 py-3 text-right font-bold ${row.margenUnit >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
-                          {formatCOP(row.margenUnit)}
+                        <td className="px-3 py-3 text-right font-semibold text-blue-700">{row.tarifaSimulada === null ? 'N/D' : formatCOP(row.tarifaSimulada)}</td>
+                        <td className={`px-3 py-3 text-right font-bold ${row.margenUnit === null ? 'text-slate-500' : row.margenUnit >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                          {row.margenUnit === null ? 'N/D' : formatCOP(row.margenUnit)}
                         </td>
                         <td className="px-3 py-3 text-center">
                           <span
                             className={`inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-bold ${
-                              row.margenUnit >= 0
+                              row.margenUnit === null ? 'border-slate-300 bg-slate-100 text-slate-600' : row.margenUnit >= 0
                                 ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200'
                                 : 'bg-rose-50 text-rose-700 ring-1 ring-rose-200'
                             }`}
                           >
-                            {row.margenUnit >= 0 ? 'GANANDO' : 'PERDIENDO'}
+                            {row.margenUnit === null ? 'INCOMPLETO' : row.margenUnit >= 0 ? 'GANANDO' : 'PERDIENDO'}
                           </span>
                         </td>
                       </tr>

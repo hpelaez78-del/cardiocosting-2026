@@ -139,6 +139,7 @@ export default function Insumos() {
   };
 
   const handleDelete = async (id) => {
+    if (!window.confirm('¿Desea eliminar este insumo?')) return;
     setError('');
     try {
       await api.delete(`/insumos/${id}`, { params: { sedeId: selectedSede } });

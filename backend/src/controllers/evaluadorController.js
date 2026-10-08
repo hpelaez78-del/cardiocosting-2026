@@ -1,7 +1,8 @@
 const db = require('../config/db');
 const { resolverSedeId } = require('./sedesController');
-const { calcularCostoMinuto, calcularCostoExamen } = require('../services/costEngine');
+const { calcularCostoMinuto, calcularCostoExamen, calcularBolsaFijaSede } = require('../services/costEngine');
 const formulaConfigService = require('../services/formulaConfigService');
+const costingDataService = require('../services/costingDataService');
 
 const evaluarSede = async (req, res, next) => {
   try {
@@ -56,6 +57,7 @@ const evaluarSede = async (req, res, next) => {
       `, [selectedConvenioId, idSede]),
       db.query(`
          SELECT s.arriendo_mensual, s.servicios_publicos, s.mantenimiento_otros,
+           s.capacidad_sala_minutos,
            s.volumen_mensual_esperado,
                COALESCE(p.nomina_admin_detallada, 0) AS nomina_admin,
                COALESCE(s.arriendo_mensual, 0) + COALESCE(s.servicios_publicos, 0)
@@ -90,16 +92,23 @@ const evaluarSede = async (req, res, next) => {
 
       const sedeCostos = {
         ...sede,
-        costoFijoBolsa: Number(sede.costo_fijo_bolsa),
+        costoFijoBolsa: calcularBolsaFijaSede(sede, costingConfig),
       };
-      const datosExamenes = result.rows.map((examen) => {
+      const [areaBasedDistribution, equipmentCosts] = await Promise.all([
+        costingDataService.cargarDistribucionAreas(idSede, sedeCostos.costoFijoBolsa, costingConfig),
+        costingDataService.cargarCostosEquiposRegistrados(idSede)
+      ]);
+      sedeCostos.areaBasedDistribution = areaBasedDistribution;
+      const datosExamenes = result.rows.map((row) => {
+        const examen = { ...row, ...(equipmentCosts[String(row.id)] || {}) };
         const costo = calcularCostoExamen(examen, rolesMap, sedeCostos, costingConfig);
         return { ...examen, ...costo };
       });
       const calculosIncompletos = datosExamenes.filter((examen) => examen.datosFaltantes.length > 0);
       if (calculosIncompletos.length > 0) {
         return res.status(409).json({
-          error: `Costeo incompleto para ${calculosIncompletos.length} exámenes por tarifas de personal o duración faltantes.`
+          error: `Costeo incompleto para ${calculosIncompletos.length} exámenes. Revise los datos indicados.`,
+          faltantes: calculosIncompletos.map(({ id, nombre, datosFaltantes }) => ({ examenId: id, examen: nombre, campos: datosFaltantes }))
         });
       }
 
@@ -108,14 +117,16 @@ const evaluarSede = async (req, res, next) => {
       convenioId: selectedConvenioId,
       formulaVersionId: activeConfig.id,
       formulaVersionName: activeConfig.nombre,
+      allocationMethod: costingConfig.fixedCost.allocationMethod,
       tasasMinuto: rolesMap,
-        costoFijoBolsa: Number(sede.costo_fijo_bolsa || 0),
+        costoFijoBolsa: sedeCostos.costoFijoBolsa,
       resumen: {
         totalExamenes: datosExamenes.length,
         estado: 'Evaluación ejecutada exitosamente'
       },
       examenes: datosExamenes,
-      evaluacion: datosExamenes
+      evaluacion: datosExamenes,
+      distribucionAreas: areaBasedDistribution
     });
   } catch (error) {
     console.error('[ERROR EVALUADOR]', error.message);

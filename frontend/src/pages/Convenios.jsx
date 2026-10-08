@@ -77,10 +77,15 @@ export default function Convenios() {
     setSaving(true);
     setError('');
     try {
-      await api.put(`/convenios/${selectedConvenioId}/tarifas`, {
-        examen_id: tarifa.examen_id,
-        nueva_tarifa: Number(tarifa.tarifa_acordada) || 0,
-      });
+      const value = String(tarifa.tarifa_acordada ?? '').trim();
+      if (value === '') {
+        await api.delete(`/convenios/${selectedConvenioId}/tarifas/${tarifa.examen_id}`);
+      } else {
+        await api.put(`/convenios/${selectedConvenioId}/tarifas`, {
+          examen_id: tarifa.examen_id,
+          nueva_tarifa: Number(value),
+        });
+      }
       await fetchTarifas(selectedConvenioId);
     } catch (err) {
       setError(err?.response?.data?.error || 'No se pudo guardar la tarifa.');
@@ -131,7 +136,7 @@ export default function Convenios() {
               <tr key={item.id ?? `${item.examen_id}-${index}`} className="border-t border-slate-700">
                 <td className="p-3 text-white">{item.examen}</td>
                 <td className="p-3 text-slate-300">{item.codigo_cups || '-'}</td>
-                <td className="p-3"><input value={item.tarifa_acordada ?? 0} onChange={(e) => handleTarifaChange(index, e.target.value)} className="w-40 rounded border border-slate-600 bg-slate-900 p-2 text-white" /></td>
+                <td className="p-3"><input value={item.tarifa_acordada ?? ''} onChange={(e) => handleTarifaChange(index, e.target.value)} className="w-40 rounded border border-slate-600 bg-slate-900 p-2 text-white" /></td>
                 <td className="p-3">
                   <button disabled={saving} onClick={() => handleSave(item)} className="rounded bg-amber-500 px-3 py-2 font-medium text-slate-950 disabled:opacity-60">
                     {saving ? 'Guardando...' : 'Guardar'}

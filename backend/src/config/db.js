@@ -45,13 +45,27 @@ const ensureEquipmentPermissions = async () => {
 
 const ensureSedeAreas = async () => {
     await pool.query(`
+        ALTER TABLE sedes
+        ADD COLUMN IF NOT EXISTS capacidad_sala_minutos INTEGER;
+
         CREATE TABLE IF NOT EXISTS sede_areas (
             id BIGSERIAL PRIMARY KEY,
             sede_id VARCHAR(20) NOT NULL REFERENCES sedes(id) ON DELETE CASCADE,
             nombre VARCHAR(100) NOT NULL,
             m2 NUMERIC(10, 2) NOT NULL DEFAULT 0,
             es_directo BOOLEAN NOT NULL DEFAULT FALSE,
-            costo_asignado_directo NUMERIC(12, 2) NOT NULL DEFAULT 0
+            costo_asignado_directo NUMERIC(12, 2) NOT NULL DEFAULT 0,
+            capacidad_minutos INTEGER CHECK (capacidad_minutos IS NULL OR capacidad_minutos > 0)
+        );
+
+        ALTER TABLE sede_areas
+        ADD COLUMN IF NOT EXISTS capacidad_minutos INTEGER;
+
+        CREATE TABLE IF NOT EXISTS area_examen (
+            area_id BIGINT NOT NULL REFERENCES sede_areas(id) ON DELETE CASCADE,
+            examen_id VARCHAR(50) NOT NULL REFERENCES examenes(id) ON DELETE CASCADE,
+            minutos NUMERIC(8, 2) NOT NULL CHECK (minutos > 0),
+            PRIMARY KEY (area_id, examen_id)
         );
     `);
 };

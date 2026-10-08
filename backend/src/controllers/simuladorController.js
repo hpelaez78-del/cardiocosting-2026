@@ -1,6 +1,7 @@
 const pool = require('../config/db');
-const { calcularCostoMinuto, calcularCostoExamen } = require('../services/costEngine');
+const { calcularCostoMinuto, calcularCostoExamen, calcularBolsaFijaSede } = require('../services/costEngine');
 const formulaConfigService = require('../services/formulaConfigService');
+const costingDataService = require('../services/costingDataService');
 
 const resolveConvenioId = async (convenioId) => {
   const id = convenioId !== undefined && convenioId !== null && convenioId !== '' ? Number(convenioId) : null;
@@ -44,6 +45,7 @@ const simularEscenario = async (req, res) => {
       SELECT
         id,
         nombre,
+        capacidad_sala_minutos,
         COALESCE(arriendo_mensual, 0) AS arriendo,
         COALESCE(servicios_publicos, 0) AS servicios,
         COALESCE((
@@ -63,13 +65,18 @@ const simularEscenario = async (req, res) => {
     }
 
     const sedeBase = sedeRes.rows[0];
-    const totalFijoBase = Number(sedeBase.arriendo) + Number(sedeBase.servicios) + Number(sedeBase.admin) + Number(sedeBase.mtto);
-
     // Aplicar ajustes de simulación sobre la Sede
     const sedeSimulada = {
       ...sedeBase,
       ...(ajustesSede || {})
     };
+    const totalFijoSimulado = calcularBolsaFijaSede(sedeSimulada, costingConfig);
+    const [areaBasedDistribution, equipmentCosts] = await Promise.all([
+      costingDataService.cargarDistribucionAreas(sedeBase.id, totalFijoSimulado, costingConfig),
+      costingDataService.cargarCostosEquiposRegistrados(sedeBase.id)
+    ]);
+    sedeSimulada.costoFijoBolsa = totalFijoSimulado;
+    sedeSimulada.areaBasedDistribution = areaBasedDistribution;
 
     // 3. Obtener Roles y aplicar simulaciones
     const rolesRes = await pool.query(`
@@ -135,6 +142,7 @@ const simularEscenario = async (req, res) => {
 
       const examenSimulado = {
         ...examen,
+        ...(equipmentCosts[String(examen.id)] || {}),
         tarifa_convenio: tarifaConvenio,
         ...ajusteExamen
       };
@@ -155,14 +163,15 @@ const simularEscenario = async (req, res) => {
         vol_mes: volumenSede,
         volumen: volumenSede,
         volumen_estimado: Boolean(examen.volumen_estimado),
-        tarifaConvenio: tarifaConvenio ?? Number(examen.tarifa_soat_referencia || 0),
+        tarifaConvenio: calculo.tarifaAplicada,
         ...calculo
       };
     });
     const calculosIncompletos = resultadosSimulados.filter((examen) => examen.datosFaltantes.length > 0);
     if (calculosIncompletos.length > 0) {
       return res.status(409).json({
-        error: `Simulación incompleta para ${calculosIncompletos.length} exámenes: faltan tarifas de personal o duración.`
+        error: `Simulación incompleta para ${calculosIncompletos.length} exámenes. Revise los datos indicados.`,
+        faltantes: calculosIncompletos.map(({ examenId, nombre, datosFaltantes }) => ({ examenId, examen: nombre, campos: datosFaltantes }))
       });
     }
 
@@ -172,7 +181,9 @@ const simularEscenario = async (req, res) => {
       nombreSede: sedeBase.nombre,
       formulaVersionId: activeConfig.id,
       formulaVersionName: activeConfig.nombre,
-      costoFijoBolsa: totalFijoBase,
+      allocationMethod: costingConfig.fixedCost.allocationMethod,
+      costoFijoBolsa: totalFijoSimulado,
+      distribucionAreas: areaBasedDistribution,
       evaluacion: resultadosSimulados
     });
   } catch (error) {

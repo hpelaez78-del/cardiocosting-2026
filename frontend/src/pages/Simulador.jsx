@@ -58,14 +58,17 @@ export default function Simulador() {
       const rows = Array.isArray(evaluacionRes?.data?.evaluacion)
         ? evaluacionRes.data.evaluacion.map((item) => ({
             ...item,
-            tarifaConvenio: Number(item.tarifaConvenio ?? item.tarifa_convenio ?? 0),
-            tarifa_convenio: Number(item.tarifaConvenio ?? item.tarifa_convenio ?? 0)
+            tarifaConvenio: item.tarifaAplicada ?? item.tarifa_aplicada ?? item.tarifa_soat_referencia ?? null,
+            tarifa_convenio: item.tarifa_convenio ?? null
           }))
         : [];
       setEvaluacion(rows);
       setError('');
     } catch (err) {
-      setError(err?.response?.data?.error || 'No se pudo cargar el simulador.');
+      const errorMessage = err?.response?.data?.error || 'No se pudo cargar el simulador.';
+      const missing = err?.response?.data?.faltantes || [];
+      const details = missing.map((item) => `${item.examen || item.examenId}: ${(item.campos || []).join(', ')}`).join('; ');
+      setError(details ? `${errorMessage} ${details}` : errorMessage);
     } finally {
       setLoading(false);
     }

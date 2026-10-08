@@ -18,6 +18,101 @@ const calcularCostoMinuto = (sueldoBase, provPct, horasMes, config = {}) => {
   return costoHora / minutesPerHour;
 };
 
+const calcularBolsaFijaSede = (sede, config = {}) => {
+  const fixedConfig = config.fixedCost || {};
+  const totalComponentes =
+    (fixedConfig.includeRent === false ? 0 : Number(sede.arriendo ?? sede.arriendo_mensual ?? 0)) +
+    (fixedConfig.includeServices === false ? 0 : Number(sede.servicios ?? sede.servicios_publicos ?? 0)) +
+    (fixedConfig.includeAdminPayroll === false ? 0 : Number(sede.admin ?? sede.nomina_admin ?? 0)) +
+    (fixedConfig.includeMaintenance === false ? 0 : Number(sede.mtto ?? sede.mantenimiento_otros ?? 0));
+  const bolsaAsignada = Number(sede.costoFijoBolsa ?? sede.costo_fijo_bolsa ?? 0);
+  return config.fixedCost ? totalComponentes : (bolsaAsignada > 0 ? bolsaAsignada : totalComponentes);
+};
+
+const prepararDistribucionAreas = (bolsaFija, areas = []) => {
+  const normalizedAreas = areas.map((area) => ({
+    ...area,
+    id: area.id ?? area.area_id,
+    m2: Number(area.m2) || 0,
+    capacidadMinutos: Number(area.capacidad_minutos ?? area.capacidadMinutos) || 0,
+    costoDirecto: Number(area.costo_asignado_directo ?? area.costoAsignadoDirecto) || 0,
+    esDirecto: Boolean(area.es_directo ?? area.esDirecto),
+    asignaciones: area.asignaciones || area.examenes || []
+  }));
+  const directTotal = normalizedAreas
+    .filter((area) => area.esDirecto)
+    .reduce((total, area) => total + area.costoDirecto, 0);
+  const remainder = Number(bolsaFija) - directTotal;
+  const m2Areas = normalizedAreas.filter((area) => !area.esDirecto);
+  const totalM2 = m2Areas.reduce((total, area) => total + area.m2, 0);
+  const issues = [];
+
+  if (remainder < -0.005) issues.push('sub_bolsas_superan_bolsa_fija');
+  if (remainder > 0.005 && totalM2 <= 0) issues.push('faltan_areas_para_prorratear_remanente');
+
+  const preparedAreas = normalizedAreas.map((area) => {
+    const subBolsa = area.esDirecto
+      ? area.costoDirecto
+      : totalM2 > 0 ? Math.max(0, remainder) * area.m2 / totalM2 : 0;
+    const productiva = area.asignaciones.length > 0;
+    return {
+      ...area,
+      subBolsa,
+      productiva,
+      tasaMinuto: productiva && area.capacidadMinutos > 0 ? subBolsa / area.capacidadMinutos : null
+    };
+  });
+  const bolsaGeneral = preparedAreas
+    .filter((area) => !area.productiva)
+    .reduce((total, area) => total + area.subBolsa, 0);
+  const bolsaProductiva = preparedAreas
+    .filter((area) => area.productiva)
+    .reduce((total, area) => total + area.subBolsa, 0);
+  const diferencia = Number(bolsaFija) - bolsaGeneral - bolsaProductiva;
+  if (Math.abs(diferencia) > 0.005) issues.push('sub_bolsas_no_concilian');
+
+  return {
+    areas: preparedAreas,
+    bolsaGeneral,
+    bolsaProductiva,
+    diferencia,
+    issues
+  };
+};
+
+const calcularCostoFijoAreaBased = (examen, sede, duracionMinutos) => {
+  const distribution = sede.areaBasedDistribution;
+  const missing = [...(distribution?.issues || [])];
+  const capacidadSede = Number(sede.capacidad_sala_minutos ?? sede.capacidadSalaMinutos) || 0;
+  if (capacidadSede <= 0) missing.push('capacidad_sala_minutos');
+
+  const bolsaGeneral = Number(distribution?.bolsaGeneral) || 0;
+  const tasaGeneral = capacidadSede > 0 ? bolsaGeneral / capacidadSede : null;
+  let costoAreas = 0;
+  const areasExamen = [];
+  for (const area of distribution?.areas || []) {
+    const asignacion = area.asignaciones.find((item) => String(item.examen_id ?? item.examenId) === String(examen.id));
+    if (!asignacion) continue;
+    if (area.capacidadMinutos <= 0) {
+      missing.push(`capacidad_area_${area.id}`);
+      continue;
+    }
+    const minutos = Number(asignacion.minutos) || 0;
+    const costo = minutos * area.tasaMinuto;
+    costoAreas += costo;
+    areasExamen.push({ areaId: area.id, minutos, tasaMinuto: area.tasaMinuto, costo });
+  }
+
+  if (missing.length > 0) return { costo: null, missing: [...new Set(missing)], areasExamen, tasaGeneral };
+  return {
+    costo: costoAreas + duracionMinutos * tasaGeneral,
+    missing: [],
+    areasExamen,
+    bolsaGeneral,
+    tasaGeneral
+  };
+};
+
 const calcularCostoExamen = (examen, rolesMap, sede, config = {}) => {
   const minMedico = Number(examen.min_medico ?? examen.minutos_medico ?? 0) || 0;
   const minAsistencial = Number(examen.min_asis ?? examen.minutos_asistencial ?? 0) || 0;
@@ -35,16 +130,7 @@ const calcularCostoExamen = (examen, rolesMap, sede, config = {}) => {
     ? costoMedico + costoAsistencial
     : null;
 
-  // Gastos Fijos de la Sede o Sub-bolsa
-  const fixedConfig = config.fixedCost || {};
-  const totalComponentes =
-    (fixedConfig.includeRent === false ? 0 : Number(sede.arriendo ?? sede.arriendo_mensual ?? 0)) +
-    (fixedConfig.includeServices === false ? 0 : Number(sede.servicios ?? sede.servicios_publicos ?? 0)) +
-    (fixedConfig.includeAdminPayroll === false ? 0 : Number(sede.admin ?? sede.nomina_admin ?? 0)) +
-    (fixedConfig.includeMaintenance === false ? 0 : Number(sede.mtto ?? sede.mantenimiento_otros ?? 0));
-
-  const bolsaAsignada = Number(sede.costoFijoBolsa ?? sede.costo_fijo_bolsa ?? 0);
-  const gastosFijosSede = config.fixedCost ? totalComponentes : (bolsaAsignada > 0 ? bolsaAsignada : totalComponentes);
+  const gastosFijosSede = calcularBolsaFijaSede(sede, config);
 
   // --- TDABC: Asignación basada en Capacidad en Minutos ---
   const capacidadMinutosMes = Number(
@@ -54,9 +140,14 @@ const calcularCostoExamen = (examen, rolesMap, sede, config = {}) => {
   const allocationMethod = config.fixedCost?.allocationMethod || 'practical_capacity';
   const volumenSede = Number(sede.volumen_mensual_esperado ?? sede.volumen ?? 0);
   const costoMinutoFijoSede = capacidadMinutosMes > 0 ? gastosFijosSede / capacidadMinutosMes : null;
-  const costoFijoProrrateado = allocationMethod === 'per_procedure'
-    ? volumenSede > 0 ? gastosFijosSede / volumenSede : null
-    : costoMinutoFijoSede !== null && duracionValida ? duracionMinutos * costoMinutoFijoSede : null;
+  const areaBasedResult = allocationMethod === 'area_based'
+    ? calcularCostoFijoAreaBased(examen, sede, duracionMinutos)
+    : null;
+  const costoFijoProrrateado = allocationMethod === 'area_based'
+    ? areaBasedResult.costo
+    : allocationMethod === 'per_procedure'
+      ? volumenSede > 0 ? gastosFijosSede / volumenSede : null
+      : costoMinutoFijoSede !== null && duracionValida ? duracionMinutos * costoMinutoFijoSede : null;
 
   const costoInsumos = config.supplies?.includeInCost === false
     ? 0
@@ -65,15 +156,20 @@ const calcularCostoExamen = (examen, rolesMap, sede, config = {}) => {
     && Number(examen.equipo_vida_util_meses) > 0
     && Number(examen.equipo_minutos_disponibles_mes) > 0
     && Number(examen.equipo_tiempo_uso_minutos) > 0;
+  const hasRegisteredEquipmentCost = examen.equipo_depreciacion_registrada !== undefined
+    && examen.equipo_depreciacion_registrada !== null;
   const costoCips = config.equipment?.includeDepreciation === false
     ? 0
-    : hasEquipmentReference
+    : hasRegisteredEquipmentCost
+      ? Number(examen.equipo_depreciacion_registrada || 0)
+        + (config.equipment?.includeMaintenance === false ? 0 : Number(examen.equipo_mantenimiento_registrado || 0))
+      : hasEquipmentReference
       ? ((Number(examen.equipo_valor_compra) / Number(examen.equipo_vida_util_meses)
         + (config.equipment?.includeMaintenance === false ? 0 : Number(examen.equipo_mantenimiento_anual || 0) / 12))
         / Number(examen.equipo_minutos_disponibles_mes)) * Number(examen.equipo_tiempo_uso_minutos)
       : Number(examen.cips ?? examen.costo_depreciacion_equipos ?? 0);
 
-  const costoTotalValido = costoPersonalTotal !== null && costoFijoProrrateado !== null;
+  const costoTotalValido = duracionValida && costoPersonalTotal !== null && costoFijoProrrateado !== null;
   const costoDirectoTotal = costoTotalValido
     ? costoPersonalTotal + costoInsumos + costoCips + costoFijoProrrateado
     : null;
@@ -99,6 +195,7 @@ const calcularCostoExamen = (examen, rolesMap, sede, config = {}) => {
   }
   if (costoPersonalTotal === null) datosFaltantes.push('costo_personal');
   if (tarifaFaltante) datosFaltantes.push('tarifa');
+  if (areaBasedResult) datosFaltantes.push(...areaBasedResult.missing);
 
   return {
     duracionMinutos,
@@ -108,13 +205,17 @@ const calcularCostoExamen = (examen, rolesMap, sede, config = {}) => {
     costoFijoProrrateado,
     costoTotal: costoDirectoTotal,
     costoDirecto: costoDirectoTotal,
+    tarifaAplicada: tarifaFaltante ? null : tarifa,
     utilidad,
     margenPct,
-    datosFaltantes
+    datosFaltantes: [...new Set(datosFaltantes)],
+    ...(areaBasedResult ? { desgloseCostoFijoAreas: areaBasedResult } : {})
   };
 };
 
 module.exports = {
   calcularCostoMinuto,
-  calcularCostoExamen
+  calcularCostoExamen,
+  prepararDistribucionAreas,
+  calcularBolsaFijaSede
 };

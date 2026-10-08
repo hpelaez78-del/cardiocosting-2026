@@ -44,6 +44,7 @@ export default function ConfiguracionCosteo() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const [activationMissing, setActivationMissing] = useState([]);
 
   const cargarDatos = async () => {
     setLoading(true);
@@ -113,12 +114,14 @@ export default function ConfiguracionCosteo() {
   const handleActivate = async (versionId) => {
     setError('');
     setMessage('');
+    setActivationMissing([]);
     try {
       await api.post(`/configuracion-costeo/${versionId}/activar`);
       setMessage(`Versión ${versionId} restaurada.`);
       await cargarDatos();
     } catch (err) {
       setError(err.response?.data?.error || 'No se pudo restaurar la versión.');
+      setActivationMissing(err.response?.data?.faltantes || []);
     }
   };
 
@@ -127,12 +130,14 @@ export default function ConfiguracionCosteo() {
     setSaving(true);
     setError('');
     setMessage('');
+    setActivationMissing([]);
     try {
       const response = await api.post('/configuracion-costeo', { nombre: nombreVersion, config });
       setMessage(`Versión ${response.data.version.id} guardada y activada.`);
       await cargarDatos();
     } catch (err) {
       setError(err.response?.data?.error || 'No se pudo activar la nueva versión.');
+      setActivationMissing(err.response?.data?.faltantes || []);
     } finally {
       setSaving(false);
     }
@@ -164,6 +169,9 @@ export default function ConfiguracionCosteo() {
       </header>
 
       {error && <p role="alert" className="rounded border border-rose-300 bg-rose-50 p-3 text-sm text-rose-800">{error}</p>}
+      {activationMissing.length > 0 && <ul role="alert" className="list-inside list-disc rounded border border-rose-300 bg-rose-50 p-3 text-sm text-rose-800">
+        {activationMissing.map((item, index) => <li key={`${item.sedeId}-${item.areaId}-${item.campo}-${index}`}>Sede {item.sedeId}{item.areaId ? `, área ${item.areaId}` : ''}: {item.campo}</li>)}
+      </ul>}
       {message && <p role="status" className="rounded border border-emerald-300 bg-emerald-50 p-3 text-sm text-emerald-800">{message}</p>}
 
       <section className="grid gap-5 lg:grid-cols-2">
@@ -216,6 +224,7 @@ export default function ConfiguracionCosteo() {
             <select value={config.fixedCost.allocationMethod} onChange={(event) => updateSection('fixedCost', 'allocationMethod', event.target.value)} className="mt-1 block w-full rounded border border-slate-300 bg-white px-3 py-2">
               <option value="practical_capacity">TDABC por capacidad práctica</option>
               <option value="per_procedure">Costo fijo uniforme por procedimiento</option>
+              <option value="area_based">Por áreas y bolsa general</option>
             </select>
           </label>
           <div className="grid gap-2 sm:grid-cols-2">
@@ -238,7 +247,7 @@ export default function ConfiguracionCosteo() {
         <div className="mt-3 grid gap-3 text-sm text-cyan-950 md:grid-cols-2">
           <p>Minuto laboral: costo mensual con provisiones / (horas productivas × {config.labor.minutesPerHour} min).</p>
           <p>Duración predeterminada: {config.duration.defaultMode === 'sequential_sum' ? 'minutos médico + minutos asistencial' : 'máximo entre minutos médico y asistencial'}.</p>
-          <p>Costo fijo: {config.fixedCost.allocationMethod === 'practical_capacity' ? 'componentes seleccionados / capacidad práctica mensual × minutos de sala.' : 'componentes seleccionados / volumen mensual agregado de la sede.'}</p>
+          <p>Costo fijo: {config.fixedCost.allocationMethod === 'area_based' ? 'minutos por área × tasa de área + duración total × tasa general de la sede.' : config.fixedCost.allocationMethod === 'practical_capacity' ? 'componentes seleccionados / capacidad práctica mensual × minutos de sala.' : 'componentes seleccionados / volumen mensual agregado de la sede.'}</p>
           <p>Equipo: depreciación mensual y mantenimiento configurados, prorrateados por disponibilidad y uso.</p>
         </div>
         <div className="mt-4 flex flex-wrap items-end gap-3">
@@ -263,6 +272,12 @@ export default function ConfiguracionCosteo() {
             {preview.costs.datosFaltantes.length > 0 && <p className="text-rose-800">Faltan: {preview.costs.datosFaltantes.join(', ')}</p>}
           </div>
         )}
+        {config.fixedCost.allocationMethod === 'area_based' && preview?.distribucionAreas && <div className="mt-4 space-y-2 border-t border-cyan-200 pt-4 text-sm text-cyan-950">
+          <p>Bolsa fija: <strong>{Number(preview.distribucionAreas.bolsaGeneral + preview.distribucionAreas.bolsaProductiva).toLocaleString('es-CO', { style: 'currency', currency: 'COP' })}</strong>; productivas: <strong>{Number(preview.distribucionAreas.bolsaProductiva).toLocaleString('es-CO', { style: 'currency', currency: 'COP' })}</strong>; general: <strong>{Number(preview.distribucionAreas.bolsaGeneral).toLocaleString('es-CO', { style: 'currency', currency: 'COP' })}</strong>; diferencia: <strong>{Number(preview.distribucionAreas.diferencia).toLocaleString('es-CO', { style: 'currency', currency: 'COP' })}</strong>.</p>
+          {preview.distribucionAreas.bolsaGeneral === 0 && <p role="status" className="text-amber-800">La bolsa general está en cero; revise las áreas comunes.</p>}
+          {preview.distribucionAreas.warnings?.length > 0 && <p role="status" className="text-amber-800">Hay exámenes con minutos asignados por áreas superiores a su duración.</p>}
+          {preview.distribucionAreas.issues?.length > 0 && <p role="alert" className="text-rose-800">Distribución incompleta: {preview.distribucionAreas.issues.join(', ')}.</p>}
+        </div>}
       </section>
 
       <section className="rounded border border-slate-200 bg-white p-5">

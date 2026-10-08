@@ -14,7 +14,19 @@ test('normaliza parámetros permitidos de la configuración de costeo', () => {
   assert.equal(config.labor.provisionsMode, 'global');
   assert.equal(config.duration.defaultMode, 'concurrent_max');
   assert.equal(config.fixedCost.includeServices, false);
+  assert.equal(config.fixedCost.allocationMethod, 'practical_capacity');
   assert.equal(config.supplies.includeInCost, true);
+});
+
+test('acepta area_based sin cambiar la opción predeterminada', () => {
+  const config = normalizeFormulaConfig({
+    fixedCost: { allocationMethod: 'area_based' }
+  });
+
+  assert.equal(config.fixedCost.allocationMethod, 'area_based');
+  assert.throws(() => normalizeFormulaConfig({
+    fixedCost: { allocationMethod: 'unknown' }
+  }), /Método de distribución fija inválido/);
 });
 
 test('rechaza opciones inválidas antes de versionar la fórmula', () => {

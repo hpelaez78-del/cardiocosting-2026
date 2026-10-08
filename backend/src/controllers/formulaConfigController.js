@@ -1,7 +1,8 @@
 const formulaConfigService = require('../services/formulaConfigService');
 const db = require('../config/db');
 const { resolverSedeId } = require('./sedesController');
-const { calcularCostoMinuto, calcularCostoExamen } = require('../services/costEngine');
+const { calcularCostoMinuto, calcularCostoExamen, calcularBolsaFijaSede } = require('../services/costEngine');
+const costingDataService = require('../services/costingDataService');
 
 const getFormulaConfig = async (req, res, next) => {
   try {
@@ -25,7 +26,7 @@ const saveFormulaConfig = async (req, res, next) => {
     });
     res.status(201).json({ message: 'Nueva versión de costeo activada', version });
   } catch (error) {
-    if (error.statusCode === 400) return res.status(400).json({ error: error.message });
+    if (error.statusCode === 400) return res.status(400).json({ error: error.message, faltantes: error.details || [] });
     next(error);
   }
 };
@@ -41,6 +42,10 @@ const previewFormulaConfig = async (req, res, next) => {
     const [siteResult, examResult, roleResult] = await Promise.all([
       db.query(`
          SELECT s.arriendo_mensual, s.servicios_publicos, s.mantenimiento_otros,
+           s.capacidad_sala_minutos,
+           s.arriendo_mensual AS arriendo,
+           s.servicios_publicos AS servicios,
+           s.mantenimiento_otros AS mtto,
            s.volumen_mensual_esperado,
                COALESCE(p.admin_payroll, 0) AS admin_payroll
         FROM sedes s
@@ -91,13 +96,23 @@ const previewFormulaConfig = async (req, res, next) => {
     }
 
     const site = siteResult.rows[0];
-    const exam = examResult.rows[0];
+    const [areaBasedDistribution, equipmentCosts] = await Promise.all([
+      costingDataService.cargarDistribucionAreas(
+        resolvedSedeId,
+        calcularBolsaFijaSede({ ...site, admin: site.admin_payroll }, normalizedConfig),
+        normalizedConfig
+      ),
+      costingDataService.cargarCostosEquiposRegistrados(resolvedSedeId)
+    ]);
+    const exam = { ...examResult.rows[0], ...(equipmentCosts[String(examResult.rows[0].id)] || {}) };
     const costs = calcularCostoExamen(exam, rolesMap, {
       ...site,
       admin: Number(site.admin_payroll),
-      capacidadSalaMinutos: Number(exam.capacidad_sala_minutos)
+      capacidadSalaMinutos: Number(site.capacidad_sala_minutos),
+      costoFijoBolsa: calcularBolsaFijaSede({ ...site, admin: site.admin_payroll }, normalizedConfig),
+      areaBasedDistribution
     }, normalizedConfig);
-    res.json({ sedeId: resolvedSedeId, examenId, costs, rates: rolesMap });
+    res.json({ sedeId: resolvedSedeId, examenId, costs, rates: rolesMap, distribucionAreas: areaBasedDistribution });
   } catch (error) {
     if (error.statusCode === 400) return res.status(400).json({ error: error.message });
     next(error);
@@ -110,6 +125,7 @@ const activateFormulaVersion = async (req, res, next) => {
     res.json({ message: 'Versión de costeo restaurada', version });
   } catch (error) {
     if (error.statusCode === 404) return res.status(404).json({ error: error.message });
+    if (error.statusCode === 400) return res.status(400).json({ error: error.message, faltantes: error.details || [] });
     next(error);
   }
 };

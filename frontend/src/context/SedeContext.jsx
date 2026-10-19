@@ -11,7 +11,7 @@ export const SedeProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const cargarDatosIniciales = async () => {
+  const cargarDatosIniciales = async (preferredSedeId) => {
     try {
       setLoading(true);
       setError(null);
@@ -27,7 +27,10 @@ export const SedeProvider = ({ children }) => {
       setSedes(listaSedes);
       setConvenios(listaConvenios);
 
-      if (listaSedes.length > 0 && !listaSedes.some((sede) => String(sede.id) === String(sedeSeleccionada?.id))) {
+      const sedePreferida = listaSedes.find((sede) => String(sede.id) === String(preferredSedeId));
+      if (sedePreferida) {
+        setSedeSeleccionada(sedePreferida);
+      } else if (listaSedes.length > 0 && !listaSedes.some((sede) => String(sede.id) === String(sedeSeleccionada?.id))) {
         setSedeSeleccionada(listaSedes[0]);
       } else if (listaSedes.length === 0) {
         setSedeSeleccionada(null);

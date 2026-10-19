@@ -65,6 +65,7 @@ router.delete('/convenios/:id/tarifas/:examenId', requirePermiso('convenios', 'e
 
 // 8. Sedes y Áreas por sede
 router.get('/sedes', requirePermiso('sedes', 'view'), sedesController.getSedes || sedesController.obtenerSedes);
+router.post('/sedes', requirePermiso('sedes', 'create'), sedesController.createSede || sedesController.crearSede);
 router.put('/sedes/:id', requirePermiso('sedes', 'edit'), sedesController.updateSede || sedesController.actualizarSede);
 router.get('/sedes/:id/areas', requirePermiso('sedes', 'view'), sedesController.getAreasSede || sedesController.obtenerAreasSede);
 router.post('/sedes/:id/areas', requirePermiso('sedes', 'edit'), sedesController.saveAreasSede || sedesController.guardarAreasSede);

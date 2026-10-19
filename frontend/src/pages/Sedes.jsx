@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import api from '../api/axiosConfig';
 import { useSedeContext } from '../context/SedeContext';
-import { Save, Plus, Trash2, Calculator, Layers } from 'lucide-react';
+import { Save, Plus, Trash2, Calculator, Layers, X } from 'lucide-react';
 
 const emptySede = { arriendo: 0, servicios: 0, mtto: 0, volumen: 0, capacidad_sala_minutos: '' };
 const defaultFixedCost = { includeRent: true, includeServices: true, includeAdminPayroll: true, includeMaintenance: true };
 
 export default function Sedes() {
-  const { selectedSede, sedes } = useSedeContext();
+  const { selectedSede, sedes, recargarContexto } = useSedeContext();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -18,6 +18,10 @@ export default function Sedes() {
   const [fixedCostConfig, setFixedCostConfig] = useState(defaultFixedCost);
   const [selectedAreaIndex, setSelectedAreaIndex] = useState(0);
   const [assignmentDraft, setAssignmentDraft] = useState({ examenId: '', minutos: '' });
+  const [nombreSede, setNombreSede] = useState('');
+  const [nombreNuevaSede, setNombreNuevaSede] = useState('');
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [creatingSede, setCreatingSede] = useState(false);
 
   useEffect(() => {
     const cargarDatosSede = async () => {
@@ -26,6 +30,7 @@ export default function Sedes() {
       setAreas([]);
       setDatosSede(emptySede);
       setNominaAdmin(0);
+      setNombreSede('');
 
       if (!selectedSede) {
         setLoading(false);
@@ -42,6 +47,7 @@ export default function Sedes() {
           .find((item) => String(item.id) === String(selectedSede));
 
         if (sede) {
+          setNombreSede(sede.nombre || '');
           setDatosSede({
             arriendo: Number(sede.arriendo_mensual) || 0,
             servicios: Number(sede.servicios_publicos) || 0,
@@ -166,10 +172,14 @@ export default function Sedes() {
 
   const guardarTodo = async () => {
     if (!selectedSede || subBolsaDirecta > costoFijoTotalSede + 0.005) return;
+    if (!nombreSede.trim()) {
+      setError('El nombre de la sede es obligatorio.');
+      return;
+    }
     setSaving(true);
     setError('');
     try {
-      await api.put(`/sedes/${selectedSede}`, datosSede);
+      await api.put(`/sedes/${selectedSede}`, { ...datosSede, nombre: nombreSede.trim() });
       await api.post(`/sedes/${selectedSede}/areas`, { areas });
       const savedAreasResponse = await api.get(`/sedes/${selectedSede}/areas`);
       setAreas((Array.isArray(savedAreasResponse.data?.areas) ? savedAreasResponse.data.areas : []).map((area) => ({
@@ -179,11 +189,34 @@ export default function Sedes() {
         capacidadMinutos: area.capacidad_minutos ?? area.capacidadMinutos ?? '',
         asignaciones: Array.isArray(area.asignaciones) ? area.asignaciones : []
       })));
+      await recargarContexto(selectedSede);
       setError('Configuración guardada correctamente.');
     } catch (err) {
       setError(err.response?.data?.error || 'No se pudo guardar la configuración.');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const crearSede = async (event) => {
+    event.preventDefault();
+    const nombre = nombreNuevaSede.trim();
+    if (!nombre) {
+      setError('Ingrese el nombre de la nueva sede.');
+      return;
+    }
+    setCreatingSede(true);
+    setError('');
+    try {
+      const response = await api.post('/sedes', { nombre });
+      await recargarContexto(response.data.id);
+      setNombreNuevaSede('');
+      setShowCreateForm(false);
+      setError('Sede creada correctamente.');
+    } catch (err) {
+      setError(err.response?.data?.error || 'No se pudo crear la sede.');
+    } finally {
+      setCreatingSede(false);
     }
   };
 
@@ -198,13 +231,28 @@ export default function Sedes() {
           <h1 className="text-2xl font-bold text-slate-900">Gestión de Sedes y Sub-bolsas (m²)</h1>
           <p className="text-xs text-slate-500 mt-1">Sede activa: <span className="font-bold text-blue-600">{sedeActual?.nombre || 'Sin sede seleccionada'}</span></p>
         </div>
-        <button onClick={guardarTodo} disabled={saving || !selectedSede || subBolsaDirecta > costoFijoTotalSede + 0.005} className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-blue-700 shadow-sm transition disabled:opacity-50">
-          <Save className="w-4 h-4" />
-          {saving ? 'Guardando...' : 'Guardar Todo'}
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <button type="button" onClick={() => setShowCreateForm((open) => !open)} className="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-xs font-bold text-slate-700 shadow-sm transition hover:bg-slate-50">
+            {showCreateForm ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+            {showCreateForm ? 'Cancelar' : 'Nueva sede'}
+          </button>
+          <button onClick={guardarTodo} disabled={saving || !selectedSede || subBolsaDirecta > costoFijoTotalSede + 0.005} className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-blue-700 shadow-sm transition disabled:opacity-50">
+            <Save className="w-4 h-4" />
+            {saving ? 'Guardando...' : 'Guardar Todo'}
+          </button>
+        </div>
       </header>
 
       {error && <p role="status" className="text-sm text-slate-700">{error}</p>}
+      {showCreateForm && <form onSubmit={crearSede} className="flex flex-wrap items-end gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <label className="min-w-56 flex-1 text-xs font-bold text-slate-600">Nombre de la nueva sede
+          <input autoFocus maxLength="100" required value={nombreNuevaSede} onChange={(event) => setNombreNuevaSede(event.target.value)} className="mt-1 w-full rounded-lg border border-slate-300 p-2 text-sm font-normal text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </label>
+        <button type="submit" disabled={creatingSede} className="flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-700 disabled:opacity-50">
+          <Plus className="h-4 w-4" />
+          {creatingSede ? 'Creando...' : 'Crear sede'}
+        </button>
+      </form>}
       {!selectedSede && <p className="text-sm text-slate-600">No hay sedes disponibles en la base de datos.</p>}
 
       <section className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
@@ -213,6 +261,10 @@ export default function Sedes() {
           <span className="text-xs font-extrabold text-slate-700 bg-slate-100 px-3 py-1 rounded-full">Total Sede: ${costoFijoTotalSede.toLocaleString()}</span>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <label className="block text-xs font-bold text-slate-600">
+            Nombre de la sede
+            <input maxLength="100" value={nombreSede} onChange={(event) => setNombreSede(event.target.value)} className="mt-1 w-full rounded-lg border border-slate-300 p-2 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          </label>
           {[
             ['arriendo', 'Arriendo Mensual ($)'],
             ['servicios', 'Servicios Públicos ($)'],

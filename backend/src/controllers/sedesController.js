@@ -24,17 +24,74 @@ const getSedes = async (req, res, next) => {
   }
 };
 
+const createSede = async (req, res, next) => {
+  try {
+    const nombre = String(req.body?.nombre || '').trim();
+    if (!nombre || nombre.length > 100) {
+      return res.status(400).json({ error: 'El nombre de la sede es obligatorio y debe tener máximo 100 caracteres.' });
+    }
+
+    const duplicate = await db.query(
+      'SELECT 1 FROM sedes WHERE LOWER(nombre) = LOWER($1) LIMIT 1;',
+      [nombre]
+    );
+    if (duplicate.rows.length > 0) {
+      return res.status(409).json({ error: 'Ya existe una sede con ese nombre.' });
+    }
+
+    const baseId = nombre.normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '') || 'sede';
+    let id = baseId.slice(0, 20);
+    let suffix = 2;
+    while (true) {
+      const existing = await db.query('SELECT 1 FROM sedes WHERE id = $1 LIMIT 1;', [id]);
+      if (existing.rows.length === 0) break;
+      const suffixText = `-${suffix}`;
+      id = `${baseId.slice(0, 20 - suffixText.length)}${suffixText}`;
+      suffix += 1;
+    }
+
+    const result = await db.query(
+      'INSERT INTO sedes (id, nombre) VALUES ($1, $2) RETURNING *;',
+      [id, nombre]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error('[ERROR CREAR SEDE]', error.message);
+    next(error);
+  }
+};
+
 const updateSede = async (req, res, next) => {
   try {
     const { id } = req.params;
     const numericId = await resolverSedeId(id);
-    const { arriendo, servicios, mtto, volumen, capacidad_sala_minutos } = req.body;
+    const body = req.body || {};
+    const { arriendo, servicios, mtto, volumen, capacidad_sala_minutos } = body;
+    const nombreProvided = Object.hasOwn(body, 'nombre');
+    const nombre = String(body.nombre || '').trim();
 
     if (!numericId) return res.status(404).json({ error: 'Sede no encontrada' });
+    if (nombreProvided && (!nombre || nombre.length > 100)) {
+      return res.status(400).json({ error: 'El nombre de la sede es obligatorio y debe tener máximo 100 caracteres.' });
+    }
+    if (nombreProvided) {
+      const duplicate = await db.query(
+        'SELECT 1 FROM sedes WHERE LOWER(nombre) = LOWER($1) AND id <> $2 LIMIT 1;',
+        [nombre, numericId]
+      );
+      if (duplicate.rows.length > 0) {
+        return res.status(409).json({ error: 'Ya existe una sede con ese nombre.' });
+      }
+    }
 
     const query = `
       UPDATE sedes 
-      SET arriendo_mensual = $1,
+      SET nombre = CASE WHEN $8 THEN $9 ELSE nombre END,
+          arriendo_mensual = $1,
           servicios_publicos = $2,
           mantenimiento_otros = $3,
           volumen_mensual_esperado = $4,
@@ -50,7 +107,9 @@ const updateSede = async (req, res, next) => {
       Number(volumen) || 0,
       Number(capacidad_sala_minutos) > 0 ? Number(capacidad_sala_minutos) : null,
       Object.hasOwn(req.body || {}, 'capacidad_sala_minutos'),
-      numericId
+      numericId,
+      nombreProvided,
+      nombre
     ]);
     res.json({ data: result.rows[0] });
   } catch (error) {
@@ -213,6 +272,8 @@ const saveAreasSede = async (req, res, next) => {
 module.exports = {
   getSedes,
   obtenerSedes: getSedes,
+  createSede,
+  crearSede: createSede,
   updateSede,
   actualizarSede: updateSede,
   getAreasSede,
